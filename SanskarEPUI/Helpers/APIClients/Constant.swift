@@ -35,7 +35,7 @@ struct Constant {
 
     static let getlogin                    = "api_panel/login_app"
     static let monthWiseDetailApi          = "api_panel/get_month_wise_emp_detail"
-
+    static let eventDetail                 = "api_panel/event_detail"
 }
 
 
