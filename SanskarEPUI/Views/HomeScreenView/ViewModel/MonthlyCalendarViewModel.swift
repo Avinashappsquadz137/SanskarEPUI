@@ -21,7 +21,7 @@ class MonthlyCalendarViewModel: ObservableObject {
         let currentYear = calendar.component(.year, from: date)
         
         var dict = [String: Any]()
-        dict["EmpCode"] = "SANS-00345"
+        dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
         dict["month"] = "\(currentMonth)"
         dict["year"] = "\(currentYear)"
         

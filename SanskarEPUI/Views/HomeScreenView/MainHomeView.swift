@@ -13,7 +13,8 @@ struct MainHomeView: View {
     @State private var selectedDate = Date()
     @State private var selectedAttendance: EpmDetails? = nil
     @State private var selectedDayOnly: String = ""
-    @State private var name = "avinash Gupta"
+    @State private var name: String = UserDefaultsManager.getName()
+    @State private var empCode: String = UserDefaultsManager.getEmpCode()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -30,7 +31,7 @@ struct MainHomeView: View {
             VStack(spacing: 16) {
                 EmployeeCard(
                     imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
-                    employeeCode: "SANS-00298",
+                    employeeCode: "\(empCode)",
                     employeeAttendance: "\(selectedAttendance?.inTime ?? "N/A") - \(selectedAttendance?.outTime ?? "N/A")"
                 )
                 
@@ -143,9 +144,8 @@ struct AdminInfoView: View {
     
     
     func eventOnSelectedDate() {
-        
         var dict = [String: Any]()
-        dict["EmpCode"] = "SANS-00345"
+        dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
         if selectedDates.isEmpty {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
