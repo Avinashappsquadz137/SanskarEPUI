@@ -89,7 +89,6 @@ struct MonthlyCalendarView: View {
                                 selectedDayOnly = formattedDate
                             }
                         }
-
                 }
 
             }
@@ -137,16 +136,9 @@ struct MonthlyCalendarView: View {
         case .absent: return .red
         case .weekend: return .orange
         case .holiday: return .yellow
-        case .unknown, nil: return .white
+        case .unknown, nil: return .clear
         }
     }
 
-}
-extension Date {
-    func toLocalTime() -> Date {
-        let timeZone = TimeZone.current
-        let seconds = TimeInterval(timeZone.secondsFromGMT(for: self))
-        return addingTimeInterval(seconds)
-    }
 }
 

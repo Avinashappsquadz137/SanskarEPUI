@@ -24,3 +24,10 @@ let dateFormatter: DateFormatter = {
     formatter.timeZone = TimeZone.current 
     return formatter
 }()
+extension Date {
+    func toLocalTime() -> Date {
+        let timeZone = TimeZone.current
+        let seconds = TimeInterval(timeZone.secondsFromGMT(for: self))
+        return addingTimeInterval(seconds)
+    }
+}
