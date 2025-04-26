@@ -18,10 +18,9 @@ var monthYearFormatter: DateFormatter {
     return formatter
 }
 
-var dateFormatter: DateFormatter = {
+let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd" // or "dd-MMM-yyyy" depending on API
-    formatter.timeZone = TimeZone(secondsFromGMT: 0) // IMPORTANT: Use UTC to avoid shift
-    formatter.locale = Locale(identifier: "en_US_POSIX") // Consistent parsing
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone.current 
     return formatter
 }()

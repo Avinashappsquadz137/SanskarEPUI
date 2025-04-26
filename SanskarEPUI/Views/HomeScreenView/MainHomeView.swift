@@ -12,7 +12,7 @@ struct MainHomeView: View {
     
     @State private var selectedDate = Date()
     @State private var selectedAttendance: EpmDetails? = nil
-    @State private var selectedDayOnly: Date? = nil
+    @State private var selectedDayOnly: String = ""
     @State private var name = "avinash Gupta"
 
     var body: some View {
@@ -36,9 +36,13 @@ struct MainHomeView: View {
                 
             }
             .padding(10)
-            MonthlyCalendarView(selectedDate: $selectedDate,  selectedAttendance: $selectedAttendance, selectedDayOnly: $selectedDayOnly)
+            MonthlyCalendarView(
+                selectedDate: $selectedDate,
+                selectedAttendance: $selectedAttendance,
+                selectedDayOnly: $selectedDayOnly
+            )
             ScrollView{
-                AdminInfoView(selectedDates: selectedDayOnly ?? selectedDate)
+                AdminInfoView(selectedDates: $selectedDayOnly)
             }
             Spacer()
         }
@@ -47,7 +51,8 @@ struct MainHomeView: View {
 
 // MARK: - HR Admin Info View
 struct AdminInfoView: View {
-    let selectedDates: Date
+    @Binding var selectedDates: String
+ 
     @State private var eventDetails: [Events] = []
     var body: some View {
            VStack(spacing: 12) {
@@ -104,10 +109,10 @@ struct AdminInfoView: View {
 
     
     func eventOnSelectedDate() {
-        let formattedDate = dateFormatter.string(from: selectedDates)
+       
         var dict = [String: Any]()
         dict["EmpCode"] = "SANS-00345"
-        dict["req_date"] = formattedDate
+        dict["req_date"] = selectedDates
         
         
         ApiClient.shared.callmethodMultipart(

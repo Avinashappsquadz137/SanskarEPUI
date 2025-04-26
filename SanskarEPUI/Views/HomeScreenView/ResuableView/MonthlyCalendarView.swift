@@ -23,13 +23,14 @@ enum AttendanceStatus {
 struct MonthlyCalendarView: View {
     @Binding var selectedDate: Date
     @Binding var selectedAttendance: EpmDetails?
-    @Binding var selectedDayOnly: Date?  // For selected day
+    @Binding var selectedDayOnly: String
+    
     @StateObject private var viewModel = MonthlyCalendarViewModel()
     
     private let calendar = Calendar.current
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 10) {
             HStack {
                 Button(action: { changeMonth(by: -1) }) {
                     Image(systemName: "chevron.left")
@@ -55,14 +56,14 @@ struct MonthlyCalendarView: View {
             }
 
             let days = generateCalendarDays()
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 12) {
-                ForEach(Array(days.enumerated()), id: \.element.id) { index, day in
-                    let isSelected = day.date != nil && calendar.component(.day, from: day.date!) == viewModel.selectedDay
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
+                ForEach(Array(days.enumerated()), id: \.offset) { index, day in
+                    let isSelected = day.date != nil && calendar.isDate(day.date!, inSameDayAs: viewModel.selectedFullDate ?? Date.distantPast)
                     let isToday = day.date != nil && calendar.isDateInToday(day.date!)
                     let dayText = day.date != nil ? dayFormatter.string(from: day.date!) : ""
-                    
+
                     Text(dayText)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: 35)
                         .background(
                             index % 7 == 0
                             ? Color.orange
@@ -78,14 +79,19 @@ struct MonthlyCalendarView: View {
                         .clipShape(Circle())
                         .onTapGesture {
                             if let date = day.date {
-                                viewModel.selectedDay = calendar.component(.day, from: date)
-                                viewModel.selectedFullDate = date
-                                viewModel.updateAttendance(for: date)
+                                let startOfDay = calendar.startOfDay(for: date)
+                                let localStartOfDay = startOfDay.toLocalTime()
+                                let formattedDate = dateFormatter.string(from: localStartOfDay)
+                                viewModel.selectedDay = calendar.component(.day, from: localStartOfDay)
+                                viewModel.selectedFullDate = localStartOfDay
+                                viewModel.updateAttendance(for: localStartOfDay)
                                 selectedAttendance = viewModel.selectedAttendance
-                                selectedDayOnly = date 
+                                selectedDayOnly = formattedDate
                             }
                         }
+
                 }
+
             }
         }
         .onAppear {
@@ -116,7 +122,8 @@ struct MonthlyCalendarView: View {
         let offset = (firstWeekday - calendar.firstWeekday + 7) % 7
         var days: [CalendarDay] = Array(repeating: CalendarDay(date: nil, status: nil), count: offset)
         for day in dayRange {
-            if let date = calendar.date(bySetting: .day, value: day, of: selectedDate) {
+            if let rawDate = calendar.date(bySetting: .day, value: day, of: selectedDate) {
+                let date = calendar.startOfDay(for: rawDate)
                 let status = viewModel.getStatus(for: date)
                 days.append(CalendarDay(date: date, status: status))
             }
@@ -135,3 +142,11 @@ struct MonthlyCalendarView: View {
     }
 
 }
+extension Date {
+    func toLocalTime() -> Date {
+        let timeZone = TimeZone.current
+        let seconds = TimeInterval(timeZone.secondsFromGMT(for: self))
+        return addingTimeInterval(seconds)
+    }
+}
+
