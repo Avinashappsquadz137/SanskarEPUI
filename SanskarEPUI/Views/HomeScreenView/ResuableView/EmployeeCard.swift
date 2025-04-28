@@ -11,6 +11,9 @@ struct EmployeeCard: View {
     var employeeName: String = "AVINASH GUPTA"
     var employeeCode: String = "SANS-00301"
     var employeeAttendance: String = "10:00 AM"
+    var ellipsisShow : Bool = false
+    
+    @State private var showAllListView = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -22,7 +25,10 @@ struct EmployeeCard: View {
                     .padding()
                     .background(Color.blue.opacity(0.1))
                     .clipShape(Circle())
-                
+                    .overlay(
+                            Circle()
+                                .stroke(Color.green, lineWidth: 2) 
+                        )
                 VStack(alignment: .leading, spacing: 4) {
                     Text(employeeName)
                         .font(.headline)
@@ -31,18 +37,27 @@ struct EmployeeCard: View {
                     Text(employeeCode)
                         .font(.subheadline)
                         .foregroundColor(.primary)
-                
-                    HStack {
-                        Text(employeeAttendance)
-                            .font(.subheadline)
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Button(action: {
-                            print("More tapped")
-                        }) {
-                            Image(systemName: "ellipsis.circle")
+                    if ellipsisShow {
+                        HStack {
+                            Text(employeeAttendance)
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            
+                            NavigationLink(destination: AllListView()) {
+                                Image(systemName: "ellipsis.circle")
+                                    .font(.title)
+                                    .foregroundColor(.black)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    } else {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "pencil")
                                 .font(.title)
                                 .foregroundColor(.black)
+                           
                         }
                     }
                 }

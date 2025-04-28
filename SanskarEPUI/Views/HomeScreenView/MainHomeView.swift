@@ -17,35 +17,37 @@ struct MainHomeView: View {
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     
     var body: some View {
-        VStack(spacing: 0) {
-            MainNavigationBar(
-                logoName: "sanskar",
-                projectName: "SEP",
-                onSearchTapped: {
-                    print("Search tapped")
-                },
-                onNotificationTapped: {
-                    print("Notification tapped")
-                }
-            )
-            VStack(spacing: 16) {
-                EmployeeCard(
-                    imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
-                    employeeCode: "\(empCode)",
-                    employeeAttendance: "\(selectedAttendance?.inTime ?? "N/A") - \(selectedAttendance?.outTime ?? "N/A")"
+        NavigationView {
+            VStack(spacing: 0) {
+                MainNavigationBar(
+                    logoName: "sanskar",
+                    projectName: "SEP",
+                    onSearchTapped: {
+                        print("Search tapped")
+                    },
+                    onNotificationTapped: {
+                        print("Notification tapped")
+                    }
                 )
-                
+                VStack(spacing: 16) {
+                    EmployeeCard(
+                        imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
+                        employeeCode: "\(empCode)",
+                        employeeAttendance: "\(selectedAttendance?.inTime ?? "N/A") - \(selectedAttendance?.outTime ?? "N/A")",ellipsisShow : true
+                    )
+                    
+                }
+                .padding(10)
+                MonthlyCalendarView(
+                    selectedDate: $selectedDate,
+                    selectedAttendance: $selectedAttendance,
+                    selectedDayOnly: $selectedDayOnly
+                )
+                ScrollView{
+                    AdminInfoView(selectedDates: $selectedDayOnly)
+                }
+                Spacer()
             }
-            .padding(10)
-            MonthlyCalendarView(
-                selectedDate: $selectedDate,
-                selectedAttendance: $selectedAttendance,
-                selectedDayOnly: $selectedDayOnly
-            )
-            ScrollView{
-                AdminInfoView(selectedDates: $selectedDayOnly)
-            }
-            Spacer()
         }
     }
 }
