@@ -12,6 +12,7 @@ struct CustonButton: View {
     var backgroundColor: Color = .blue
     var titleColor: Color = .white
     var cornerRadius: CGFloat = 10
+    var width: CGFloat? = nil
     var action: () -> Void
 
     var body: some View {
@@ -19,7 +20,7 @@ struct CustonButton: View {
             Text(title)
                 .foregroundColor(titleColor)
                 .font(.headline)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: width == nil ? .infinity : nil)
                 .padding()
                 .background(backgroundColor)
                 .cornerRadius(cornerRadius)

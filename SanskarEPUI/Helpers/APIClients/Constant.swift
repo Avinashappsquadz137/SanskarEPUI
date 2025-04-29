@@ -38,7 +38,8 @@ struct Constant {
     static let eventDetail                 = "api_panel/event_detail"
     static let sidebarapi                  = "api_panel/side_bar"
     static let getLogin                    = "api_panel/login_app"
-
+    static let detailOfEmp                 = "api_panel/detailofemp"
+    static let hodLeaveUpdate              = "api_panel/hod_leave_update"
 }
 
 
