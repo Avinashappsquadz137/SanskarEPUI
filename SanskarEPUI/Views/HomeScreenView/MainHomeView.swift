@@ -201,12 +201,16 @@ struct AdminInfoView: View {
                 Text(detail.name ?? "Unknown")
                     .bold()
                 Spacer()
-                Text(detail.leave_type ?? "No Leave Type")
-                    .foregroundColor(.gray)
-                Text("Leave")
-                    .padding(5)
-                    .background(Color.yellow.opacity(0.3))
-                    .cornerRadius(5)
+                VStack {
+                    Text(detail.leave_type ?? "No Leave Type")
+                        .foregroundColor(.gray)
+                    Text("\(detail.from_date ?? "") To \(detail.to_date ?? "")")
+                        .font(.system(size: 12))
+                        .foregroundColor(.black)
+                }
+                Image(systemName: "arrowshape.right.circle")
+                    .resizable()
+                    .frame(width: 25, height: 25)
             }
             .padding(10)
             .background(Color.white)
