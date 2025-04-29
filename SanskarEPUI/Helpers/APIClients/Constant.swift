@@ -21,7 +21,7 @@ class ApiRequest {
         static var serverURL: String {
             switch buildType {
             case .dev:
-                return "https://emp.sanskargroup.in/"
+                return "https://emp.sanskargroup.in/empDev/"
             case .pro:
                 return "https://emp.sanskargroup.in/"
             }

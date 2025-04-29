@@ -18,7 +18,7 @@ struct AttendanceRow: Identifiable {
 
 struct AttendanceGridView: View {
     @StateObject private var viewModel = AttendanceViewModel()
-
+    let detail: Events
     var body: some View {
 
         ScrollView(.horizontal) {
@@ -99,7 +99,7 @@ struct AttendanceGridView: View {
             }
         
         .onAppear {
-            viewModel.fetchDetail(empCode: "SANS-00329")
+            viewModel.fetchDetail(empCode: "\(detail.emp_Code ?? "")")
         }
     }
 }

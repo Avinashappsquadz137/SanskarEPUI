@@ -12,7 +12,8 @@ struct EmployeeCard: View {
     var employeeCode: String = "SANS-00301"
     var employeeAttendance: String = "10:00 AM"
     var ellipsisShow : Bool = false
-    
+    @State private var isImageFullScreen = false
+
     @State private var showAllListView = false
     @State private var showSheet = false
     
@@ -30,6 +31,9 @@ struct EmployeeCard: View {
                         Circle()
                             .stroke(Color.green, lineWidth: 2)
                     )
+                    .onTapGesture {
+                            isImageFullScreen = true
+                        }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(employeeName)
                         .font(.headline)
@@ -98,6 +102,9 @@ struct EmployeeCard: View {
                     .cornerRadius(15)
                 }
             }
+        }
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: imageName)
         }
     }
 }

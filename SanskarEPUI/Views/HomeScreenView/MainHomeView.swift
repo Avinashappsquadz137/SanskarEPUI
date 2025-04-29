@@ -34,9 +34,7 @@ struct MainHomeView: View {
                         imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
                         employeeCode: "\(empCode)",
                         employeeAttendance: "\(selectedAttendance?.inTime ?? "N/A") - \(selectedAttendance?.outTime ?? "N/A")",ellipsisShow : true
-                    )
-                    
-                }
+                    )}
                 .padding(10)
                 MonthlyCalendarView(
                     selectedDate: $selectedDate,

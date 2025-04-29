@@ -9,6 +9,7 @@ import SwiftUI
 struct LeaveDetailView: View {
     let detail: Events
     @Environment(\.dismiss) private var dismiss
+    @State private var isImageFullScreen = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -21,7 +22,9 @@ struct LeaveDetailView: View {
                     .overlay(
                         Circle()
                             .stroke(Color.green, lineWidth: 2)
-                    )
+                    ) .onTapGesture {
+                        isImageFullScreen = true
+                    }
                 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("EMP Code: \(detail.emp_Code ?? "Unknown")")
@@ -33,7 +36,7 @@ struct LeaveDetailView: View {
                 
             }
             Text("Reason for Leave: \(detail.reason ?? "Leave")")
-            AttendanceGridView()
+            AttendanceGridView(detail: detail)
             HStack( spacing: 16 ) {
                 CustonButton(title: "Accept", backgroundColor: .green ,width: 100) {
                     print("Accept button tapped!")
@@ -51,6 +54,9 @@ struct LeaveDetailView: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.horizontal, 10)
             Spacer()
+        }
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: detail.pImg)
         }
         .padding()
         .navigationTitle(detail.name ?? "Leave Details")
