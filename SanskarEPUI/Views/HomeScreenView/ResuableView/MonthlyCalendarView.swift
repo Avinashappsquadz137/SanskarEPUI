@@ -82,6 +82,13 @@ struct MonthlyCalendarView: View {
                                 let startOfDay = calendar.startOfDay(for: date)
                                 let localStartOfDay = startOfDay.toLocalTime()
                                 let formattedDate = dateFormatter.string(from: localStartOfDay)
+
+                                // ✅ Update selectedDate if it's not the same month
+                                if !calendar.isDate(date, equalTo: selectedDate, toGranularity: .month) {
+                                    selectedDate = date
+                                    viewModel.getMonthlyCalendar(for: date)
+                                }
+
                                 viewModel.selectedDay = calendar.component(.day, from: localStartOfDay)
                                 viewModel.selectedFullDate = localStartOfDay
                                 viewModel.updateAttendance(for: localStartOfDay)
