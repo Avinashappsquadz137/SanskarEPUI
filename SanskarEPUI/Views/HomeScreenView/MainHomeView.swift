@@ -94,44 +94,18 @@ struct AdminInfoView: View {
                     .padding()
                 }
             } else {
-                ForEach(eventDetails, id: \.emp_Code) { detail in
-                    HStack {
-                        if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
-                            AsyncImage(url: url) { image in
-                                image.resizable()
-                            } placeholder: {
-                                ProgressView()
-                            }
-                            .frame(width: 50, height: 50)
-                            .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                        }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(detail.name ?? "Unknown").bold()
-                            Text("\(detail.dept ?? "")")
-                                .font(.footnote)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
-                        Button(action: {
-                            print("Message tapped for \(detail.name ?? "")")
-                        }) {
-                            Text("Message")
-                                .padding(.horizontal)
-                                .padding(.vertical, 6)
-                                .background(Color.green)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
+                VStack(spacing: 10) {
+                    ForEach(eventDetails, id: \.emp_Code) { detail in
+                        if detail.event_type?.lowercased() == "birthday" {
+                            birthdayCell(detail: detail)
+                        } else if detail.event_type?.lowercased() == "leave" {
+                            leaveCell(detail: detail)
+                        } else if detail.event_type?.lowercased() == "booking" {
+                            bookingCell(detail: detail)
                         }
                     }
-                    .padding(10)
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .shadow(radius: 2)
                 }
+
             }
         }
         .padding()
@@ -178,6 +152,86 @@ struct AdminInfoView: View {
                     print("API Error: \(error)")
                 }
             }
+        }
+    }
+    func birthdayCell(detail: Events) -> some View {
+        VStack {
+            HStack {
+                if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(detail.name ?? "Unknown").bold()
+                    Text(detail.bDay ?? "")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+                Button(action: {
+                    print("Message tapped for \(detail.name ?? "Unknown")")
+                }) {
+                    Text("Message")
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(10)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 2)
+        }
+    }
+    
+    func leaveCell(detail: Events) -> some View {
+        VStack {
+            HStack {
+                Text(detail.name ?? "Unknown")
+                    .bold()
+                Spacer()
+                Text(detail.leave_type ?? "No Leave Type")
+                    .foregroundColor(.gray)
+                Text("Leave")
+                    .padding(5)
+                    .background(Color.yellow.opacity(0.3))
+                    .cornerRadius(5)
+            }
+            .padding(10)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 2)
+        }
+    }
+    
+    func bookingCell(detail: Events) -> some View {
+        VStack {
+            HStack {
+                Text(detail.name ?? "Unknown")
+                    .bold()
+                Spacer()
+                Text(detail.dept ?? "No Department")
+                    .foregroundColor(.gray)
+                Text("Booking")
+                    .padding(5)
+                    .background(Color.blue.opacity(0.3))
+                    .cornerRadius(5)
+            }
+            .padding(10)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 2)
         }
     }
 }

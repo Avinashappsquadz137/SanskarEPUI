@@ -95,7 +95,7 @@ struct EmployeeCard: View {
                     }
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .background(Color.clear)
-                    .cornerRadius(0)
+                    .cornerRadius(15)
                 }
             }
         }
