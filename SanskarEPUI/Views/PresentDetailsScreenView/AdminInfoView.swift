@@ -112,26 +112,32 @@ struct AdminInfoView: View {
     func birthdayCell(detail: Events) -> some View {
         VStack {
             HStack {
-                if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
-                    AsyncImage(url: url) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
+                NavigationLink(destination: BirthdayWishView(detail: detail)) {
+                    HStack {
+                        if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
+                            AsyncImage(url: url) { image in
+                                image.resizable()
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            .frame(width: 50, height: 50)
+                            .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                        }
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(detail.name ?? "Unknown").bold().foregroundColor(.black)
+                            Text(detail.bDay ?? "")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.crop.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
                 }
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(detail.name ?? "Unknown").bold()
-                    Text(detail.bDay ?? "")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                }
-                Spacer()
                 Button(action: {
                     print("Message tapped for \(detail.name ?? "Unknown")")
                 }) {
