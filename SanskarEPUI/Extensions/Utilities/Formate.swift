@@ -24,6 +24,12 @@ let dateFormatter: DateFormatter = {
     formatter.timeZone = TimeZone.current 
     return formatter
 }()
+
+ func formattedDate(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "dd-MMM-yyyy"
+    return formatter.string(from: date)
+}
 extension Date {
     func toLocalTime() -> Date {
         let timeZone = TimeZone.current

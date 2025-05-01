@@ -23,7 +23,7 @@ struct AllListView: View {
                             CardView(item: item)
                         }
                     }
-                    .padding(8)
+                    .padding(3)
                 }
             }
         }
@@ -68,7 +68,9 @@ struct AllListView: View {
     private func destinationView(for id: Int) -> some View {
         if id == 1000 {
             UserProfileScreenView()
-        } else {
+        } else if id == 2 {
+            ApplyLeaveView()
+        }else {
             Text("No screen available")
         }
     }
@@ -80,7 +82,7 @@ struct CardView: View {
     let item: SideBar
     
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 5) {
             Image(uiImage: imageForID(item.id ?? 0))
                 .resizable()
                 .scaledToFit()
@@ -96,7 +98,7 @@ struct CardView: View {
             Spacer()
         }
         .padding()
-        .frame(width: UIScreen.main.bounds.width / 2  - 20)
+        .frame(width: UIScreen.main.bounds.width / 2  - 30)
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
