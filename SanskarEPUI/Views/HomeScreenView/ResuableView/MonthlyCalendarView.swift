@@ -58,7 +58,9 @@ struct MonthlyCalendarView: View {
             let days = generateCalendarDays()
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                 ForEach(Array(days.enumerated()), id: \.offset) { index, day in
-                    let isSelected = day.date != nil && calendar.isDate(day.date!, inSameDayAs: viewModel.selectedFullDate ?? Date.distantPast)
+                    //let isSelected = day.date != nil && calendar.isDate(day.date!, inSameDayAs: viewModel.selectedFullDate ?? Date.distantPast)
+                    let isSelected = day.date != nil && calendar.isDate(day.date!, inSameDayAs: viewModel.selectedFullDate ?? Date())
+
                     let isToday = day.date != nil && calendar.isDateInToday(day.date!)
                     let dayText = day.date != nil ? dayFormatter.string(from: day.date!) : ""
 

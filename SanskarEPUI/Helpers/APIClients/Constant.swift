@@ -16,7 +16,7 @@ class ApiRequest {
     }
     
     struct Url {
-        static var buildType: BuildType = .dev
+        static var buildType: BuildType = .pro
         
         static var serverURL: String {
             switch buildType {
@@ -43,7 +43,8 @@ struct Constant {
     static let birthdayWishApi             = "api-panel/wish-birthday"
     static let wfhomeRequest               = "api_panel/work_from_home"
     static let dayOffRequest               = "api_panel/off_day"
-    static let leaveRequest            = "api_panel/employee_leave"
+    static let leaveRequest                = "api_panel/employee_leave"
+    static let getMonthWiseEmpDetail       = "api_panel/get_month_wise_emp_detail"
 }
 
 

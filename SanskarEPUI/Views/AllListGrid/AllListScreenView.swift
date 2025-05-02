@@ -9,14 +9,28 @@ import SwiftUI
 
 struct AllListView: View {
     @State private var reqType: [SideBar] = []
-     let columns = [GridItem(.flexible()), GridItem(.flexible())]
-    
+    let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    @State private var searchText = ""
+    var filteredReqType: [SideBar] {
+        if searchText.isEmpty {
+            return reqType
+        } else {
+            return reqType.filter { ($0.name ?? "").localizedCaseInsensitiveContains(searchText) }
+        }
+    }
     var body: some View {
         VStack {
+            TextField("Search...", text: $searchText)
+                .padding(10)
+                .padding(.horizontal)
+                .background(Color(.systemGray5))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                .padding(.top, 8)
             ScrollView {
                 LazyVGrid(columns: columns) {
-                    ForEach(reqType.indices, id: \.self) { index in
-                        let item = reqType[index]
+                    ForEach(filteredReqType.indices, id: \.self) { index in
+                        let item = filteredReqType[index]
                         NavigationLink(
                             destination: destinationView(for: item.id ?? 0)
                         ) {
@@ -70,7 +84,9 @@ struct AllListView: View {
             UserProfileScreenView()
         } else if id == 2 {
             ApplyLeaveView()
-        }else {
+        }else if id == 25 {
+            PunchHistoryView()
+        }else  {
             Text("No screen available")
         }
     }

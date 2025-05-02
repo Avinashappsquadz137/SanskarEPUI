@@ -15,6 +15,7 @@ struct MainHomeView: View {
     @State private var selectedDayOnly: String = ""
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
+    @StateObject private var calendarViewModel = MonthlyCalendarViewModel()
     
     var body: some View {
         NavigationView {
@@ -31,19 +32,15 @@ struct MainHomeView: View {
                 )
                 VStack(spacing: 16) {
                     EmployeeCard(
-                        imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
-                        employeeCode: "\(empCode)",
-                        employeeAttendance: "\(selectedAttendance?.inTime ?? "N/A") - \(selectedAttendance?.outTime ?? "N/A")",ellipsisShow : true
-                    )}
-                .padding(10)
-                MonthlyCalendarView(
-                    selectedDate: $selectedDate,
-                    selectedAttendance: $selectedAttendance,
-                    selectedDayOnly: $selectedDayOnly
-                )
-                ScrollView{
-                    AdminInfoView(selectedDates: $selectedDayOnly)
+                        imageName: "person.fill",
+                        employeeName: name.uppercased(),
+                        employeeCode: empCode,
+                        employeeAttendance: "\(selectedAttendance?.inTime ?? "") - \(selectedAttendance?.outTime ?? "")",
+                        type: .none
+                    )
                 }
+                .padding(10)
+                AllListView()
                 Spacer()
             }
         }

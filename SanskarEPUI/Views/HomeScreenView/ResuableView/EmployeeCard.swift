@@ -6,14 +6,19 @@
 //
 import SwiftUI
 
+enum EmployeeCardType {
+    case ellipsisShow
+    case pencil
+    case none
+}
+
 struct EmployeeCard: View {
     var imageName: String = "person.fill"
     var employeeName: String = "AVINASH GUPTA"
     var employeeCode: String = "SANS-00301"
     var employeeAttendance: String = "10:00 AM"
-    var ellipsisShow : Bool = false
+    let type: EmployeeCardType
     @State private var isImageFullScreen = false
-
     @State private var showAllListView = false
     @State private var showSheet = false
     
@@ -32,8 +37,8 @@ struct EmployeeCard: View {
                             .stroke(Color.green, lineWidth: 2)
                     )
                     .onTapGesture {
-                            isImageFullScreen = true
-                        }
+                        isImageFullScreen = true
+                    }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(employeeName)
                         .font(.headline)
@@ -42,27 +47,32 @@ struct EmployeeCard: View {
                     Text(employeeCode)
                         .font(.subheadline)
                         .foregroundColor(.primary)
-                    if ellipsisShow {
-                        HStack {
-                            Text(employeeAttendance)
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
-                            Spacer()
+                    HStack {
+                        switch type {
+                        case .ellipsisShow:
+                            HStack {
+                                Text(employeeAttendance)
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "ellipsis.circle")
+                                    .font(.title)
+                                    .foregroundColor(.black)
+                                    .onTapGesture {
+                                        showSheet.toggle()
+                                    }
+                            }
                             
-                            Image(systemName: "ellipsis.circle")
-                                .font(.title)
-                                .foregroundColor(.black)
-                                .buttonStyle(PlainButtonStyle())
-                                .onTapGesture {
-                                    showSheet.toggle()
-                                }
-                        }
-                    } else {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "pencil")
-                                .font(.title)
-                                .foregroundColor(.black)
+                        case .pencil:
+                            HStack {
+                                Spacer()
+                                Image(systemName: "pencil")
+                                    .font(.title)
+                                    .foregroundColor(.black)
+                            }
+                            
+                        case .none:
+                            EmptyView()
                         }
                     }
                 }

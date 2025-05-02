@@ -20,7 +20,7 @@ struct UserProfileScreenView: View {
             EmployeeCard(
                 imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
                 employeeCode: "\(empCode)",
-                employeeAttendance: "",ellipsisShow : false
+                employeeAttendance: "",type: .pencil
             )
             .padding(.horizontal, 10)
            

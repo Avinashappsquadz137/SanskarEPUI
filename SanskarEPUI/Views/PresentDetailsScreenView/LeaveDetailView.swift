@@ -10,6 +10,9 @@ struct LeaveDetailView: View {
     let detail: Events
     @Environment(\.dismiss) private var dismiss
     @State private var isImageFullScreen = false
+    @State private var showRejectRemarkSheet = false
+    @State private var rejectRemarkText = ""
+    @State private var showToast = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -46,9 +49,7 @@ struct LeaveDetailView: View {
                 }
                 CustonButton(title: "Reject", backgroundColor: .red ,width: 100) {
                     print("Reject button tapped!")
-                    if let reqID = detail.iD {
-                        getGrant([reqID], "declined")
-                    }
+                    showRejectRemarkSheet = true
                 }
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -58,6 +59,44 @@ struct LeaveDetailView: View {
         .fullScreenCover(isPresented: $isImageFullScreen) {
             FullScreenImageView(imageURL: detail.pImg)
         }
+        .sheet(isPresented: $showRejectRemarkSheet) {
+            NavigationView {
+                VStack(spacing: 20) {
+                    Text("Please enter rejection reason")
+                        .font(.headline)
+                    
+                    TextEditor(text: $rejectRemarkText)
+                        .frame(height: 150)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                        )
+                        .padding(.horizontal)
+                    
+                    HStack {
+                        Button("Cancel") {
+                            showRejectRemarkSheet = false
+                        }
+                        .foregroundColor(.red)
+                        
+                        Spacer()
+                        
+                        Button("Submit") {
+                            if let reqID = detail.iD {
+                                getGrant([reqID], "declined", reason: rejectRemarkText)
+                            }
+                            showRejectRemarkSheet = false
+                        }
+                        .disabled(rejectRemarkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding()
+                .navigationTitle("Reject Leave")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+        .overlay(showToast ? ToastView() : nil)
         .padding()
         .navigationTitle(detail.name ?? "Leave Details")
         .navigationBarTitleDisplayMode(.inline)
@@ -94,11 +133,13 @@ struct LeaveDetailView: View {
             }
         }
     }
-    func getGrant(_ id: [String], _ reply: String) {
+    func getGrant(_ id: [String], _ reply: String, reason: String? = nil) {
         var dict = [String: Any]()
         dict["req_id"] = id
         dict["reply"] = reply
-        
+        if let reason = reason {
+            dict["reason"] = reason
+        }
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.hodLeaveUpdate,
             method: .post,
@@ -108,12 +149,18 @@ struct LeaveDetailView: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
-                    if let data = model.data {
-                        ToastManager.shared.show(message: model.message ?? "Successfully")
-                        print("Fetched items: \(data)")
-                        dismiss()
+                    if model.status == true {
+                        showToast = true
+                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+                        print("Approved successfully.")
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showToast = false
+                            dismiss()
+                        }
                     } else {
-                        print("No data received")
+                        ToastManager.shared.show(message: model.message ?? "Something went wrong.")
+                        print("API responded with failure: \(model)")
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "\(error.localizedDescription)")
