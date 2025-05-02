@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct PunchHistoryView: View {
-    @State private var startDate = Date()
-    @State private var endDate = Date()
+    
     @State private var attendanceData: [Attendance] = []
+    @State private var startDate: Date = {
+        let calendar = Calendar.current
+        let now = Date()
+        return calendar.date(from: calendar.dateComponents([.year, .month], from: now)) ?? now
+    }()
+    @State private var endDate: Date = Date()
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -28,14 +33,14 @@ struct PunchHistoryView: View {
             
             // Date Pickers
             HStack(spacing: 12) {
-                DatePicker("", selection: $startDate, displayedComponents: .date)
+                DatePicker("", selection: $startDate, in: ...Date(), displayedComponents: .date)
                     .datePickerStyle(.compact)
                     .labelsHidden()
                     .frame(maxWidth: .infinity)
                     .padding(8)
                     .background(RoundedRectangle(cornerRadius: 8).stroke())
-
-                DatePicker("", selection: $endDate, displayedComponents: .date)
+                
+                DatePicker("", selection: $endDate, in: ...Date(), displayedComponents: .date)
                     .datePickerStyle(.compact)
                     .labelsHidden()
                     .frame(maxWidth: .infinity)
@@ -43,7 +48,20 @@ struct PunchHistoryView: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke())
             }
             .padding(.horizontal)
-
+            VStack{
+                Button(action: {
+                    punchHistoryAPI()
+                }) {
+                    Text("Search")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+            }
+            .padding(.horizontal)
             // Table Header
             HStack(spacing: 5) {
                 Text("Date")
@@ -85,43 +103,37 @@ struct PunchHistoryView: View {
         }
         .padding(.top)
         .onAppear {
-            punchHistoryAPI()
+            punchHistoryAPI(isInitial: true)
         }
     }
     
-    func punchHistoryAPI() {
+    func punchHistoryAPI(isInitial: Bool = false) {
         var dict = [String: Any]()
         let empCode = UserDefaultsManager.getEmpCode()
         dict["EmpCode"] = empCode
         
-//        let fromDateText = frombtn.title(for: .normal) ?? ""
-//        let toDateText = tobtn.title(for: .normal) ?? ""
-//        
         let calendar = Calendar.current
-        let currentYear = calendar.component(.year, from: startDate)
-      //  let currentMonth = calendar.component(.month, from: startDate)
-//        if let fromDate = dateFormatter.date(from: fromDateText),
-//           let toDate = dateFormatter.date(from: toDateText),
-//           fromDateText != "From Date",
-//           toDateText != "To Date" {
-//            
-//            let fromEpoch = String(Int(fromDate.timeIntervalSince1970 * 1000))
-//            if let endOfDay = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: currentDate) {
-//                let toEpoch = String(Int(endOfDay.timeIntervalSince1970 * 1000))
-//                dict["to_date"] = toEpoch
-//            }
-//
-//
-//
-//            dict["from_date"] = fromEpoch
-//            dict["month"] = "-1"
-//            dict["year"] = "\(currentYear)"
-//        } else {
-//            dict["month"] = String(format: "%02d", currentMonth)
-//            dict["year"] = "\(currentYear)"
-//        }
-        dict["month"] = "5"//String(format: "%02d", currentMonth)
-        dict["year"] = "\(currentYear)"
+        if isInitial {
+            let currentYear = calendar.component(.year, from: Date())
+            let currentMonth = calendar.component(.month, from: Date())
+            dict["month"] = String(format: "%02d", currentMonth)
+            dict["year"] = "\(currentYear)"
+        } else {
+            let startOfDay = calendar.startOfDay(for: startDate)
+            let endOfDay = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: endDate) ?? endDate
+            
+            if startDate <= endDate {
+                dict["from_date"] = String(Int(startOfDay.timeIntervalSince1970 * 1000))
+                dict["to_date"] = String(Int(endOfDay.timeIntervalSince1970 * 1000))
+                dict["month"] = "-1"
+                dict["year"] = "\(calendar.component(.year, from: startDate))"
+            } else {
+                let currentYear = calendar.component(.year, from: Date())
+                let currentMonth = calendar.component(.month, from: Date())
+                dict["month"] = String(format: "%02d", currentMonth)
+                dict["year"] = "\(currentYear)"
+            }
+        }
         
         
         ApiClient.shared.callmethodMultipart(
