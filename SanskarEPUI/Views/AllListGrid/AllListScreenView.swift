@@ -41,8 +41,6 @@ struct AllListView: View {
                 }
             }
         }
-        .navigationTitle("All Options")
-        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             fetchSidebarAPI()
         }
@@ -63,8 +61,11 @@ struct AllListView: View {
                 case .success(let model):
                     if let data = model.data {
                         self.reqType = data
-                        let manualItem = SideBar(id: 1000, name: "User Profile")
+                        let manualItem = SideBar(id: 100, name: "User Profile")
                         self.reqType.insert(manualItem, at: 0)
+                        let manualItem2 = SideBar(id: 101, name: "Calander")
+                        self.reqType.insert(manualItem2, at: 1)
+                     
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                         print("Fetched items: \(data)")
                     } else {
@@ -80,13 +81,15 @@ struct AllListView: View {
     
     @ViewBuilder
     private func destinationView(for id: Int) -> some View {
-        if id == 1000 {
+        if id == 100 {
             UserProfileScreenView()
         } else if id == 2 {
             ApplyLeaveView()
         }else if id == 25 {
             PunchHistoryView()
-        }else  {
+        }else if id == 101 {
+            CalendarScreenView()
+        }else {
             Text("No screen available")
         }
     }
@@ -105,7 +108,8 @@ struct CardView: View {
                 .frame(width: 40, height: 40)
             
             Text(item.name ?? "")
-                .font(.subheadline)
+                .font(.caption2)
+                .fontWeight(.semibold)
                 .foregroundColor(.black)
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
@@ -133,7 +137,8 @@ struct CardView: View {
         case 14: return UIImage(named: "Privacy Policy") ?? defaultImage()
         case 24: return UIImage(named: "biometricAttendance") ?? defaultImage()
         case 25: return UIImage(named: "attendance") ?? defaultImage()
-        case 1000: return UIImage(named: "Profile") ?? defaultImage()
+        case 100: return UIImage(named: "Profile") ?? defaultImage()
+        case 101:return UIImage(named: "Leave") ?? defaultImage()
         default: return defaultImage()
         }
     }
