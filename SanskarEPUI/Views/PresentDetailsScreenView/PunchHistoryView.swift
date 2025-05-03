@@ -25,9 +25,18 @@ struct PunchHistoryView: View {
                     .font(.headline)
                 
                 Spacer()
-                
-                Image(systemName: "line.3.horizontal.decrease.circle")
-                    .font(.title2)
+                Menu {
+                    Button("7 Days") { applyFilter(days: 7) }
+                    Button("15 Days") { applyFilter(days: 15) }
+                    Button("1 Month") { applyFilter(months: 1) }
+                    Button("3 Months") { applyFilter(months: 3) }
+                    Button("6 Months") { applyFilter(months: 6) }
+                    Button("Custom") {
+                    }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .font(.title2)
+                }
             }
             .padding(.horizontal)
             
@@ -107,6 +116,23 @@ struct PunchHistoryView: View {
         }
     }
     
+    func applyFilter(days: Int? = nil, months: Int? = nil) {
+        let calendar = Calendar.current
+        let now = Date()
+        var fromDate: Date?
+
+        if let days = days {
+            fromDate = calendar.date(byAdding: .day, value: -days + 1, to: now)
+        } else if let months = months {
+            fromDate = calendar.date(byAdding: .month, value: -months, to: now)
+        }
+
+        if let fromDate = fromDate {
+            startDate = calendar.startOfDay(for: fromDate)
+            endDate = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? now
+            punchHistoryAPI()
+        }
+    }
     func punchHistoryAPI(isInitial: Bool = false) {
         var dict = [String: Any]()
         let empCode = UserDefaultsManager.getEmpCode()
