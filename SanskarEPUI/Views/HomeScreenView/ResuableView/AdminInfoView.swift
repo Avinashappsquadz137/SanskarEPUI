@@ -202,5 +202,38 @@ struct AdminInfoView: View {
             .shadow(radius: 2)
         }
     }
+    
+    func check(status: String ) -> String {
+        
+        switch status {
+        case "A":
+            return " Approved"
+        case "R":
+            return " Pending"
+        case "XA":
+            return " Declined"
+        case "X":
+            return " Cancel"
+        default:
+            return ""
+        }
+    }
+    
+    func sColor(status: String ) -> UIColor {
+        
+        switch status {
+        case "A":
+            return .systemGreen
+        case "R":
+            return .systemBlue
+        case "XA":
+            return .systemRed
+        case "X":
+            return .systemPurple
+        default:
+            return .black
+        }
+    }
+    
 }
 

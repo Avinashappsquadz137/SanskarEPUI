@@ -20,33 +20,40 @@ struct CalendarScreenView: View {
                 selectedAttendance: $selectedAttendance,
                 selectedDayOnly: $selectedDayOnly
             )
-            
-            VStack(alignment: .leading, spacing: 8) {
-                if !selectedDayOnly.isEmpty {
-                    Text("Selected Date: \(selectedDayOnly)")
-                        .font(.headline)
-                }
-
+            ScrollView {
                 HStack {
-                    Text("In-Time:")
-                        .bold()
-                    Text(selectedAttendance?.inTime ?? "--")
+                    VStack(alignment: .leading, spacing: 8) {
+                        if !selectedDayOnly.isEmpty {
+                            Text("Selected Date: \(selectedDayOnly)")
+                                .font(.headline)
+                        }
+                        
+                        HStack {
+                            Text("In-Time:")
+                                .bold()
+                            Text(selectedAttendance?.inTime ?? "--")
+                        }
+                        
+                        HStack {
+                            Text("Out-Time:")
+                                .bold()
+                            Text(selectedAttendance?.outTime ?? "--")
+                        }
+                    }
+                    Spacer()
                 }
-
-                HStack {
-                    Text("Out-Time:")
-                        .bold()
-                    Text(selectedAttendance?.outTime ?? "--")
-                }
+                .padding(.leading)
+                
+                AdminInfoView(selectedDates: $selectedDayOnly)
+                
+                Spacer()
+                
+                LegendView()
             }
-          
-         
-
-            Spacer()
-
-            LegendView()
         }
-       
+        .navigationTitle("Calendar View")
+        .navigationBarTitleDisplayMode(.inline)
+        
     }
 }
 struct LegendView: View {
@@ -56,19 +63,19 @@ struct LegendView: View {
         (Color.blue, "Selected Date"),
         (Color.orange, "Weekend"),
         (Color.gray, "Today"),
-        (Color.yellow, "Approved Leave") 
+        (Color.yellow, "Approved Leave")
     ]
     
     let columns = [
         GridItem(.flexible(minimum: 100), spacing: 16),
         GridItem(.flexible(minimum: 100), spacing: 16)
     ]
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Legend:")
                 .font(.headline)
-
+            
             LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                 ForEach(items, id: \.1) { item in
                     LegendBullet(color: item.0, text: item.1)
@@ -81,7 +88,7 @@ struct LegendView: View {
 struct LegendBullet: View {
     let color: Color
     let text: String
-
+    
     var body: some View {
         HStack(spacing: 6) {
             Circle()

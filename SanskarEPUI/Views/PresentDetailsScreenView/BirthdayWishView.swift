@@ -10,7 +10,7 @@ import SwiftUI
 struct BirthdayWishView: View {
     let detail: Events
     @State private var messageText: String = ""
-    
+    @Environment(\.dismiss) private var dismiss
     let defaultMessages = [
         "Wishing you a day filled with love and cheer!",
         "Have a wonderful birthday!",
@@ -18,7 +18,8 @@ struct BirthdayWishView: View {
     ]
     
     var body: some View {
-        VStack(spacing: 20) {
+        ScrollView{
+        VStack(spacing: 15) {
             // Profile Image
             if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
                 AsyncImage(url: url) { phase in
@@ -41,7 +42,7 @@ struct BirthdayWishView: View {
                 .clipShape(Rectangle())
                 .overlay(Rectangle().stroke(Color.gray, lineWidth: 2))
                 .shadow(radius: 4)
-               
+                
             } else {
                 Image(systemName: "person.crop.circle.fill")
                     .resizable()
@@ -59,7 +60,7 @@ struct BirthdayWishView: View {
                 .foregroundColor(.gray)
             
             // Default Message Buttons
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text("Select a message:")
                     .font(.footnote)
                     .foregroundColor(.gray)
@@ -69,6 +70,7 @@ struct BirthdayWishView: View {
                         messageText = msg
                     }) {
                         Text(msg)
+                            .font(.system(size: 16))
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(Color.blue.opacity(0.1))
@@ -79,14 +81,20 @@ struct BirthdayWishView: View {
             .padding(.horizontal)
             
             // TextField
-            TextField("Type your message here...", text: $messageText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextEditor(text: $messageText)
+                .padding(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                )
+                .frame(height: 100)
                 .padding(.horizontal)
             
             // Send Button
             Button(action: {
                 print("Message sent: \(messageText)")
-                // Add your actual send logic here
+                birthdayWishreply()
+                
             }) {
                 Text("Send")
                     .frame(maxWidth: .infinity)
@@ -96,9 +104,42 @@ struct BirthdayWishView: View {
                     .cornerRadius(10)
             }
             .padding(.horizontal)
-
             Spacer()
         }
-        .padding()
+        }
+        .overlay(ToastView())
+      
+    }
+    func birthdayWishreply() {
+        var dict = [String: Any]()
+        dict["EmpCode"] = detail.emp_Code
+        dict["Msg"] = messageText
+        dict["FromEmpCode"] =  "\(UserDefaultsManager.getEmpCode())"
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.birthdayWishreply,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    if let data = model.data {
+                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+                        messageText = ""
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            dismiss()
+                        }
+                        print("Fetched items: \(data)")
+                    } else {
+                        print("No data received")
+                    }
+                case .failure(let error):
+                    ToastManager.shared.show(message: "Enter Correct ID")
+                    print("API Error: \(error)")
+                }
+            }
+        }
     }
 }
