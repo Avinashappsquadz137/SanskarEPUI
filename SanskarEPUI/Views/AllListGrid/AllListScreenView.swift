@@ -89,7 +89,9 @@ struct AllListView: View {
             PunchHistoryView()
         }else if id == 101 {
             CalendarScreenView()
-        }else {
+        } else if id == 8 {
+            GuestRecordHistory()
+        } else {
             Text("No screen available")
         }
     }
