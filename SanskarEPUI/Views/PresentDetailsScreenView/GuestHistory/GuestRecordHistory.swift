@@ -12,7 +12,26 @@ struct GuestRecordHistory: View {
     @State private var guestHistory: [GuestHistory] = []
     @State private var isLoading = false
     @State private var showSheet = false
+    @State private var showFilterSheet = false
+    @State private var addNewGuestSheet = false
     
+    @State private var startDate: String = ""
+    @State private var endDate: String = ""
+    @State private var searchText: String = ""
+
+    @State private var startDateRaw: Date = Date()
+    @State private var endDateRaw: Date = Date()
+    
+    var filteredGuestHistory: [GuestHistory] {
+        if searchText.isEmpty {
+            return guestHistory
+        } else {
+            return guestHistory.filter {
+                ($0.name ?? "").localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+
     var body: some View {
         VStack {
             if isLoading {
@@ -27,12 +46,13 @@ struct GuestRecordHistory: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else {
                     CustomNavigationBar(
-                        onFilter: { print("Filter tapped") },
-                        onSearch: { query in print("Searching: \(query)") },
-                        onAddListToggle: { print("Toggled") },
+                        onFilter: { showFilterSheet.toggle()  },
+                        onSearch: {  query in
+                            self.searchText = query },
+                        onAddListToggle: { addNewGuestSheet.toggle() },
                         isListMode: true
                     )
-                    List(guestHistory, id: \.id) { guest in
+                    List(filteredGuestHistory, id: \.id) { guest in
                         HStack(alignment: .center, spacing: 12) {
                             if let imageUrl = guest.image, let url = URL(string: imageUrl) {
                                 AsyncImage(url: url) { image in
@@ -94,7 +114,7 @@ struct GuestRecordHistory: View {
                 }
             }
         }
-      
+        
         .navigationTitle("Guest History")
         .onAppear {
             GuestHistoryApi()
@@ -103,7 +123,7 @@ struct GuestRecordHistory: View {
             NavigationStack {
                 GeometryReader { geometry in
                     VStack {
-                        AllListView()
+                        EditGuestView()
                             .toolbar {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     Button(action: {
@@ -129,12 +149,93 @@ struct GuestRecordHistory: View {
                 }
             }
         }
+        .sheet(isPresented: $showFilterSheet) {
+            NavigationStack {
+                VStack(spacing: 20) {
+                    Text("Filter by Date")
+                        .font(.headline)
+                    
+                    DatePicker("Start Date", selection: $startDateRaw, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .padding(.horizontal)
+
+                    DatePicker("End Date", selection: $endDateRaw, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .padding(.horizontal)
+
+                    
+                    Button("Submit") {
+                        startDate = dateFormatter.string(from: startDateRaw)
+                        endDate = dateFormatter.string(from: endDateRaw)
+                        showFilterSheet = false
+                        GuestHistoryApi()
+                    }
+
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+                }
+                .padding()
+                .presentationDetents([.height(300)])
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showFilterSheet = false
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.black)
+                        }
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $addNewGuestSheet) {
+            NavigationStack {
+                GeometryReader { geometry in
+                    VStack {
+                        AddNewGuestView()
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button(action: {
+                                        addNewGuestSheet.toggle()
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.black)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .navigationBarTitleDisplayMode(.inline)
+                            .presentationDetents([
+                                .height(UIScreen.main.bounds.height * 0.65),
+                                .large
+                            ])
+                        
+                    }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .background(Color.clear)
+                    .cornerRadius(15)
+                }
+            }
+        }
+        
     }
     
     func GuestHistoryApi() {
         var dict = [String: Any]()
         dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
+        if !startDate.isEmpty {
+            dict["fromDate"] = startDate
+        }
         
+        if !endDate.isEmpty {
+            dict["toDate"] = endDate
+        }
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.guestRecordHistoryApi,
             method: .post,

@@ -81,7 +81,7 @@ struct PunchHistoryView: View {
                     .frame(width: 70, alignment: .center)
                 Text("Out Time")
                     .bold()
-                    .frame(width: 70, alignment: .center)
+                    .frame(width: 80, alignment: .center)
                 Text("Location")
                     .bold()
                     .frame(maxWidth: .infinity, alignment: .center)

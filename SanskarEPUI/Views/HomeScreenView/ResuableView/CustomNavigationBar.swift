@@ -21,15 +21,17 @@ struct CustomNavigationBar: View {
         VStack {
             HStack {
                 if isSearching {
-                    TextField("Search...", text: $searchText, onCommit: {
-                        onSearch?(searchText)
-                    })
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .transition(.move(edge: .trailing))
-
+                    TextField("Search...", text: $searchText)
+                        .onChange(of: searchText) { newValue in
+                            onSearch?(newValue)
+                        }
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .transition(.move(edge: .trailing))
+                    
                     Button(action: {
                         isSearching = false
                         searchText = ""
+                        onSearch?("") 
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 22))
@@ -42,7 +44,6 @@ struct CustomNavigationBar: View {
                                 .font(.system(size: 22))
                         }
                     }
-
                     if onSearch != nil {
                         Button(action: {
                             withAnimation {
