@@ -162,21 +162,16 @@ struct GuestRecordHistory: View {
                     DatePicker("End Date", selection: $endDateRaw, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .padding(.horizontal)
-
                     
-                    Button("Submit") {
+                    CustonButton(
+                        title: "Submit",
+                        backgroundColor: .orange
+                    ) {
                         startDate = dateFormatter.string(from: startDateRaw)
                         endDate = dateFormatter.string(from: endDateRaw)
                         showFilterSheet = false
                         GuestHistoryApi()
                     }
-
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
                 }
                 .padding()
                 .presentationDetents([.height(300)])
@@ -210,6 +205,7 @@ struct GuestRecordHistory: View {
                                     .buttonStyle(PlainButtonStyle())
                                 }
                             }
+                            .navigationTitle("Add New Guest")
                             .navigationBarTitleDisplayMode(.inline)
                             .presentationDetents([
                                 .height(UIScreen.main.bounds.height * 0.65),

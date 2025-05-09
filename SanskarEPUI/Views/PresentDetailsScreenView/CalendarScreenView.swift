@@ -27,28 +27,26 @@ struct CalendarScreenView: View {
                             Text("Selected Date: \(selectedDayOnly)")
                                 .font(.headline)
                         }
-                        
                         HStack {
-                            Text("In-Time:")
-                                .bold()
-                            Text(selectedAttendance?.inTime ?? "--")
-                        }
-                        
-                        HStack {
-                            Text("Out-Time:")
-                                .bold()
-                            Text(selectedAttendance?.outTime ?? "--")
+                            if let inTime = selectedAttendance?.inTime, !inTime.isEmpty {
+                                Text("In-")
+                                    .bold()
+                                Text(inTime)
+                            }
+                            if let outTime = selectedAttendance?.outTime, !outTime.isEmpty {
+                                Text("Out-")
+                                    .bold()
+                                Text(outTime)
+                            }
                         }
                     }
                     Spacer()
                 }
                 .padding(.leading)
-                
+                LegendView()
                 AdminInfoView(selectedDates: $selectedDayOnly)
                 
                 Spacer()
-                
-                LegendView()
             }
         }
         .navigationTitle("Calendar View")
@@ -59,10 +57,8 @@ struct CalendarScreenView: View {
 struct LegendView: View {
     let items = [
         (Color.green, "Present"),
-        (Color.red, "Absent / Leave"),
-        (Color.blue, "Selected Date"),
+        (Color.red, "Absent"),
         (Color.orange, "Weekend"),
-        (Color.gray, "Today"),
         (Color.yellow, "Approved Leave")
     ]
     
@@ -76,7 +72,7 @@ struct LegendView: View {
             Text("Legend:")
                 .font(.headline)
             
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
                 ForEach(items, id: \.1) { item in
                     LegendBullet(color: item.0, text: item.1)
                 }

@@ -25,7 +25,7 @@ class ApiClient: NSObject {
             ongoingRequests.remove(at: index)
         }
     }
-    
+    //MARK: -  multipart requests
     func callHttpMethod<T: Decodable>(
         apiendpoint: String,
         method: ApiMethod,

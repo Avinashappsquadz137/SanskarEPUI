@@ -11,56 +11,17 @@ import SwiftUI
 struct AdminInfoView: View {
     @Binding var selectedDates: String
     @State private var eventDetails: [Events] = []
-    private let moodOptions = ["😊", "😴", "😕", "🫠", "🤔"]
-    @State private var selectedMood: String? = nil
     
     var body: some View {
-        VStack(spacing: 12) {
-            if eventDetails.isEmpty {
-                if selectedMood == nil {
-                    VStack(spacing: 10) {
-                        Text("How are you feeling today?")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                        HStack(spacing: 16) {
-                            ForEach(moodOptions, id: \.self) { mood in
-                                Text(mood)
-                                    .font(.system(size: 40))
-                                    .onTapGesture {
-                                        selectedMood = mood
-                                    }
-                            }
-                        }
-                    }
-                    .padding()
+        VStack(spacing: 10) {
+            ForEach(eventDetails, id: \.emp_Code) { detail in
+                if detail.event_type?.lowercased() == "birthday" {
+                    birthdayCell(detail: detail)
+                } else if detail.event_type?.lowercased() == "leave" {
+                    leaveCell(detail: detail)
+                } else if detail.event_type?.lowercased() == "booking" {
+                    bookingCell(detail: detail)
                 }
-                if let mood = selectedMood {
-                    VStack(spacing: 5) {
-                        Text("Today Mood: ")
-                            .font(.title3)
-                            .foregroundColor(.gray)
-                        Text(mood)
-                            .font(.system(size: 100))
-                            .foregroundColor(.gray)
-                        Text("No Events Found")
-                            .font(.headline)
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                }
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(eventDetails, id: \.emp_Code) { detail in
-                        if detail.event_type?.lowercased() == "birthday" {
-                            birthdayCell(detail: detail)
-                        } else if detail.event_type?.lowercased() == "leave" {
-                            leaveCell(detail: detail)
-                        } else if detail.event_type?.lowercased() == "booking" {
-                            bookingCell(detail: detail)
-                        }
-                    }
-                }
-
             }
         }
         .padding()
@@ -68,7 +29,6 @@ struct AdminInfoView: View {
             eventOnSelectedDate()
         }
         .onChange(of: selectedDates) { _ in
-            selectedMood = nil
             eventOnSelectedDate()
         }
     }
@@ -127,10 +87,9 @@ struct AdminInfoView: View {
                                 .resizable()
                                 .frame(width: 50, height: 50)
                                 .clipShape(Circle())
-                        }
-
+                        }                        
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(detail.name ?? "Unknown").bold().foregroundColor(.black)
+                            Text(detail.name ?? "Unknown").font(.subheadline).bold().foregroundColor(.black)
                             Text(detail.bDay ?? "")
                                 .font(.footnote)
                                 .foregroundColor(.gray)
@@ -181,7 +140,7 @@ struct AdminInfoView: View {
             .shadow(radius: 2)
         }
     }
-
+    
     
     func bookingCell(detail: Events) -> some View {
         VStack {
