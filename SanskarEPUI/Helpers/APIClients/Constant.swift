@@ -48,6 +48,7 @@ struct Constant {
     static let getMonthWiseEmpDetail       = "api_panel/get_month_wise_emp_detail"
     static let guestRecordHistoryApi       = "api_panel/guest_record"
     static let applyNewGuest               = "api_panel/guest_request"
+    
 }
 
 

@@ -86,6 +86,17 @@ struct AddNewGuestView: View {
     }
     //MARK: - Multi Part
     func addNewGuestApi() {
+        /*
+    
+         dict["id"] = selectedId ?? ""
+      
+   
+         dict["WhomtoMeet"] = meetinglbl.text
+   
+         dict["Date1"] = Datetime.text
+         dict["image"] = image.image?.resizeToWidth3(250)
+
+         */
         var dict = [String: Any]()
         dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
         dict["Guest_Name"] = guestName

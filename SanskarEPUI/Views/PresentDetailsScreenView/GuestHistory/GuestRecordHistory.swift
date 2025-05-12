@@ -14,11 +14,11 @@ struct GuestRecordHistory: View {
     @State private var showSheet = false
     @State private var showFilterSheet = false
     @State private var addNewGuestSheet = false
-    
+    @State private var selectedGuest: GuestHistory? = nil
     @State private var startDate: String = ""
     @State private var endDate: String = ""
     @State private var searchText: String = ""
-
+    
     @State private var startDateRaw: Date = Date()
     @State private var endDateRaw: Date = Date()
     
@@ -31,27 +31,26 @@ struct GuestRecordHistory: View {
             }
         }
     }
-
+    
     var body: some View {
         VStack {
             if isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else {
-                
-                
+                CustomNavigationBar(
+                    onFilter: { showFilterSheet.toggle()  },
+                    onSearch: {  query in
+                        self.searchText = query },
+                    onAddListToggle: { addNewGuestSheet.toggle() },
+                    isListMode: true
+                )
+                Spacer()
                 if guestHistory.isEmpty {
                     Text("No guest history available.")
                         .foregroundColor(.gray)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else {
-                    CustomNavigationBar(
-                        onFilter: { showFilterSheet.toggle()  },
-                        onSearch: {  query in
-                            self.searchText = query },
-                        onAddListToggle: { addNewGuestSheet.toggle() },
-                        isListMode: true
-                    )
                     List(filteredGuestHistory, id: \.id) { guest in
                         HStack(alignment: .center, spacing: 12) {
                             if let imageUrl = guest.image, let url = URL(string: imageUrl) {
@@ -75,8 +74,6 @@ struct GuestRecordHistory: View {
                                     .clipShape(Circle())
                                     .overlay(Circle().stroke(Color.green, lineWidth: 2))
                             }
-                            
-                            
                             VStack(alignment: .leading, spacing: 5) {
                                 Text("Name: \(guest.name ?? "")")
                                     .font(.system(size: 17, weight: .semibold))
@@ -99,6 +96,7 @@ struct GuestRecordHistory: View {
                                 .font(.title)
                                 .foregroundColor(.black)
                                 .onTapGesture {
+                                    selectedGuest = guest
                                     showSheet.toggle()
                                 }
                         }
@@ -106,47 +104,48 @@ struct GuestRecordHistory: View {
                         .background(Color.white)
                         .cornerRadius(12)
                         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        
-                        
                     }
                     .listStyle(PlainListStyle())
                     
                 }
             }
         }
-        
         .navigationTitle("Guest History")
         .onAppear {
             GuestHistoryApi()
         }
         .sheet(isPresented: $showSheet) {
-            NavigationStack {
-                GeometryReader { geometry in
-                    VStack {
-                        EditGuestView()
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarTrailing) {
-                                    Button(action: {
-                                        showSheet.toggle()
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.black)
+            if let selectedGuest = selectedGuest {
+                NavigationStack {
+                    GeometryReader { geometry in
+                        VStack {
+                            EditGuestView(guest: selectedGuest)
+                                .toolbar {
+                                    ToolbarItem(placement: .navigationBarTrailing) {
+                                        Button(action: {
+                                            showSheet.toggle()
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.black)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    .buttonStyle(PlainButtonStyle())
                                 }
-                            }
-                            .navigationBarTitleDisplayMode(.inline)
-                            .presentationDetents([
-                                .height(UIScreen.main.bounds.height * 0.65),
-                                .large
-                            ])
-                        
+                                .navigationBarTitleDisplayMode(.inline)
+                                .presentationDetents([
+                                    .height(UIScreen.main.bounds.height * 0.65),
+                                    .large
+                                ])
+                            
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .background(Color.clear)
+                        .cornerRadius(15)
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .background(Color.clear)
-                    .cornerRadius(15)
                 }
+            } else {
+                Text("No guest selected") 
             }
         }
         .sheet(isPresented: $showFilterSheet) {
@@ -158,7 +157,7 @@ struct GuestRecordHistory: View {
                     DatePicker("Start Date", selection: $startDateRaw, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .padding(.horizontal)
-
+                    
                     DatePicker("End Date", selection: $endDateRaw, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .padding(.horizontal)
