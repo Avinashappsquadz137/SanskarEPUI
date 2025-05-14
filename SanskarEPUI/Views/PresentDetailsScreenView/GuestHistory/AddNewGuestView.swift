@@ -86,17 +86,6 @@ struct AddNewGuestView: View {
     }
     //MARK: - Multi Part
     func addNewGuestApi() {
-        /*
-    
-         dict["id"] = selectedId ?? ""
-      
-   
-         dict["WhomtoMeet"] = meetinglbl.text
-   
-         dict["Date1"] = Datetime.text
-         dict["image"] = image.image?.resizeToWidth3(250)
-
-         */
         var dict = [String: Any]()
         dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
         dict["Guest_Name"] = guestName
@@ -133,18 +122,3 @@ struct AddNewGuestView: View {
     }
 }
 
-import UIKit
-extension UIImage {
-    func resizeToWidth(_ width: CGFloat) -> UIImage? {
-        let scale = width / self.size.width
-        let height = self.size.height * scale
-        let newSize = CGSize(width: width, height: height)
-        
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        self.draw(in: CGRect(origin: .zero, size: newSize))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImage
-    }
-}
