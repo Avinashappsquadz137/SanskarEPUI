@@ -7,31 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "2ED2A1C9-1A48-40F9-A161-19AC3D5B2E5D"
+            uuid = "20A010CD-7E18-4F9B-92D2-B26A3C41C35C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SanskarEPUI/Views/HomeScreenView/ResuableView/AdminInfoView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
-            landmarkName = "birthdayCell(detail:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "552561B2-1EA8-4C2B-B3C9-16E8553D748A"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/BirthdayWishView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -39,32 +23,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1CD65C34-EB2D-41D5-9ED4-DADB87B62FBD"
+            uuid = "DDBC671D-7303-4E0C-A3E2-A6A30CCFD1BD"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/GuestHistory/AddNewGuestView.swift"
+            filePath = "SanskarEPUI/Views/HomeScreenView/ResuableView/AdminInfoView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
-            landmarkName = "addNewGuestApi()"
-            landmarkType = "7">
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "body"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9422883D-2EF3-4064-9127-288D270F1538"
+            uuid = "C8D744D7-85F1-4CD9-8564-023AA367373C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/GuestHistory/AddNewGuestView.swift"
+            filePath = "SanskarEPUI/Views/HomeScreenView/ViewModel/MonthlyCalendarViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
-            landmarkName = "addNewGuestApi()"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
+            landmarkName = "getMonthlyCalendar(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

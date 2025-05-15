@@ -91,6 +91,14 @@ struct AllListView: View {
             CalendarScreenView()
         } else if id == 8 {
             GuestRecordHistory()
+        } else if id == 17 {
+            MyReportsViews()
+                .navigationTitle("My Reports")
+        } else if id  == 18 {
+            AllReportsViews()
+                .navigationTitle("All Reports")
+        } else if id == 7 {
+            Text(" Reports")
         } else {
             Text("No screen available")
         }
@@ -137,6 +145,8 @@ struct CardView: View {
         case 8: return UIImage(named: "Guest") ?? defaultImage()
         case 11: return UIImage(named: "healthcare") ?? defaultImage()
         case 14: return UIImage(named: "Privacy Policy") ?? defaultImage()
+        case 17: return UIImage(named: "Reports") ?? defaultImage()
+        case 18: return UIImage(named: "Reports") ?? defaultImage()
         case 24: return UIImage(named: "biometricAttendance") ?? defaultImage()
         case 25: return UIImage(named: "attendance") ?? defaultImage()
         case 100: return UIImage(named: "Profile") ?? defaultImage()

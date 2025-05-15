@@ -48,7 +48,9 @@ struct Constant {
     static let getMonthWiseEmpDetail       = "api_panel/get_month_wise_emp_detail"
     static let guestRecordHistoryApi       = "api_panel/guest_record"
     static let applyNewGuest               = "api_panel/guest_request"
-    
+    static let getMyReportsListApi         = "api_panel/get_leave_requestList"
+    static let myLeaveCancel               = "api_panel/leave_cancellation"
+    static let employeeLeaveListApi        = "api_panel/employee"
 }
 
 
