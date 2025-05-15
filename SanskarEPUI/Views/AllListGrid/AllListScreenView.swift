@@ -98,7 +98,7 @@ struct AllListView: View {
             AllReportsViews()
                 .navigationTitle("All Reports")
         } else if id == 7 {
-            Text(" Reports")
+            ReportsViews()
         } else {
             Text("No screen available")
         }
