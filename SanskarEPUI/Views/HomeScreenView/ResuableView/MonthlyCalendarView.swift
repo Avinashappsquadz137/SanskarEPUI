@@ -80,17 +80,20 @@ struct MonthlyCalendarView: View {
                         )
                         .clipShape(Circle())
                         .onTapGesture {
-                            if let date = day.date {
-                                let startOfDay = calendar.startOfDay(for: date)
-                                let localStartOfDay = startOfDay.toLocalTime()
-                                let formattedDate = dateFormatter.string(from: localStartOfDay)
-
-                                viewModel.selectedDay = calendar.component(.day, from: localStartOfDay)
-                                viewModel.selectedFullDate = localStartOfDay
-                                viewModel.updateAttendance(for: localStartOfDay)
-                                selectedAttendance = viewModel.selectedAttendance
-                                selectedDayOnly = formattedDate
+                            if let tappedDate = day.date {
+                                var components = calendar.dateComponents([.year, .month], from: selectedDate)
+                                components.day = calendar.component(.day, from: tappedDate)
+                                if let correctDate = calendar.date(from: components) {
+                                    let formattedDate = dateFormatter.string(from: correctDate)
+                                    
+                                    viewModel.selectedDay = calendar.component(.day, from: correctDate)
+                                    viewModel.selectedFullDate = correctDate
+                                    viewModel.updateAttendance(for: correctDate)
+                                    selectedAttendance = viewModel.selectedAttendance
+                                    selectedDayOnly = formattedDate
+                                }
                             }
+
                         }
                 }
 
