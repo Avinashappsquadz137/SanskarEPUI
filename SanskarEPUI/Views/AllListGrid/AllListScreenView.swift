@@ -99,7 +99,16 @@ struct AllListView: View {
                 .navigationTitle("All Reports")
         } else if id == 7 {
             ReportsViews()
-        } else {
+        } else if id == 22 {
+            LeaveApprovalView()
+                .navigationTitle("Leave Approval")
+        }  else if id == 23 {
+            //  BookingApprovalView()
+            Text("No screen available")
+        } else if id == 1 {
+            //     ApprovalView()
+            Text("No screen available")
+        }else {
             Text("No screen available")
         }
     }
@@ -159,3 +168,35 @@ struct CardView: View {
         return UIImage(named: "default") ?? UIImage(systemName: "questionmark.square")!
     }
 }
+/*
+
+
+ {
+   "name" : "Full Day",
+   "id" : 19
+ },
+ {
+   "name" : "Half Day",
+   "id" : 20
+ },
+ {
+   "name" : "Off Day",
+   "id" : 21
+ },
+ {
+   "name" : "Leave Approval",
+   "id" : 22
+ },
+ {
+   "name" : "Booking Approval",
+   "id" : 23
+ },
+ {
+   "name" : "Self Punch",
+   "id" : 24
+ },
+ {
+   "name" : "Punch History",
+   "id" : 25
+ }
+ */

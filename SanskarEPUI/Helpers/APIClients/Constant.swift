@@ -51,6 +51,7 @@ struct Constant {
     static let getMyReportsListApi         = "api_panel/get_leave_requestList"
     static let myLeaveCancel               = "api_panel/leave_cancellation"
     static let employeeLeaveListApi        = "api_panel/employee"
+    static let approveListHistory          = "api_panel_dev/aprovelistHistory"
 }
 
 
