@@ -109,7 +109,12 @@ struct AllListView: View {
             ApprovalView()
         }else if id == 14 {
             WebOpenerView(urlString: "https://app.sanskargroup.in/terms.html")
-        } else {
+        }else if id ==  11 {
+            HealthViewScreen()
+                .navigationTitle("Health Policy Card")
+        }else if id == 4 {
+            //HomeViewController()
+        }else {
             Text("No screen available")
         }
     }

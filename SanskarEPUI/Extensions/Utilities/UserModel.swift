@@ -113,7 +113,7 @@ class UserDefaultsManager {
     }
     
     static func getPolicyAmount() -> String {
-        UserDefaults.standard.string(forKey: Keys.policyAmount) ?? ""
+        UserDefaults.standard.string(forKey: Keys.policyAmount) ?? "150000"
     }
     
     static func getPlBalance() -> String {
@@ -121,11 +121,11 @@ class UserDefaultsManager {
     }
     
     static func getPolicyNumber() -> String {
-        UserDefaults.standard.string(forKey: Keys.policyNumber) ?? ""
+        UserDefaults.standard.string(forKey: Keys.policyNumber) ?? "789456"
     }
     
     static func getPolicyValidity() -> String {
-        UserDefaults.standard.string(forKey: Keys.policyValidity) ?? ""
+        UserDefaults.standard.string(forKey: Keys.policyValidity) ?? "2026"
     }
     
     static func getBookingRoleID() -> String {
