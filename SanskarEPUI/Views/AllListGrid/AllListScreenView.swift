@@ -103,12 +103,13 @@ struct AllListView: View {
             LeaveApprovalView()
                 .navigationTitle("Leave Approval")
         }  else if id == 23 {
-            //  BookingApprovalView()
-            Text("No screen available")
+            BookingApprovalView()
+                .navigationTitle("Booking Approval")
         } else if id == 1 {
-            //     ApprovalView()
-            Text("No screen available")
-        }else {
+            ApprovalView()
+        }else if id == 14 {
+            WebOpenerView(urlString: "https://app.sanskargroup.in/terms.html")
+        } else {
             Text("No screen available")
         }
     }
@@ -158,6 +159,8 @@ struct CardView: View {
         case 18: return UIImage(named: "Reports") ?? defaultImage()
         case 24: return UIImage(named: "biometricAttendance") ?? defaultImage()
         case 25: return UIImage(named: "attendance") ?? defaultImage()
+        case 23: return UIImage(named: "booking") ?? defaultImage()
+        case 22: return UIImage(named: "Leave") ?? defaultImage()
         case 100: return UIImage(named: "Profile") ?? defaultImage()
         case 101:return UIImage(named: "Leave") ?? defaultImage()
         default: return defaultImage()
@@ -168,35 +171,15 @@ struct CardView: View {
         return UIImage(named: "default") ?? UIImage(systemName: "questionmark.square")!
     }
 }
-/*
+struct WebOpenerView: View {
+    let urlString: String
 
-
- {
-   "name" : "Full Day",
-   "id" : 19
- },
- {
-   "name" : "Half Day",
-   "id" : 20
- },
- {
-   "name" : "Off Day",
-   "id" : 21
- },
- {
-   "name" : "Leave Approval",
-   "id" : 22
- },
- {
-   "name" : "Booking Approval",
-   "id" : 23
- },
- {
-   "name" : "Self Punch",
-   "id" : 24
- },
- {
-   "name" : "Punch History",
-   "id" : 25
- }
- */
+    var body: some View {
+        Text("Opening Web Page...")
+            .onAppear {
+                if let url = URL(string: urlString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+    }
+}

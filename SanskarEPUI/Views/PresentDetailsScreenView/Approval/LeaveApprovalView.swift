@@ -32,7 +32,7 @@ struct LeaveApprovalView: View {
                 Text("History").tag(2)
             }
             .pickerStyle(SegmentedPickerStyle())
-            .padding()
+            .padding(.horizontal)
             if selectedSegment == 0 {
                 HStack {
                     TextField("Search...", text: $searchText)
