@@ -72,8 +72,7 @@ struct BookingViewScreen: View {
 
 struct NewBookingCellView: View {
     let booking: NewBooking
-  
-
+    @State private var navigate = false
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
@@ -81,11 +80,14 @@ struct NewBookingCellView: View {
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
-                   
+                    navigate = true
                 }) {
                     Image(systemName: "arrowshape.forward.circle.fill")
                         .foregroundColor(.blue)
                         .imageScale(.large)
+                }
+                NavigationLink(destination: BookingApproveSchedule(booking: booking), isActive: $navigate) {
+                    EmptyView()
                 }
             }
             HStack {
