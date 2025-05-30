@@ -37,7 +37,7 @@ struct GuestRecordHistory: View {
             if isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else {
+            } else {                          
                 CustomNavigationBar(
                     onFilter: { showFilterSheet.toggle()  },
                     onSearch: {  query in

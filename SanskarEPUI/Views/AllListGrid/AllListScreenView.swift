@@ -113,7 +113,9 @@ struct AllListView: View {
             HealthViewScreen()
                 .navigationTitle("Health Policy Card")
         }else if id == 4 {
-            //HomeViewController()
+            Text("Inventory is not Working")
+        } else if id == 3 {
+            BookingViewScreen()
         }else {
             Text("No screen available")
         }

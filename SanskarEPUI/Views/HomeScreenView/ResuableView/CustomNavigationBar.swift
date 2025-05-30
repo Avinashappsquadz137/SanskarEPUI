@@ -58,8 +58,8 @@ struct CustomNavigationBar: View {
                     if let onAddListToggle = onAddListToggle {
                         Button(action: onAddListToggle) {
                             HStack(spacing: 4) {
-                                Image(systemName: isListMode ? "plus" : "list.bullet")
-                                Text(isListMode ? "New Guest" : "List")
+                                Image(systemName: isListMode ? "plus" : "plus")
+                                Text(isListMode ? "New Guest" : "New")
                             }
                         }
                     }
