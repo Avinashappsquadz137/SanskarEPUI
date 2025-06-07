@@ -57,15 +57,15 @@ struct AllListView: View {
             model: SideBarApi.self
         ) { result in
             DispatchQueue.main.async {
-                switch result {
+                switch result { 
                 case .success(let model):
-                    if let data = model.data {
-                        self.reqType = data
+                    if var data = model.data {
+                        data = data.filter { $0.id != 4 }
                         let manualItem = SideBar(id: 100, name: "User Profile")
                         self.reqType.insert(manualItem, at: 0)
                         let manualItem2 = SideBar(id: 101, name: "Calander")
                         self.reqType.insert(manualItem2, at: 1)
-                     
+                        self.reqType = data
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                         print("Fetched items: \(data)")
                     } else {
@@ -112,8 +112,6 @@ struct AllListView: View {
         }else if id ==  11 {
             HealthViewScreen()
                 .navigationTitle("Health Policy Card")
-        }else if id == 4 {
-            Text("Inventory is not Working")
         } else if id == 3 {
             BookingViewScreen()
         }else {

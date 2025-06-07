@@ -9,17 +9,23 @@ import SwiftUI
 
 struct BookingViewScreen: View {
     @State private var bookings: [NewBooking] = []
-   
+    @State private var navigateToAddKatha = false
     @State private var searchText = ""
-
+    
     var body: some View {
         VStack {
             CustomNavigationBar(
                 onSearch: { query in self.searchText = query },
-                onAddListToggle: { /* show add new guest screen */ },
+                onAddListToggle: {  navigateToAddKatha = true },
                 isListMode: false
             )
-
+            NavigationLink(
+                destination: BookKathaView(),
+                isActive: $navigateToAddKatha
+            ) {
+                EmptyView()
+            }
+            .hidden()
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(filteredBookings, id: \.katha_booking_id) { booking in
@@ -35,7 +41,7 @@ struct BookingViewScreen: View {
             getApproveKathalist()
         }
     }
-
+    
     var filteredBookings: [NewBooking] {
         if searchText.isEmpty {
             return bookings
@@ -43,13 +49,13 @@ struct BookingViewScreen: View {
             return bookings.filter { $0.name?.localizedCaseInsensitiveContains(searchText) ?? false }
         }
     }
-
+    
     func getApproveKathalist() {
         let params: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode(),
             "category_id": "2"
         ]
-
+        
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.getApproveKathalist,
             method: .post,
@@ -97,7 +103,7 @@ struct NewBookingCellView: View {
                 Text("GST: \(booking.gST ?? "N/A")")
                     .font(.caption2)
             }
-
+            
             HStack {
                 Text("Channel: \(booking.channelName ?? "N/A")")
                     .font(.caption2)
@@ -105,7 +111,7 @@ struct NewBookingCellView: View {
                 Text("Venue: \(booking.venue ?? "N/A")")
                     .font(.caption2)
             }
-
+            
             Text("Date: \(booking.katha_date ?? booking.katha_from_Date ?? "N/A")").font(.caption2)
             Text("Time: \(booking.kathaTiming ?? booking.slotTiming ?? "N/A")").font(.caption2)
             Text("Status: \(booking.status ?? "N/A")").font(.caption2)

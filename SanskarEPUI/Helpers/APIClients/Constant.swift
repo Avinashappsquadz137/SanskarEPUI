@@ -32,7 +32,8 @@ class ApiRequest {
 struct Constant {
 
     static let BASEURL                     = ApiRequest.Url.serverURL
-
+    static let imageURL                    = "https://ep.sanskargroup.in/uploads/"
+    
     static let getlogin                    = "api_panel/login_app"
     static let monthWiseDetailApi          = "api_panel/get_month_wise_emp_detail"
     static let eventDetail                 = "api_panel/event_detail"
@@ -56,7 +57,10 @@ struct Constant {
     static let kathaBookingDetail          = "api_panel/katha_booking_detail"
     static let getApproveKathalist         = "api_panel/get-approve-kathalist"
     static let kathaApprovalApi            = "api_panel/katha_approval"
-    
+    static let kathaCategory               = "api_panel/katha_category"
+    static let channelList                 = "api_panel/channel_list"
+    static let getKathaTimingCategory      = "api_panel/get_katha_timing_by_katha_category"
+    static let existGuruList              = "api_panel/exist_guru_list"
 }
 
 
