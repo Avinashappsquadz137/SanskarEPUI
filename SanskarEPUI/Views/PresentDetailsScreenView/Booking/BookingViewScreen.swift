@@ -20,7 +20,7 @@ struct BookingViewScreen: View {
                 isListMode: false
             )
             NavigationLink(
-                destination: BookKathaView(),
+                destination: BookKathaView(isSelected: false),
                 isActive: $navigateToAddKatha
             ) {
                 EmptyView()

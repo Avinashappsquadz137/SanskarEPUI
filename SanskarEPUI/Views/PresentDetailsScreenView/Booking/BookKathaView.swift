@@ -22,7 +22,7 @@ extension ActiveSheetType: Identifiable {
 struct BookKathaView: View {
     
     @State private var activeSheet: ActiveSheetType? = nil
-    @State private var selectedChannel: String? = nil
+    @State private var selectedChannel: ChannelList? = nil
     @State private var selectedCategory: String? = nil
 
     @State private var channels: [ChannelList] = []
@@ -36,14 +36,15 @@ struct BookKathaView: View {
     
     @State private var suggestedFromDate = Date()
     @State private var suggestedToDate = Date()
-    
+    @State private var selectedGuru: ExistGuruList? = nil
+
     @State private var selectedSlot: KathaTimingCategory?
     @State private var guruSearchText: String = ""
     @State private var showGuruList = false
     
     @State private var venue = ""
     @State private var amount = ""
-    
+    @State var isSelected: Bool
     func filteredGuruList() -> [ExistGuruList] {
         if guruSearchText.isEmpty {
             return existGuru
@@ -63,10 +64,10 @@ struct BookKathaView: View {
                         ForEach(channels, id: \.sno) { channel in
                             HStack(spacing: 1) {
                                 Button(action: {
-                                    selectedChannel = (selectedChannel == channel.channelName) ? nil : channel.channelName
+                                    selectedChannel = (selectedChannel?.channelName == channel.channelName) ? nil : channel
                                 }) {
-                                    Image(systemName: selectedChannel == channel.channelName ? "checkmark.circle.fill" : "circle")
-                                        .foregroundColor(selectedChannel == channel.channelName ? .green : .gray)
+                                    Image(systemName: selectedChannel?.channelName == channel.channelName ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(selectedChannel?.channelName == channel.channelName ? .green : .gray)
                                         .imageScale(.medium)
                                 }
                                 let imageUrlString = "\(Constant.imageURL)\(channel.channel_thumbnail ?? "")"
@@ -108,66 +109,95 @@ struct BookKathaView: View {
                     selectedUIImage: $selectedUIImage,
                     selectedFileUrl: $selectedFileUrl
                 )
-                VStack(alignment: .leading){
-                    Text("Select Date & Time").fontWeight(.bold)
+                    Text("Select Date & Time")
+                        .font(.headline)
+                        .padding(.horizontal)
+                        .padding(.top, 10)
                     
-                    HStack(alignment: .center){
-                        DatePicker(
-                            "From",
-                            selection: $suggestedFromDate,
-                            displayedComponents: [.date]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .center, spacing: 16){
+                            VStack(alignment: .leading) {
+                             
+                                DatePicker(
+                                    "From",
+                                    selection: $suggestedFromDate,
+                                    displayedComponents: [.date]
+                                )
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .padding(10)
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            VStack(alignment: .leading) {
+                               
+                                DatePicker(
+                                    "To",
+                                    selection: $suggestedToDate,
+                                    in: suggestedFromDate...,
+                                    displayedComponents: [.date]
+                                )
+                                .labelsHidden()
+                                .datePickerStyle(.compact)
+                                .padding(10)
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding(.horizontal)
                         
-                        DatePicker(
-                            "To ",
-                            selection: $suggestedToDate,
-                            in: suggestedFromDate...,
-                            displayedComponents: [.date]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Button(action: {
+                                activeSheet = .time
+                            }) {
+                                HStack {
+                                    Text(selectedSlot == nil ? "Select Time" : "\(selectedSlot?.slotName ?? "") \(selectedSlot?.slotTiming ?? "")")
+                                        .foregroundColor(selectedSlot == nil ? .gray : .primary)
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(10)
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                            }
+                            .padding(.horizontal)
+                            
+                            if selectedSlot?.slotName == "Custom" {
+                                HStack(alignment: .center, spacing: 16){
+                                    VStack(alignment: .leading) {
+                                      
+                                        DatePicker(
+                                            "From",
+                                            selection: $suggestedFromDate,
+                                            displayedComponents: [.hourAndMinute]
+                                        )
+                                       
+                                        .datePickerStyle(.compact)
+                                        .padding(10)
+                                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    
+                                    VStack(alignment: .leading) {
+                                        
+                                        DatePicker(
+                                            "To",
+                                            selection: $suggestedToDate,
+                                            in: suggestedFromDate...,
+                                            displayedComponents: [.hourAndMinute]
+                                        )
+                                        
+                                        .datePickerStyle(.compact)
+                                        .padding(10)
+                                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
                     }
-                }
-                .padding()
-                Button(action: {
-                    activeSheet = .time
-                }) {
-                    HStack {
-                        Text(selectedSlot == nil ? "Select Time" : "\(selectedSlot?.slotName ?? "") \(selectedSlot?.slotTiming ?? "")")
-                            .foregroundColor(selectedSlot == nil ? .gray : .primary)
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .foregroundColor(.gray)
-                    }
-                    .padding(10)
-                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                    .padding(.horizontal)
-                }
-                
-                if selectedSlot?.slotName == "Custom" {
-                    HStack(alignment: .center){
-                        DatePicker(
-                            "From",
-                            selection: $suggestedFromDate,
-                            displayedComponents: [.hourAndMinute]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
-                        
-                        DatePicker(
-                            "To ",
-                            selection: $suggestedToDate,
-                            in: suggestedFromDate...,
-                            displayedComponents: [.hourAndMinute]
-                        )
-                        .labelsHidden()
-                        .datePickerStyle(.compact)
-                    }
-                    .padding(.horizontal)
-                    
-                }
                 VStack(alignment: .leading) {
                     Text("Select Guru")
                         .font(.headline)
@@ -177,10 +207,10 @@ struct BookKathaView: View {
                         showGuruList = editing
                     })
                     .padding(10)
-                    .background(Color.gray.opacity(0.1))
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .cornerRadius(8)
                     .padding(.horizontal)
-                    ZStack{
+                
                     if showGuruList && !filteredGuruList().isEmpty {
                         ScrollView {
                             LazyVStack(alignment: .leading, spacing: 10) {
@@ -190,29 +220,63 @@ struct BookKathaView: View {
                                         .padding(.vertical, 5)
                                         .background(Color.blue.opacity(0.1))
                                         .cornerRadius(8)
-                                        .padding(.horizontal)
                                         .onTapGesture {
                                             guruSearchText = guru.guru_name ?? ""
                                             showGuruList = false
+                                            selectedGuru = guru
                                         }
                                 }
                             }
+                            .padding(.horizontal)
+                        }
+                        .frame(maxHeight: 200)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 4)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 16) {
+                            TextField("Enter Venue", text: $venue)
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                            
+                            TextField("Enter Amount", text: $amount)
+                                .keyboardType(.numberPad)
+                                .onChange(of: amount) { newValue in
+                                    amount = newValue.filter { $0.isNumber }
+                                }
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                         }
                     }
-                 }
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 16) {
-                        TextField("Enter Venue", text: $venue)
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding(.horizontal)
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Button(action: {
+                                isSelected.toggle()
+                            }) {
+                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(isSelected ? .green : .gray)
+                                    .imageScale(.large)
+                            }
 
-                        TextField("Enter Amount", text: $amount)
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                            Text("GST")
+                                .fontWeight(.semibold)
+
+                            Spacer()
+
+                            Text("Amount: ₹\(amount)")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(10)
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                        .padding(.horizontal)
                     }
+                    CustonButton(title: "Submit", backgroundColor: .orange) {
+                        BookKathaApi()
+                    }.padding(20)
                 }
-                .padding(.horizontal)
             }
             
             Spacer()
@@ -330,6 +394,105 @@ struct BookKathaView: View {
                 case .failure(let error):
                     ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    func BookKathaApi() {
+        var dict = [String: Any]()
+        
+        // Employee Code
+        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        
+        // Guru Information
+        if let selectedGuru = selectedGuru {
+            dict["guru_ID"] = String(selectedGuru.guru_ID ?? 0)
+            dict["name"] = selectedGuru.guru_name ?? ""
+        } else {
+            dict["guru_ID"] = "0"
+            dict["name"] = guruSearchText
+        }
+        
+        // Channel Information
+        dict["channel"] = selectedChannel ?? ""
+        
+        // Amount and GST
+        dict["amount"] = amount
+        dict["gst"] = isSelected ? "1" : "0"
+        dict["gst_percentage"] = "18"
+        
+        // Venue
+        dict["venue"] = venue
+        
+        // Date Formatting
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dict["katha_from_date"] = dateFormatter.string(from: suggestedFromDate)
+        dict["katha_to_date"] = dateFormatter.string(from: suggestedToDate)
+        
+        // Katha Category
+        dict["katha_category_id"] = selectedCategory ?? ""
+        
+        // Time Slot
+        if let slot = selectedSlot {
+            dict["katha_slot"] = slot.slotName ?? ""
+            
+            // Custom time handling
+            if slot.slotName == "Custom" {
+                let timeFormatter = DateFormatter()
+                timeFormatter.dateFormat = "HH:mm"
+                dict["start_time"] = timeFormatter.string(from: suggestedFromDate)
+                dict["end_time"] = timeFormatter.string(from: suggestedToDate)
+            }
+        }
+        
+        // Image handling
+        if let selectedUIImage = selectedUIImage,
+           let imageData = selectedUIImage.jpegData(compressionQuality: 0.8) {
+            
+            ApiClient.shared.callHttpMethod(
+                apiendpoint: Constant.kathabookingApi,
+                method: .post,
+                param: dict,
+                model: GetSuccessMessageBook.self,
+                isMultipart: true,
+                images: ["image": imageData]
+            ) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let model):
+                        if model.status == true {
+                            ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
+                        } else {
+                            ToastManager.shared.show(message: model.message ?? "Booking failed")
+                        }
+                    case .failure(let error):
+                        ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
+                        print("Error booking katha:", error)
+                    }
+                }
+            }
+        } else {
+            // API call without image
+            ApiClient.shared.callHttpMethod(
+                apiendpoint: Constant.kathabookingApi,
+                method: .post,
+                param: dict,
+                model: GetSuccessMessageBook.self,
+                isMultipart: false
+            ) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let model):
+                        if model.status == true {
+                            ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
+                        } else {
+                            ToastManager.shared.show(message: model.message ?? "Booking failed")
+                        }
+                    case .failure(let error):
+                        ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
+                        print("Error booking katha:", error)
+                    }
                 }
             }
         }

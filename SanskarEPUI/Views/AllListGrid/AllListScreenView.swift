@@ -61,11 +61,12 @@ struct AllListView: View {
                 case .success(let model):
                     if var data = model.data {
                         data = data.filter { $0.id != 4 }
+                        self.reqType = data
                         let manualItem = SideBar(id: 100, name: "User Profile")
                         self.reqType.insert(manualItem, at: 0)
                         let manualItem2 = SideBar(id: 101, name: "Calander")
                         self.reqType.insert(manualItem2, at: 1)
-                        self.reqType = data
+                       
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                         print("Fetched items: \(data)")
                     } else {

@@ -29,3 +29,16 @@ struct GetSuccessMessage : Codable {
     }
 
 }
+struct GetSuccessMessageBook: Codable {
+    let status: Bool?
+    let message: String?
+    let data: [String]?
+    let error: [String: String]?
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case message
+        case data
+        case error
+    }
+}
