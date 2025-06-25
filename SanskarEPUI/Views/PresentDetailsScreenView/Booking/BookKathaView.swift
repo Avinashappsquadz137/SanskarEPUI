@@ -23,7 +23,7 @@ struct BookKathaView: View {
     
     @State private var activeSheet: ActiveSheetType? = nil
     @State private var selectedChannel: ChannelList? = nil
-    @State private var selectedCategory: String? = nil
+    @State private var selectedCategory: KathaCategory? = nil
 
     @State private var channels: [ChannelList] = []
     @State private var kathaTime: [KathaTimingCategory] = []
@@ -93,8 +93,8 @@ struct BookKathaView: View {
                     activeSheet = .category
                 }) {
                     HStack {
-                        Text(selectedCategory ?? "Select Katha Category")
-                            .foregroundColor(selectedCategory == nil ? .gray : .primary)
+                        Text(selectedCategory?.kathaName ?? "Select Katha Category")
+                            .foregroundColor(selectedCategory?.kathaName == nil ? .gray : .primary)
                         Spacer()
                         Image(systemName: "chevron.down")
                             .foregroundColor(.gray)
@@ -114,169 +114,9 @@ struct BookKathaView: View {
                         .padding(.horizontal)
                         .padding(.top, 10)
                     
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(alignment: .center, spacing: 16){
-                            VStack(alignment: .leading) {
-                             
-                                DatePicker(
-                                    "From",
-                                    selection: $suggestedFromDate,
-                                    displayedComponents: [.date]
-                                )
-                                .labelsHidden()
-                                .datePickerStyle(.compact)
-                                .padding(10)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            }
-                            .frame(maxWidth: .infinity)
-                            
-                            VStack(alignment: .leading) {
-                               
-                                DatePicker(
-                                    "To",
-                                    selection: $suggestedToDate,
-                                    in: suggestedFromDate...,
-                                    displayedComponents: [.date]
-                                )
-                                .labelsHidden()
-                                .datePickerStyle(.compact)
-                                .padding(10)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                        .padding(.horizontal)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Button(action: {
-                                activeSheet = .time
-                            }) {
-                                HStack {
-                                    Text(selectedSlot == nil ? "Select Time" : "\(selectedSlot?.slotName ?? "") \(selectedSlot?.slotTiming ?? "")")
-                                        .foregroundColor(selectedSlot == nil ? .gray : .primary)
-                                    Spacer()
-                                    Image(systemName: "chevron.down")
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(10)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            }
-                            .padding(.horizontal)
-                            
-                            if selectedSlot?.slotName == "Custom" {
-                                HStack(alignment: .center, spacing: 16){
-                                    VStack(alignment: .leading) {
-                                      
-                                        DatePicker(
-                                            "From",
-                                            selection: $suggestedFromDate,
-                                            displayedComponents: [.hourAndMinute]
-                                        )
-                                       
-                                        .datePickerStyle(.compact)
-                                        .padding(10)
-                                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    
-                                    VStack(alignment: .leading) {
-                                        
-                                        DatePicker(
-                                            "To",
-                                            selection: $suggestedToDate,
-                                            in: suggestedFromDate...,
-                                            displayedComponents: [.hourAndMinute]
-                                        )
-                                        
-                                        .datePickerStyle(.compact)
-                                        .padding(10)
-                                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                    }
-                VStack(alignment: .leading) {
-                    Text("Select Guru")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    TextField("Search Guru...", text: $guruSearchText, onEditingChanged: { editing in
-                        showGuruList = editing
-                    })
-                    .padding(10)
-                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
+                dateAndTimeSelectionView
+                selectGuruAndValue
                 
-                    if showGuruList && !filteredGuruList().isEmpty {
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 10) {
-                                ForEach(filteredGuruList(), id: \.guru_ID) { guru in
-                                    Text(guru.guru_name ?? "Unknown")
-                                        .padding(.horizontal)
-                                        .padding(.vertical, 5)
-                                        .background(Color.blue.opacity(0.1))
-                                        .cornerRadius(8)
-                                        .onTapGesture {
-                                            guruSearchText = guru.guru_name ?? ""
-                                            showGuruList = false
-                                            selectedGuru = guru
-                                        }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                        .frame(maxHeight: 200)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 4)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 16) {
-                            TextField("Enter Venue", text: $venue)
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            
-                            TextField("Enter Amount", text: $amount)
-                                .keyboardType(.numberPad)
-                                .onChange(of: amount) { newValue in
-                                    amount = newValue.filter { $0.isNumber }
-                                }
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        }
-                    }
-                    .padding(.horizontal)
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 8) {
-                            Button(action: {
-                                isSelected.toggle()
-                            }) {
-                                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(isSelected ? .green : .gray)
-                                    .imageScale(.large)
-                            }
-
-                            Text("GST")
-                                .fontWeight(.semibold)
-
-                            Spacer()
-
-                            Text("Amount: ₹\(amount)")
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(10)
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
-                        .padding(.horizontal)
-                    }
-                    CustonButton(title: "Submit", backgroundColor: .orange) {
-                        BookKathaApi()
-                    }.padding(20)
-                }
             }
             
             Spacer()
@@ -289,7 +129,7 @@ struct BookKathaView: View {
                     title: Text("Select Katha Category"),
                     buttons: categoryList.map { category in
                         .default(Text(category.kathaName ?? "Unknown")) {
-                            selectedCategory = category.kathaName
+                            selectedCategory = category
                             getKathaTimingCategoryAPI(kathaIds: String(category.iD ?? 0))
                         }
                     } + [.cancel()]
@@ -312,6 +152,174 @@ struct BookKathaView: View {
         }
     }
 
+    private var selectGuruAndValue: some View {
+        VStack(alignment: .leading) {
+            Text("Select Guru")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            TextField("Search Guru...", text: $guruSearchText, onEditingChanged: { editing in
+                showGuruList = editing
+            })
+            .padding(10)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+            .cornerRadius(8)
+            .padding(.horizontal)
+        
+            if showGuruList && !filteredGuruList().isEmpty {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        ForEach(filteredGuruList(), id: \.guru_ID) { guru in
+                            Text(guru.guru_name ?? "Unknown")
+                                .padding(.horizontal)
+                                .padding(.vertical, 5)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(8)
+                                .onTapGesture {
+                                    guruSearchText = guru.guru_name ?? ""
+                                    showGuruList = false
+                                    selectedGuru = guru
+                                }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .frame(maxHeight: 200)
+                .background(Color.white)
+                .cornerRadius(8)
+                .shadow(radius: 4)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 16) {
+                    TextField("Enter Venue", text: $venue)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    
+                    TextField("Enter Amount", text: $amount)
+                        .keyboardType(.numberPad)
+                        .onChange(of: amount) { newValue in
+                            amount = newValue.filter { $0.isNumber }
+                        }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                }
+            }
+            .padding(.horizontal)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Button(action: {
+                        isSelected.toggle()
+                    }) {
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(isSelected ? .green : .gray)
+                            .imageScale(.large)
+                    }
+
+                    Text("GST")
+                        .fontWeight(.semibold)
+
+                    Spacer()
+
+                    Text("Amount: ₹\(amount)")
+                        .foregroundColor(.secondary)
+                }
+                .padding(10)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                .padding(.horizontal)
+            }
+            CustonButton(title: "Submit", backgroundColor: .orange) {
+                BookKathaApi()
+            }.padding(20)
+        }
+        
+    }
+    private var dateAndTimeSelectionView: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 16){
+                VStack(alignment: .leading) {
+                 
+                    DatePicker(
+                        "From",
+                        selection: $suggestedFromDate,
+                        displayedComponents: [.date]
+                    )
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(alignment: .leading) {
+                   
+                    DatePicker(
+                        "To",
+                        selection: $suggestedToDate,
+                        in: suggestedFromDate...,
+                        displayedComponents: [.date]
+                    )
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal)
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Button(action: {
+                    activeSheet = .time
+                }) {
+                    HStack {
+                        Text(selectedSlot == nil ? "Select Time" : "\(selectedSlot?.slotName ?? "") \(selectedSlot?.slotTiming ?? "")")
+                            .foregroundColor(selectedSlot == nil ? .gray : .primary)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                }
+                .padding(.horizontal)
+                
+                if selectedSlot?.slotName == "Custom" {
+                    HStack(alignment: .center, spacing: 16){
+                        VStack(alignment: .leading) {
+                          
+                            DatePicker(
+                                "From",
+                                selection: $suggestedFromDate,
+                                displayedComponents: [.hourAndMinute]
+                            )
+                           
+                            .datePickerStyle(.compact)
+                            .padding(10)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                        }
+                        .frame(maxWidth: .infinity)
+                        
+                        VStack(alignment: .leading) {
+                            
+                            DatePicker(
+                                "To",
+                                selection: $suggestedToDate,
+                                in: suggestedFromDate...,
+                                displayedComponents: [.hourAndMinute]
+                            )
+                            
+                            .datePickerStyle(.compact)
+                            .padding(10)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
     func existGuruListAPI(){
         var dict = Dictionary<String, Any>()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
@@ -414,11 +422,11 @@ struct BookKathaView: View {
         }
         
         // Channel Information
-        dict["channel"] = selectedChannel ?? ""
+        dict["channel"] = "\(selectedChannel?.sno ?? 0)"
         
         // Amount and GST
         dict["amount"] = amount
-        dict["gst"] = isSelected ? "1" : "0"
+        dict["gst"] = isSelected ? "yes" : "no"
         dict["gst_percentage"] = "18"
         
         // Venue
@@ -431,11 +439,11 @@ struct BookKathaView: View {
         dict["katha_to_date"] = dateFormatter.string(from: suggestedToDate)
         
         // Katha Category
-        dict["katha_category_id"] = selectedCategory ?? ""
+        dict["katha_category_id"] = "\(selectedCategory?.iD ?? 0)"
         
         // Time Slot
         if let slot = selectedSlot {
-            dict["katha_slot"] = slot.slotName ?? ""
+            dict["katha_slot"] = slot.sno ?? ""
             
             // Custom time handling
             if slot.slotName == "Custom" {

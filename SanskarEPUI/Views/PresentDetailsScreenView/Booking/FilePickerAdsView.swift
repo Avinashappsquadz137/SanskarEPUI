@@ -10,7 +10,7 @@ import PhotosUI
 import UniformTypeIdentifiers
 
 struct FilePickerAdsView: View {
-    @Binding var selectedCategory: String?
+    @Binding var selectedCategory: KathaCategory?
     @Binding var selectedUIImage: UIImage?
     @Binding var selectedFileUrl: URL?
     
@@ -21,7 +21,7 @@ struct FilePickerAdsView: View {
     
     var body: some View {
         VStack {
-            if selectedCategory == "Ads" {
+            if selectedCategory?.kathaName == "Ads" {
                 Button(action: {
                     filePickerAds = true
                 }) {
