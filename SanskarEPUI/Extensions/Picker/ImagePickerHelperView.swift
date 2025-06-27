@@ -19,11 +19,15 @@ struct ImagePicker: UIViewControllerRepresentable {
         let parent: ImagePicker
         init(_ parent: ImagePicker) { self.parent = parent }
 
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
                 parent.selectedImage = image
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    picker.dismiss(animated: true)
+                }
+            } else {
+                picker.dismiss(animated: true)
             }
-            picker.dismiss(animated: true)
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {

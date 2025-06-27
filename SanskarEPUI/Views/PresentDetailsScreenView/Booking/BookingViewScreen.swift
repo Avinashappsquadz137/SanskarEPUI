@@ -82,7 +82,7 @@ struct NewBookingCellView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Text("\(booking.name ?? "N/A")")
+                Text("\(booking.name?.uppercased() ?? "N/A")")
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {

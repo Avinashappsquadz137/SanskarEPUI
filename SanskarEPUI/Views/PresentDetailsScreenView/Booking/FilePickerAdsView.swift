@@ -21,6 +21,14 @@ struct FilePickerAdsView: View {
     
     var body: some View {
         VStack {
+            if let image = selectedUIImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 120)
+                    .padding(.horizontal)
+            }
+
             if selectedCategory?.kathaName == "Ads" {
                 Button(action: {
                     filePickerAds = true

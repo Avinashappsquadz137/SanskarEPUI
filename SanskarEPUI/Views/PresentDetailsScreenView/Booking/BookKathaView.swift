@@ -145,6 +145,7 @@ struct BookKathaView: View {
                 )
             }
         }
+        .overlay(ToastView())
         .onAppear {
             channelListApi()
             kathaCategoryApi()
@@ -336,9 +337,7 @@ struct BookKathaView: View {
                 case .success(let model):
                     self.existGuru = model.data ?? []
                     print(model.data ?? [])
-                    ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
                 }
             }
@@ -359,9 +358,7 @@ struct BookKathaView: View {
                 case .success(let model):
                     self.kathaTime = model.data ?? []
                     print(model.data ?? [])
-                    ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
                 }
             }
@@ -379,9 +376,7 @@ struct BookKathaView: View {
                 switch result {
                 case .success(let model):
                     self.channels = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
                 }
             }
@@ -398,21 +393,18 @@ struct BookKathaView: View {
                 switch result {
                 case .success(let model):
                     self.categoryList = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
                 }
             }
         }
     }
     func BookKathaApi() {
+        print("📷 selectedUIImage is nil:", selectedUIImage == nil)
+        print("📄 selectedFileUrl is nil:", selectedFileUrl == nil)
+
         var dict = [String: Any]()
-        
-        // Employee Code
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
-        
-        // Guru Information
         if let selectedGuru = selectedGuru {
             dict["guru_ID"] = String(selectedGuru.guru_ID ?? 0)
             dict["name"] = selectedGuru.guru_name ?? ""
@@ -420,32 +412,18 @@ struct BookKathaView: View {
             dict["guru_ID"] = "0"
             dict["name"] = guruSearchText
         }
-        
-        // Channel Information
         dict["channel"] = "\(selectedChannel?.sno ?? 0)"
-        
-        // Amount and GST
         dict["amount"] = amount
         dict["gst"] = isSelected ? "yes" : "no"
         dict["gst_percentage"] = "18"
-        
-        // Venue
         dict["venue"] = venue
-        
-        // Date Formatting
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         dict["katha_from_date"] = dateFormatter.string(from: suggestedFromDate)
         dict["katha_to_date"] = dateFormatter.string(from: suggestedToDate)
-        
-        // Katha Category
         dict["katha_category_id"] = "\(selectedCategory?.iD ?? 0)"
-        
-        // Time Slot
         if let slot = selectedSlot {
             dict["katha_slot"] = slot.sno ?? ""
-            
-            // Custom time handling
             if slot.slotName == "Custom" {
                 let timeFormatter = DateFormatter()
                 timeFormatter.dateFormat = "HH:mm"
@@ -453,35 +431,39 @@ struct BookKathaView: View {
                 dict["end_time"] = timeFormatter.string(from: suggestedToDate)
             }
         }
-        
-        // Image handling
-        if let selectedUIImage = selectedUIImage,
-           let imageData = selectedUIImage.jpegData(compressionQuality: 0.8) {
-            
+        if selectedUIImage != nil || selectedFileUrl != nil {
+            var imagesData: [String: Data] = [:]
+
+            if let selectedUIImage = selectedUIImage,
+               let imageData = selectedUIImage.jpegData(compressionQuality: 0.8) {
+                imagesData["image"] = imageData
+            }
+
+            if let fileUrl = selectedFileUrl,
+               let fileData = try? Data(contentsOf: fileUrl) {
+                imagesData["file"] = fileData
+            }
+
             ApiClient.shared.callHttpMethod(
                 apiendpoint: Constant.kathabookingApi,
                 method: .post,
                 param: dict,
                 model: GetSuccessMessageBook.self,
                 isMultipart: true,
-                images: ["image": imageData]
+                images: imagesData
             ) { result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let model):
-                        if model.status == true {
-                            ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
-                        } else {
-                            ToastManager.shared.show(message: model.message ?? "Booking failed")
-                        }
+                        ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
                     case .failure(let error):
                         ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                         print("Error booking katha:", error)
                     }
                 }
             }
+
         } else {
-            // API call without image
             ApiClient.shared.callHttpMethod(
                 apiendpoint: Constant.kathabookingApi,
                 method: .post,
