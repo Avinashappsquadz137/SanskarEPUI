@@ -33,7 +33,7 @@ struct GetSuccessMessageBook: Codable {
     let status: Bool?
     let message: String?
     let data: [String]?
-    let error: ErrorValue?  // ✅ custom enum
+    let error: ErrorValue?  
 
     enum CodingKeys: String, CodingKey {
         case status

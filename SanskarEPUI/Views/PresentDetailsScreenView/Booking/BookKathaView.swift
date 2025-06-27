@@ -20,7 +20,7 @@ extension ActiveSheetType: Identifiable {
     }
 }
 struct BookKathaView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @State private var activeSheet: ActiveSheetType? = nil
     @State private var selectedChannel: ChannelList? = nil
     @State private var selectedCategory: KathaCategory? = nil
@@ -45,6 +45,7 @@ struct BookKathaView: View {
     @State private var venue = ""
     @State private var amount = ""
     @State var isSelected: Bool
+    
     func filteredGuruList() -> [ExistGuruList] {
         if guruSearchText.isEmpty {
             return existGuru
@@ -400,9 +401,6 @@ struct BookKathaView: View {
         }
     }
     func BookKathaApi() {
-        print("📷 selectedUIImage is nil:", selectedUIImage == nil)
-        print("📄 selectedFileUrl is nil:", selectedFileUrl == nil)
-
         var dict = [String: Any]()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
         if let selectedGuru = selectedGuru {
@@ -456,6 +454,7 @@ struct BookKathaView: View {
                     switch result {
                     case .success(let model):
                         ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
+                        dismiss()
                     case .failure(let error):
                         ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                         print("Error booking katha:", error)
@@ -476,6 +475,7 @@ struct BookKathaView: View {
                     case .success(let model):
                         if model.status == true {
                             ToastManager.shared.show(message: model.message ?? "Successfully booked katha")
+                            dismiss()
                         } else {
                             ToastManager.shared.show(message: model.message ?? "Booking failed")
                         }

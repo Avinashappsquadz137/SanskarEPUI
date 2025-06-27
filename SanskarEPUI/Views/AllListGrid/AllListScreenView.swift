@@ -115,6 +115,7 @@ struct AllListView: View {
                 .navigationTitle("Health Policy Card")
         } else if id == 3 {
             BookingViewScreen()
+                .navigationTitle(" Booking View")
         }else {
             Text("No screen available")
         }
