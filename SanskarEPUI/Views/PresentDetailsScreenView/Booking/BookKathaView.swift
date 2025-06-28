@@ -400,7 +400,7 @@ struct BookKathaView: View {
             }
         }
     }
-    func BookKathaApi() {
+    func BookKathaApi() {                                                
         var dict = [String: Any]()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
         if let selectedGuru = selectedGuru {

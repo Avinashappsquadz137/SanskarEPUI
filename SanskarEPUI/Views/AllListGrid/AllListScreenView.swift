@@ -116,7 +116,9 @@ struct AllListView: View {
         } else if id == 3 {
             BookingViewScreen()
                 .navigationTitle(" Booking View")
-        }else {
+        }else if id == 5 {
+            RequestViewScreen()
+        }else{
             Text("No screen available")
         }
     }

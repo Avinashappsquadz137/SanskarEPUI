@@ -16,7 +16,7 @@ class ApiRequest {
     }
     
     struct Url {
-        static var buildType: BuildType = .dev
+        static var buildType: BuildType = .pro
         
         static var serverURL: String {
             switch buildType {
@@ -62,6 +62,9 @@ struct Constant {
     static let getKathaTimingCategory      = "api_panel/get_katha_timing_by_katha_category"
     static let existGuruList               = "api_panel/exist_guru_list"
     static let kathabookingApi             = "api_panel/katha_booking"
+    static let requestBookingList          = "api_panel/request_booking"
+    static let getDataPromoAssign          = "api_panel/get_data_promo"
+    static let bookingPromoType            = "api_panel/booking_promo_type"
 }
 
 

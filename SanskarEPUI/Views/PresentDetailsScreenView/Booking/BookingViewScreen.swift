@@ -12,6 +12,8 @@ struct BookingViewScreen: View {
     @State private var navigateToAddKatha = false
     @State private var searchText = ""
     
+    @State private var navigate = false
+    @State private var selectedBooking: NewBooking?
     var body: some View {
         VStack {
             CustomNavigationBar(
@@ -26,11 +28,23 @@ struct BookingViewScreen: View {
                 EmptyView()
             }
             .hidden()
+            NavigationLink(
+                         destination: selectedBooking.map { BookingApproveSchedule(booking: $0) },
+                         isActive: $navigate
+                     ) {
+                         EmptyView()
+                     }.hidden()
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(filteredBookings, id: \.katha_booking_id) { booking in
                         NewBookingCellView(
-                            booking: booking
+                            config: NewBookingCellConfig(
+                                showAmount: true,
+                                showGST: true
+                            ), onTap: {
+                                selectedBooking = booking 
+                                navigate = true
+                            }, name: booking.name, amount: booking.amount, gST: booking.gST, channelName: booking.channelName, venue: booking.venue, katha_date: booking.katha_date, katha_from_Date: booking.katha_from_Date, kathaTiming: booking.kathaTiming, slotTiming: booking.slotTiming, status: booking.status
                         )
                     }
                 }
@@ -75,46 +89,64 @@ struct BookingViewScreen: View {
         }
     }
 }
+struct NewBookingCellConfig {
+    var showAmount: Bool = true
+    var showGST: Bool = true
+}
+
 
 struct NewBookingCellView: View {
-    let booking: NewBooking
-    @State private var navigate = false
+
+    var config: NewBookingCellConfig = NewBookingCellConfig()
+    var onTap: (() -> Void)?
+
+    let name : String?
+    let amount : String?
+    let gST : String?
+    let channelName : String?
+    let venue : String?
+    let katha_date : String?
+    let katha_from_Date : String?
+    let kathaTiming : String?
+    let slotTiming : String?
+    let status : String?
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Text("\(booking.name?.uppercased() ?? "N/A")")
+                Text("\(name?.uppercased() ?? "N/A")")
                     .fontWeight(.semibold)
                 Spacer()
                 Button(action: {
-                    navigate = true
+                    onTap?()
                 }) {
                     Image(systemName: "arrowshape.forward.circle.fill")
                         .foregroundColor(.blue)
                         .imageScale(.large)
                 }
-                NavigationLink(destination: BookingApproveSchedule(booking: booking), isActive: $navigate) {
-                    EmptyView()
+               
+            }
+            if config.showAmount || config.showGST {
+                HStack {
+                    Text("Amount: \(amount ?? "N/A")")
+                        .font(.caption2)
+                    Spacer()
+                    Text("GST: \(gST ?? "N/A")")
+                        .font(.caption2)
                 }
             }
+            
             HStack {
-                Text("Amount: \(booking.amount ?? "N/A")")
+                Text("Channel: \(channelName ?? "N/A")")
                     .font(.caption2)
                 Spacer()
-                Text("GST: \(booking.gST ?? "N/A")")
+                Text("Venue: \(venue ?? "N/A")")
                     .font(.caption2)
             }
             
-            HStack {
-                Text("Channel: \(booking.channelName ?? "N/A")")
-                    .font(.caption2)
-                Spacer()
-                Text("Venue: \(booking.venue ?? "N/A")")
-                    .font(.caption2)
-            }
-            
-            Text("Date: \(booking.katha_date ?? booking.katha_from_Date ?? "N/A")").font(.caption2)
-            Text("Time: \(booking.kathaTiming ?? booking.slotTiming ?? "N/A")").font(.caption2)
-            Text("Status: \(booking.status ?? "N/A")").font(.caption2)
+            Text("Date: \(katha_date ?? katha_from_Date ?? "N/A")").font(.caption2)
+            Text("Time: \(kathaTiming ?? slotTiming ?? "N/A")").font(.caption2)
+            Text("Status: \(status ?? "N/A")").font(.caption2)
         }
         .padding()
         .background(Color(.secondarySystemBackground))
