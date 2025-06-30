@@ -9,9 +9,11 @@ import SwiftUI
 struct SavedTourBillingRequestView: View {
     
     @State private var tourRequests: [BillingList] = []
-
+    @State private var selectedRequest: BillingList? = nil
+    @State private var navigate = false
+    
     var body: some View {
-        NavigationStack {
+        VStack {
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(tourRequests) { request in
@@ -21,19 +23,27 @@ struct SavedTourBillingRequestView: View {
                             location: request.location ?? "N/A",
                             date: "\(request.date1 ?? "-") to \(request.date2 ?? "-")",
                             onTap: {
-                                print("Tapped on \(request.tourID ?? "")")
+                                selectedRequest = request
+                                navigate = true
                             }
                         )
                     }
                 }
                 .padding()
             }
-           
-            .onAppear {
-                tourBillingApprovalList()
+            if let selectedRequest = selectedRequest {
+                NavigationLink(
+                    destination: SavedTourView(request: selectedRequest),
+                    isActive: $navigate,
+                    label: { EmptyView() }
+                )
+                .hidden()
             }
         }
-        .navigationTitle("Saved Billing Requests")
+        .onAppear {
+            tourBillingApprovalList()
+        }
+        .navigationTitle("Billing Requests")
     }
 
     // MARK: - API Call
