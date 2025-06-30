@@ -118,7 +118,10 @@ struct AllListView: View {
                 .navigationTitle(" Booking View")
         }else if id == 5 {
             RequestViewScreen()
-        }else{
+        }else if id == 6 {
+            MainTourView()
+                .navigationTitle("TOUR")
+        }else {
             Text("No screen available")
         }
     }

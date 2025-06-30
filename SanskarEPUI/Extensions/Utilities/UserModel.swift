@@ -45,7 +45,7 @@ class UserDefaultsManager {
 
     // MARK: - Getter Methods
     static func getEmpCode() -> String {
-        UserDefaults.standard.string(forKey: Keys.empCode) ?? "SANS-00037" //493
+        UserDefaults.standard.string(forKey: Keys.empCode) ?? "SANS-00290" //493
     }
 
     static func getName() -> String {

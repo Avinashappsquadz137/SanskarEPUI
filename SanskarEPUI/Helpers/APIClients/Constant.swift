@@ -65,6 +65,9 @@ struct Constant {
     static let requestBookingList          = "api_panel/request_booking"
     static let getDataPromoAssign          = "api_panel/get_data_promo"
     static let bookingPromoType            = "api_panel/booking_promo_type"
+    static let tourFormApi                 = "api_panel/tour_form"
+    static let getTourBillingApprovalList  = "api_panel/get_tour_billing_approval_list"
+   
 }
 
 
