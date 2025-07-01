@@ -67,7 +67,9 @@ struct Constant {
     static let bookingPromoType            = "api_panel/booking_promo_type"
     static let tourFormApi                 = "api_panel/tour_form"
     static let getTourBillingApprovalList  = "api_panel/get_tour_billing_approval_list"
-   
+    static let tourBillingRequestIos       = "api_panel/tour_billing_request_ios"
+    static let deleteBillingRequest        = "api_panel/delete_tourid_billing_request"
+    static let submitTourBillRequest       = "api_panel/submit_tour_billing_request"
 }
 
 
