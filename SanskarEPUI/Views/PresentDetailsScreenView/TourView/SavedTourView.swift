@@ -100,14 +100,26 @@ struct SavedTourView: View {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.gray, lineWidth: 0.5)
                         )
-
                     TextEditor(text: $remarkText)
                         .frame(height: 100)
-                        .padding(8)
+                        .padding(10)
+                        .background(Color.white)
+                        .cornerRadius(10)
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(.systemGray4))
+                                .stroke(Color.gray.opacity(0.3))
                         )
+                        .overlay(
+                            Group {
+                                if remarkText.isEmpty {
+                                    Text("Remark ...")
+                                        .foregroundColor(.gray)
+                                        .padding(.leading, 16)
+                                        .padding(.top, 12)
+                                }
+                            }, alignment: .topLeading
+                        )
+        
                     CustonButton(
                         title: "SAVE",
                         backgroundColor: (amounts.isEmpty || remarkText.isEmpty) ? .gray : .orange
