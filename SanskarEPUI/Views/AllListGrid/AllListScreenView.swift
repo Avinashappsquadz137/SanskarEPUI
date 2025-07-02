@@ -20,13 +20,7 @@ struct AllListView: View {
     }
     var body: some View {
         VStack {
-            TextField("Search...", text: $searchText)
-                .padding(10)
-                .padding(.horizontal)
-                .background(Color(.systemGray5))
-                .cornerRadius(10)
-                .padding(.horizontal)
-                .padding(.top, 8)
+            SearchBars(text: $searchText)
             ScrollView {
                 LazyVGrid(columns: columns) {
                     ForEach(filteredReqType.indices, id: \.self) { index in

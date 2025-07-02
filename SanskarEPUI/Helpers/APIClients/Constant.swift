@@ -70,6 +70,7 @@ struct Constant {
     static let tourBillingRequestIos       = "api_panel/tour_billing_request_ios"
     static let deleteBillingRequest        = "api_panel/delete_tourid_billing_request"
     static let submitTourBillRequest       = "api_panel/submit_tour_billing_request"
+    static let pushHistoryList             = "api_panel/push_history"
 }
 
 

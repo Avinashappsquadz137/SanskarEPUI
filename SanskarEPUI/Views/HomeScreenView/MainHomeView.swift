@@ -16,7 +16,7 @@ struct MainHomeView: View {
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     @StateObject private var calendarViewModel = MonthlyCalendarViewModel()
-    
+    @State private var navigateNotification = false
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -27,6 +27,7 @@ struct MainHomeView: View {
                         print("Search tapped")
                     },
                     onNotificationTapped: {
+                        navigateNotification = true
                         print("Notification tapped")
                     }
                 )
@@ -42,6 +43,13 @@ struct MainHomeView: View {
                 .padding(10)
                 AllListView()
                 Spacer()
+                NavigationLink(
+                    destination: NotificationHistoryListView(),
+                    isActive: $navigateNotification
+                ) {
+                    EmptyView()
+                }
+                .hidden()
             }
         }
     }
