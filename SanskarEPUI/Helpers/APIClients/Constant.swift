@@ -73,6 +73,7 @@ struct Constant {
     static let pushHistoryList             = "api_panel/push_history"
     static let guestFloor                  = "api_panel/get_floor"
     static let empGuestAction              = "api_panel/emp_action_guest"
+    static let removePushHistory           = "api_panel/remove_push_history"
 }
 
 

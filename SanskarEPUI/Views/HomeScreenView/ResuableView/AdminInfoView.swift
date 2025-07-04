@@ -58,9 +58,6 @@ struct AdminInfoView: View {
                     if let data = model.data {
                         eventDetails = data
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Fetched items: \(data)")
-                    } else {
-                        print("No data received")
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")

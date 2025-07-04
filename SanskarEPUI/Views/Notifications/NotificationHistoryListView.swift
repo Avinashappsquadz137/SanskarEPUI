@@ -12,7 +12,8 @@ struct NotificationHistoryListView: View {
     @State private var searchText = ""
     @State private var selectedItem: PushHistory?
     @State private var showGuestPopup = false
-    
+    @State private var showDeleteAllAlert = false
+
     var filteredNotifications: [PushHistory] {
         searchText.isEmpty
         ? notifications
@@ -65,11 +66,9 @@ struct NotificationHistoryListView: View {
                     img : item.notification_thumbnail ?? "",
                     guestName: item.notification_content ?? "Guest",
                     onAccept: { location in
-                        print("Accepted with location: \(location)")
                         showGuestPopup = false
                     },
                     onReject: {_ in
-                        print("Rejected")
                         showGuestPopup = false
                     },
                     onClose: {
@@ -87,19 +86,42 @@ struct NotificationHistoryListView: View {
         .onAppear {
             pushHistoryAPI()
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showDeleteAllAlert = true
+                }) {
+                    Image(systemName: "trash.circle")
+                        .font(.title2)
+                }
+            }
+        }
+        .alert(isPresented: $showDeleteAllAlert) {
+            Alert(
+                title: Text("Delete All Notifications"),
+                message: Text("Are you sure you want to delete all notifications?"),
+                primaryButton: .destructive(Text("Delete")) {
+                    notifications.removeAll()
+                    removePushHistoryAPI()
+                },
+                secondaryButton: .cancel()
+            )
+        }
+
     }
     func deleteNotification(_ item: PushHistory) {
-        print("Delete tapped for ID:", item.id ?? "N/A")
-        // Call API or remove from array
         notifications.removeAll { $0.id == item.id }
+        if selectedItem?.notification_type == "9" {
+            empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)",status: "2",reason: "Not Available")
+        }
     }
     
     func approveNotification(_ item: PushHistory) {
-        print("Approve tapped for ID:", item.id ?? "N/A")
-        // Call API or update status
-        // Example: update status locally
         if let index = notifications.firstIndex(where: { $0.id == item.id }) {
             notifications[index].status = true
+        }
+        if selectedItem?.notification_type == "9" {
+            empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)" ,status: "1",selectid: "1")
         }
     }
     
@@ -123,7 +145,50 @@ struct NotificationHistoryListView: View {
             }
         }
     }
-    
+    func removePushHistoryAPI() {
+        var dict = [String: Any]()
+        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.removePushHistory,
+            method: .post,
+            param: dict,
+            model: NotificationPushHistory.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    self.notifications = model.data ?? []
+                case .failure(let error):
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    func empGuestActionAPI(id: String,status: String,selectid: String? = nil,reason: String? = nil) {
+        var dict = [String: Any]()
+        dict["id"] = id
+        dict["status"] = status
+        dict["floor"] = selectid
+        dict["reason"] = reason
+
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.empGuestAction,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    ToastManager.shared.show(message: model.message ?? "Thank You")
+                case .failure(let error):
+                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
 }
 
 

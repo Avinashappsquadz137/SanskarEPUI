@@ -60,12 +60,8 @@ struct AllListView: View {
                         self.reqType.insert(manualItem, at: 0)
                         let manualItem2 = SideBar(id: 101, name: "Calander")
                         self.reqType.insert(manualItem2, at: 1)
-                       
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Fetched items: \(data)")
-                    } else {
-                        print("No data received")
-                    }
+                    } 
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")
