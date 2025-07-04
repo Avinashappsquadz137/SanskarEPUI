@@ -80,3 +80,15 @@ struct PushHistory : Codable {
 
 }
 
+// MARK: - GetFloorList
+struct GetFloorList: Codable {
+    let status: Bool
+    let message: String
+    let data: [Datum]
+    let error: String?
+}
+
+// MARK: - Datum
+struct Datum: Codable {
+    let name, id: String
+}

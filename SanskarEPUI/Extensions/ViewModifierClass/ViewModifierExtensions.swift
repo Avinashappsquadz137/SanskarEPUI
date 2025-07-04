@@ -34,3 +34,22 @@ struct SearchBars: View {
         }
     }
 }
+
+struct FilledButtonModifier: ViewModifier {
+    var backgroundColor: Color = .gray
+    
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(backgroundColor)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+    }
+}
+
+extension View {
+    func filledButtonStyle(backgroundColor: Color = .gray) -> some View {
+        self.modifier(FilledButtonModifier(backgroundColor: backgroundColor))
+    }
+}

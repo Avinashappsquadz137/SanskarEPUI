@@ -12,21 +12,21 @@ struct NotificationHistoryListView: View {
     @State private var searchText = ""
     @State private var selectedItem: PushHistory?
     @State private var showGuestPopup = false
-
+    
     var filteredNotifications: [PushHistory] {
         searchText.isEmpty
-            ? notifications
-            : notifications.filter {
-                $0.notification_title?.localizedCaseInsensitiveContains(searchText) == true ||
-                $0.notification_content?.localizedCaseInsensitiveContains(searchText) == true
-            }
+        ? notifications
+        : notifications.filter {
+            $0.notification_title?.localizedCaseInsensitiveContains(searchText) == true ||
+            $0.notification_content?.localizedCaseInsensitiveContains(searchText) == true
+        }
     }
-
+    
     var body: some View {
         ZStack {
             VStack {
                 SearchBars(text: $searchText)
-
+                
                 List(filteredNotifications, id: \.id) { item in
                     NotificationRowView(item: item)
                         .onTapGesture {
@@ -55,12 +55,12 @@ struct NotificationHistoryListView: View {
                 }
                 .listStyle(.plain)
             }
-
+            
             // Guest Popup Overlay
             if showGuestPopup, let item = selectedItem {
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
-
+                
                 GuestArrivalAlert(
                     img : item.notification_thumbnail ?? "",
                     guestName: item.notification_content ?? "Guest",
@@ -68,13 +68,14 @@ struct NotificationHistoryListView: View {
                         print("Accepted with location: \(location)")
                         showGuestPopup = false
                     },
-                    onReject: {
+                    onReject: {_ in
                         print("Rejected")
                         showGuestPopup = false
                     },
                     onClose: {
                         showGuestPopup = false
-                    }
+                    },
+                    reqID: item.req_id ?? 0
                 )
                 .padding()
                 .zIndex(1)
@@ -116,9 +117,7 @@ struct NotificationHistoryListView: View {
                 switch result {
                 case .success(let model):
                     self.notifications = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
                     print("API Error: \(error)")
                 }
             }
@@ -184,16 +183,24 @@ struct NotificationRowView: View {
     }
 }
 
-
 struct GuestArrivalAlert: View {
-    var img : String
+    var img: String
     var guestName: String
     var onAccept: (String) -> Void
-    var onReject: () -> Void
+    var onReject: (String) -> Void
     var onClose: () -> Void
-
+    var reqID: Int
     @State private var locationText = ""
-
+    @State private var selectedFloor = ""
+    @State private var rejectionReason = ""
+    
+    @State private var showFloorSheet = false
+    @State private var showReasonSheet = false
+    @State private var hiderejectBtn = false
+    
+    
+    @State private var floors: [Datum] = []
+    @State private var selectedFloorId: String = ""
     var body: some View {
         VStack {
             HStack {
@@ -226,30 +233,44 @@ struct GuestArrivalAlert: View {
                 Text("\(guestName) has arrived")
                     .font(.headline)
                     .multilineTextAlignment(.center)
-
-                TextField("Enter Location", text: $locationText)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-
-                HStack(spacing: 20) {
-                    Button("Accept") {
-                        onAccept(locationText)
+                if showReasonSheet == true {
+                    HStack(alignment: .center, spacing: 5){
+                        TextField("Enter Reason", text: $locationText)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                        Button(action: {
+                            empGuestActionAPI(id: String(reqID), status: "2", reason: "\(locationText)")
+                           
+                        }) {
+                            Image(systemName: "paperplane.circle")
+                                .resizable()
+                                .frame(width: 44, height: 44)
+                                .foregroundColor(.blue)
+                                .background(Color.white)
+                        }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-
-                    Button("Reject") {
-                        onReject()
+                }
+                HStack(spacing: 20 ) {
+                    if showReasonSheet == true {
+                        Button("Cancel") {
+                            onClose()
+                        }
+                        .filledButtonStyle(backgroundColor: .gray)
+                    } else {
+                        Button("Accept") {
+                            showFloorSheet = true
+                            
+                        }
+                        .filledButtonStyle(backgroundColor: .green)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.red)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+                    if hiderejectBtn == false {
+                        Button("Reject") {
+                            showReasonSheet = true
+                            hiderejectBtn = true
+                        }
+                        .filledButtonStyle(backgroundColor: .red)
+                    }
                 }
             }
             .padding()
@@ -258,5 +279,66 @@ struct GuestArrivalAlert: View {
         .cornerRadius(16)
         .shadow(radius: 10)
         .padding(.horizontal, 20)
+        .confirmationDialog("Select Floor", isPresented: $showFloorSheet) {
+            ForEach(floors, id: \.id) { floor in
+                Button(floor.name) {
+                    selectedFloorId = floor.id
+                    onAccept("\(locationText) - Floor ID: \(floor.id)")
+                    empGuestActionAPI(id: String(reqID), status: "1", selectid: "\(floor.id)")
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .overlay(ToastView())
+        .onAppear {
+            guestFloorAPI()
+        }
+    }
+
+    func guestFloorAPI () {
+        var dict = [String: Any]()
+        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.guestFloor,
+            method: .post,
+            param: dict,
+            model: GetFloorList.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    self.floors = model.data
+                case .failure(let error):
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    func empGuestActionAPI(id: String,status: String,selectid: String? = nil,reason: String? = nil) {
+        var dict = [String: Any]()
+        dict["id"] = id
+        dict["status"] = status
+        dict["floor"] = selectid
+        dict["reason"] = reason
+
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.empGuestAction,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    onClose()
+                    ToastManager.shared.show(message: model.message ?? "Thank You")
+                case .failure(let error):
+                    ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
+                    print("API Error: \(error)")
+                }
+            }
+        }
     }
 }
+
