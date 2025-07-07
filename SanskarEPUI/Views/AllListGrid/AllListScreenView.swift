@@ -111,6 +111,9 @@ struct AllListView: View {
         }else if id == 6 {
             MainTourView()
                 .navigationTitle("TOUR")
+        }else if id  == 24 {
+            SelfPunchView()
+                .navigationTitle("Self Punch")
         }else {
             Text("No screen available")
         }

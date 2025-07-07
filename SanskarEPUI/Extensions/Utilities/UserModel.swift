@@ -49,7 +49,7 @@ class UserDefaultsManager {
     }
 
     static func getName() -> String {
-        UserDefaults.standard.string(forKey: Keys.name) ?? "Avinash Gupta"
+        UserDefaults.standard.string(forKey: Keys.name) ?? "Vaibhav Bhradwaj"
     }
     
     static func getBirthday() -> String {

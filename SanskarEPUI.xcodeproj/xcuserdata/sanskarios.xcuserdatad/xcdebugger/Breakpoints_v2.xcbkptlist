@@ -7,33 +7,49 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D52785AE-C3DD-4E12-8913-52F923EA1535"
+            uuid = "AA32A57C-144B-4EFD-B3E1-94AB89A4251C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/TourView/PreViewBillingDetailsView.swift"
+            filePath = "SanskarEPUI/Views/Notifications/NotificationHistoryListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
-            landmarkName = "submitTourBill(tourID:)"
+            startingLineNumber = "390"
+            endingLineNumber = "390"
+            landmarkName = "empGuestActionAPI(id:status:selectid:reason:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "ACC160BB-85CE-4A93-B286-B1FB25334C46"
+            uuid = "FFBDD76C-D2F5-44CF-8512-DD3F5E49CD2E"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/Booking/BookingViewScreen.swift"
+            filePath = "SanskarEPUI/Views/Notifications/NotificationHistoryListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "24"
-            endingLineNumber = "24"
+            startingLineNumber = "352"
+            endingLineNumber = "352"
             landmarkName = "body"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4F4F7D2B-F45C-49A0-87C0-CC02D7D913DC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SanskarEPUI/Views/Notifications/NotificationHistoryListView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "362"
+            endingLineNumber = "362"
+            landmarkName = "GuestArrivalAlert"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

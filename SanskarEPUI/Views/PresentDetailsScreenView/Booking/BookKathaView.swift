@@ -71,7 +71,7 @@ struct BookKathaView: View {
                                         .foregroundColor(selectedChannel?.channelName == channel.channelName ? .green : .gray)
                                         .imageScale(.medium)
                                 }
-                                let imageUrlString = "\(Constant.imageURL)\(channel.channel_thumbnail ?? "")"
+                                let imageUrlString = "\(Constant.imageURL)\(channel.channel_thumbnail ?? "")" 
                                 AsyncImage(url: URL(string: "\(imageUrlString)")) { image in
                                     image
                                         .resizable()
