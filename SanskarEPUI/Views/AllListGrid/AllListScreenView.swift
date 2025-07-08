@@ -60,10 +60,8 @@ struct AllListView: View {
                         self.reqType.insert(manualItem, at: 0)
                         let manualItem2 = SideBar(id: 101, name: "Calander")
                         self.reqType.insert(manualItem2, at: 1)
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                     } 
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")
                 }
             }
@@ -74,6 +72,7 @@ struct AllListView: View {
     private func destinationView(for id: Int) -> some View {
         if id == 100 {
             UserProfileScreenView()
+                .navigationTitle("User Profile")
         } else if id == 2 {
             ApplyLeaveView()
         }else if id == 25 {
@@ -115,7 +114,7 @@ struct AllListView: View {
             SelfPunchView()
                 .navigationTitle("Self Punch")
         }else {
-            Text("No screen available")
+            Text("Work In Progress")
         }
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UserProfileScreenView: View {
-    
+    @State private var showLogoutAlert: Bool = false
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     let data = [
@@ -46,15 +46,57 @@ struct UserProfileScreenView: View {
                 .padding()
             }
             CustonButton(title: "Logout", backgroundColor: .orange) {
-                print("Cancel button tapped!")
+                showLogoutAlert = true
             }
             .padding(.horizontal, 10)
         }
+        .alert(isPresented: $showLogoutAlert) {
+            Alert(
+                title: Text("Are you sure?"),
+                message: Text("Do you really want to log out?"),
+                primaryButton: .destructive(Text("Log Out")) {
+                    LogoutApi()
+                },
+                secondaryButton: .cancel()
+            )
+        }.overlay(ToastView())
         
+    }
+    func LogoutApi() {
+        var dict = [String: Any]()
+        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
         
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.getlogout,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    if model.status == true {
+                        print("API Success: \(model)")
+                        ToastManager.shared.show(message: model.message ?? "Logout Device Successfully")
+                        UserDefaultsManager.removeUserData()
+                        UserDefaultsManager.setLoggedIn(false)
+                        logout()
+                        
+                    }
+                case .failure(let error):
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    func logout() {
+        UserDefaultsManager.setLoggedIn(false)
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            if let window = UIApplication.shared.windows.first {
+                window.rootViewController = UIHostingController(rootView: MainLoginView().environment(\.colorScheme, .light))
+                window.makeKeyAndVisible()
+            }
+        }
     }
 }
 
-#Preview {
-    UserProfileScreenView()
-}

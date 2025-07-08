@@ -76,6 +76,8 @@ struct Constant {
     static let removePushHistory           = "api_panel/remove_push_history"
     static let selfPunchAPI                = "api_panel/selfPunch"
     
+    static let getlogout                   = "api_panel/logout"
+    
 }
 
 

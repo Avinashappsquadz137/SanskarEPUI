@@ -38,7 +38,11 @@ extension Date {
         return addingTimeInterval(seconds)
     }
 }
-
+// MARK: - Dismiss Keyboard
+func hideKeyboard() {
+   UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                   to: nil, from: nil, for: nil)
+}
 extension UIImage {
     func resizeToWidth(_ width: CGFloat) -> UIImage? {
         let scale = width / self.size.width

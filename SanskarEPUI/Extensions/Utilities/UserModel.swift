@@ -36,13 +36,19 @@ class UserDefaultsManager {
         static let policyValidity = "PolicyValidity"
         static let bookingRoleID = "booking_role_id"
         static let isLoggedInKey = "isLoggedIn"
+        static var kDeviceToken  = ""
+        static let deviceModel = "DeviceModel"
+        static let savedDeviceModel = "SavedDeviceModel"
+        static let fCMToken = "FCMToken"
     }
     
     // MARK: - Device ID
     static var deviceId: String {
         UIDevice.current.identifierForVendor?.uuidString ?? ""
     }
-
+    static func getSavedDeviceModel() -> String {
+        UserDefaults.standard.string(forKey: Keys.savedDeviceModel) ?? deviceModel
+    }
     // MARK: - Getter Methods
     static func getEmpCode() -> String {
         UserDefaults.standard.string(forKey: Keys.empCode) ?? "SANS-00301" //493
@@ -130,6 +136,9 @@ class UserDefaultsManager {
     
     static func getBookingRoleID() -> String {
         UserDefaults.standard.string(forKey: Keys.bookingRoleID) ?? ""
+    }
+    static func getFCMToken() -> String {
+        UserDefaults.standard.string(forKey: Keys.fCMToken) ?? ""
     }
     static func isLoggedIn() -> Bool {
         return UserDefaults.standard.bool(forKey: Keys.isLoggedInKey)
@@ -227,6 +236,46 @@ class UserDefaultsManager {
     static func setLoggedIn(_ value: Bool) {
         UserDefaults.standard.set(value, forKey: Keys.isLoggedInKey)
     }
+    static func setFCMToken(_ token: String) {
+        UserDefaults.standard.set(token, forKey: Keys.fCMToken)
+    }
+    static func setSavedDeviceModel(_ value: String) {
+        UserDefaults.standard.set(value, forKey: Keys.savedDeviceModel)
+    }
+
+    // MARK: - Save All Login Data
+    static func saveUserData(from user: Login) {
+        setEmpCode(user.empCode ?? "")
+        setName(user.name ?? "")
+        setBirthday(user.bDay ?? "")
+        setEmailID(user.emailID ?? "")
+        setJoinDate(user.jDate ?? "")
+        setDepartment(user.dept ?? "")
+        setDeviceType(user.device_type ?? "")
+        setSavedDeviceModel(user.device_model ?? "")
+        setAddress(user.address ?? "")
+        setContactNo(user.cntNo ?? "")
+        setCode(user.code ?? "")
+        setDesignation(user.designation ?? "")
+        setReportTo(user.reportTo ?? "")
+        setProfileImage(user.pImg ?? "")
+        setAadharNo(user.aadharNo ?? "")
+        setPanNo(user.panNo ?? "")
+        setBloodGroup(user.bloodGroup ?? "")
+        setPolicyNumber(user.policyNumber ?? "")
+        setPolicyValidity(user.policyValidity ?? "")
+        setPolicyAmount(user.policyAmount ?? "")
+        setPlBalance(user.pl_balance ?? "")
+        setTodayInTime(user.today_intime ?? "")
+        if let roleID = user.booking_role_id {
+            setBookingRoleID(String(roleID))
+        } else {
+            setBookingRoleID("")
+        }
+        setLoggedIn(true)
+    }
+
+
     // MARK: - Helper Methods
     static func removeUserData() {
         UserDefaults.standard.removeObject(forKey: Keys.empCode)
@@ -251,4 +300,16 @@ class UserDefaultsManager {
         UserDefaults.standard.removeObject(forKey: Keys.policyValidity)
         UserDefaults.standard.removeObject(forKey: Keys.bookingRoleID)
     }
+}
+// MARK: - Device Model
+var deviceModel: String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+
+    let machineMirror = Mirror(reflecting: systemInfo.machine)
+    let identifier = machineMirror.children.reduce("") { identifier, element in
+        guard let value = element.value as? Int8, value != 0 else { return identifier }
+        return identifier + String(UnicodeScalar(UInt8(value)))
+    }
+    return identifier
 }

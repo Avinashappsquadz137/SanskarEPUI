@@ -21,7 +21,7 @@ struct CustonButton: View {
                 .foregroundColor(titleColor)
                 .font(.headline)
                 .frame(maxWidth: width == nil ? .infinity : nil)
-                .padding()
+                .padding(10)
                 .background(backgroundColor)
                 .cornerRadius(cornerRadius)
         }

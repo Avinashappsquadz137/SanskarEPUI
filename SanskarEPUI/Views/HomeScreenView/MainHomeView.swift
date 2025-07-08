@@ -52,5 +52,6 @@ struct MainHomeView: View {
                 .hidden()
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
