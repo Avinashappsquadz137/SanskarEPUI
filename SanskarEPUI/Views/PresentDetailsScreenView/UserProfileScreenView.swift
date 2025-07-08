@@ -11,30 +11,43 @@ struct UserProfileScreenView: View {
     @State private var showLogoutAlert: Bool = false
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
-    let data = [
-        "Available PL", "Joining Date", "Degignation", "Department", "Address","Reporting Authority","Pan Number","Aadhar Number","Blood Group"
+    
+    let data: [String: String] = [
+        "Available PL"         : UserDefaultsManager.getPlBalance(),
+        "Joining Date"         : UserDefaultsManager.getJoinDate(),
+        "Designation"          : UserDefaultsManager.getDesignation(),
+        "Department"           : UserDefaultsManager.getDepartment(),
+        "Address"              : UserDefaultsManager.getAddress(),
+        "Reporting Authority"  : UserDefaultsManager.getReportTo(),
+        "Pan Number"           : UserDefaultsManager.getPanNo(),
+        "Aadhar Number"        : UserDefaultsManager.getAadharNo(),
+        "Blood Group"          : UserDefaultsManager.getBloodGroup()
     ]
+    
     @State private var fieldValues: [String: String] = [:]
+
     var body: some View {
         VStack(spacing: 16) {
             EmployeeCard(
-                imageName: "person.fill", employeeName: "\(String(describing: name.uppercased()))",
-                employeeCode: "\(empCode)",
-                employeeAttendance: "",type: .pencil
+                imageName: "person.fill",
+                employeeName: name.uppercased(),
+                employeeCode: empCode,
+                employeeAttendance: "",
+                type: .pencil
             )
             .padding(.horizontal, 10)
            
             ScrollView {
                 VStack(spacing: 12) {
-                    ForEach(data, id: \.self) { item in
+                    ForEach(data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(item)
+                            Text(key)
                                 .font(.headline)
                                 .foregroundColor(.black)
                             
-                            TextField("Enter \(item)", text: Binding(
-                                get: { fieldValues[item] ?? "" },
-                                set: { fieldValues[item] = $0 }
+                            TextField("Enter \(key)", text: Binding(
+                                get: { fieldValues[key] ?? value },
+                                set: { fieldValues[key] = $0 }
                             ))
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                         }
@@ -45,6 +58,7 @@ struct UserProfileScreenView: View {
                 }
                 .padding()
             }
+
             CustonButton(title: "Logout", backgroundColor: .orange) {
                 showLogoutAlert = true
             }
@@ -59,12 +73,15 @@ struct UserProfileScreenView: View {
                 },
                 secondaryButton: .cancel()
             )
-        }.overlay(ToastView())
-        
+        }
+        .overlay(ToastView())
     }
+    
+    // MARK: - Logout API
     func LogoutApi() {
-        var dict = [String: Any]()
-        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        let dict: [String: Any] = [
+            "EmpCode": UserDefaultsManager.getEmpCode()
+        ]
         
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.getlogout,
@@ -76,12 +93,9 @@ struct UserProfileScreenView: View {
                 switch result {
                 case .success(let model):
                     if model.status == true {
-                        print("API Success: \(model)")
                         ToastManager.shared.show(message: model.message ?? "Logout Device Successfully")
                         UserDefaultsManager.removeUserData()
-                        UserDefaultsManager.setLoggedIn(false)
                         logout()
-                        
                     }
                 case .failure(let error):
                     print("API Error: \(error)")
@@ -89,14 +103,20 @@ struct UserProfileScreenView: View {
             }
         }
     }
+
+    // MARK: - Logout Action
     func logout() {
         UserDefaultsManager.setLoggedIn(false)
         DispatchQueue.main.asyncAfter(deadline: .now()) {
-            if let window = UIApplication.shared.windows.first {
+            if let window = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .flatMap({ $0.windows })
+                .first(where: { $0.isKeyWindow }) {
                 window.rootViewController = UIHostingController(rootView: MainLoginView().environment(\.colorScheme, .light))
                 window.makeKeyAndVisible()
             }
         }
     }
 }
+
 

@@ -165,6 +165,9 @@ struct MainLoginView: View {
                             showingLoginScreen = true
                             UserDefaultsManager.saveUserData(from: userData)
                             UserDefaultsManager.setLoggedIn(true)
+                            UserDefaultsManager.setName(userData.name ?? "")
+                            UserDefaultsManager.setEmpCode(userData.empCode ?? "")
+                            
                             ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                         }
                     } else {

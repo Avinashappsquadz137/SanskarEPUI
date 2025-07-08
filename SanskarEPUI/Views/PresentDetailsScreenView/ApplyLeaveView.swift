@@ -84,7 +84,7 @@ struct ApplyLeaveView: View {
                     Text("Leave Balance")
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                    Text("PL - 26")
+                    Text("\(UserDefaultsManager.getPlBalance())")
                         .font(.body)
                     
                     HStack {
