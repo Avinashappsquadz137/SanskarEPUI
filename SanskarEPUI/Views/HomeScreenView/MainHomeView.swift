@@ -15,6 +15,7 @@ struct MainHomeView: View {
     @State private var selectedDayOnly: String = ""
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
+    @State private var PImg: String = UserDefaultsManager.getProfileImage()
     @StateObject private var calendarViewModel = MonthlyCalendarViewModel()
     @State private var navigateNotification = false
     var body: some View {
@@ -33,7 +34,7 @@ struct MainHomeView: View {
                 )
                 VStack(spacing: 16) {
                     EmployeeCard(
-                        imageName: "person.fill",
+                        imageName: "\(PImg)",
                         employeeName: name.uppercased(),
                         employeeCode: empCode,
                         employeeAttendance: "\(selectedAttendance?.inTime ?? "") - \(selectedAttendance?.outTime ?? "")",

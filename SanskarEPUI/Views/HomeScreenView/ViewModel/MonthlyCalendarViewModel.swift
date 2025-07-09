@@ -37,8 +37,6 @@ class MonthlyCalendarViewModel: ObservableObject {
                     if let data = model.data {
                         self.epmDetails = data
                         self.selectedDay = self.calendar.component(.day, from: date)
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Fetched items: \(data)")
                     } else {
                         print("No data received")
                     }
@@ -70,7 +68,7 @@ class MonthlyCalendarViewModel: ObservableObject {
                 return .weekend
             case 3:
                 return .holiday
-            case 1:
+            case 2:
                 return .absent
             case 0:
                 return .present

@@ -75,7 +75,7 @@ struct Constant {
     static let empGuestAction              = "api_panel/emp_action_guest"
     static let removePushHistory           = "api_panel/remove_push_history"
     static let selfPunchAPI                = "api_panel/selfPunch"
-    
+    static let updateProfile               = "api_panel/update_profile"
     static let getlogout                   = "api_panel/logout"
     
 }

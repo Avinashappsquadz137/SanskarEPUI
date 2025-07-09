@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainLoginView: View {
     
-    @State private var mobile: String = ""
+    @State private var mobile: String = "8130067305"
     @State private var digit1: String = ""
     @State private var digit2: String = ""
     @State private var digit3: String = ""
@@ -162,13 +162,15 @@ struct MainLoginView: View {
                 case .success(let model):
                     if model.status == true {
                         if let userData = model.data {
-                            showingLoginScreen = true
+                         
                             UserDefaultsManager.saveUserData(from: userData)
                             UserDefaultsManager.setLoggedIn(true)
                             UserDefaultsManager.setName(userData.name ?? "")
                             UserDefaultsManager.setEmpCode(userData.empCode ?? "")
-                            
+                            print(userData.name ?? "")
+                            print(userData.empCode ?? "")
                             ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+                            showingLoginScreen = true
                         }
                     } else {
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")

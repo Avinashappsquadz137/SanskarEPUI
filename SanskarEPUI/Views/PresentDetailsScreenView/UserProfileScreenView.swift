@@ -6,11 +6,17 @@
 //
 
 import SwiftUI
+import Alamofire
 
 struct UserProfileScreenView: View {
     @State private var showLogoutAlert: Bool = false
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
+    @State private var PImg: String = UserDefaultsManager.getProfileImage()
+    @State private var selectedImage: UIImage?
+    @State private var isImagePickerPresented = false
+    @State private var fieldValues: [String: String] = [:]
+    
     
     let data: [String: String] = [
         "Available PL"         : UserDefaultsManager.getPlBalance(),
@@ -24,19 +30,16 @@ struct UserProfileScreenView: View {
         "Blood Group"          : UserDefaultsManager.getBloodGroup()
     ]
     
-    @State private var fieldValues: [String: String] = [:]
-
     var body: some View {
         VStack(spacing: 16) {
             EmployeeCard(
-                imageName: "person.fill",
+                imageName: "\(PImg)",
                 employeeName: name.uppercased(),
                 employeeCode: empCode,
                 employeeAttendance: "",
-                type: .pencil
+                type: .none
             )
             .padding(.horizontal, 10)
-           
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
@@ -58,11 +61,21 @@ struct UserProfileScreenView: View {
                 }
                 .padding()
             }
-
             CustonButton(title: "Logout", backgroundColor: .orange) {
                 showLogoutAlert = true
             }
             .padding(.horizontal, 10)
+        }
+        .overlay(ToastView())
+        .navigationBarItems(trailing:
+                                Button(action: {
+            isImagePickerPresented = true
+        }) {
+            Image(systemName: "camera.fill")
+                .foregroundColor(.blue)
+        })
+        .sheet(isPresented: $isImagePickerPresented, onDismiss: loadImage) {
+            ImagePicker(selectedImage: $selectedImage)
         }
         .alert(isPresented: $showLogoutAlert) {
             Alert(
@@ -74,9 +87,85 @@ struct UserProfileScreenView: View {
                 secondaryButton: .cancel()
             )
         }
-        .overlay(ToastView())
     }
     
+    func loadImage() {
+        guard let selectedImage = selectedImage else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            ToastManager.shared.show(message: "📤 Waiting for approval by HOD")
+        }
+        uploadProfileImage(image: selectedImage)
+    }
+    
+//    func uploadProfileImage(image: UIImage) {
+//        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+//        
+//        let url = Constant.BASEURL + Constant.updateProfile
+//        let parameters: [String: String] = [
+//            "EmpCode": empCode
+//        ]
+//        
+//        AF.upload(multipartFormData: { form in
+//            for (key, value) in parameters {
+//                form.append(Data(value.utf8), withName: key)
+//            }
+//            form.append(imageData, withName: "image", fileName: "\(Int64(Date().timeIntervalSince1970 * 1000)).png", mimeType: "image/png")
+//        }, to: url)
+//        .responseJSON { response in
+//            switch response.result {
+//            case .success(let value):
+//                if let json = value as? [String: Any], let status = json["status"] as? Bool, status {
+//                    let msg = json["message"] as? String ?? "📤 Waiting for approval by HOD"
+//                        ToastManager.shared.show(message: msg)
+//                    if let imgURL = json["imgUrl"] as? String {
+//                        UserDefaultsManager.setProfileImage(imgURL)
+//                        PImg = imgURL
+//                    }
+//                }
+//            case .failure(let error):
+//                print("Upload failed: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+    
+    func uploadProfileImage(image: UIImage) {
+        var dict = [String: Any]()
+        dict["EmpCode"] = empCode
+        if let resizedImage = image.resizeToWidth2(250),
+           let imageData = resizedImage.pngData() {
+            dict["image"] = imageData
+        }
+
+        let url = Constant.BASEURL + Constant.updateProfile
+print(url)
+        AF.upload(multipartFormData: { multipartFormData in
+            for (key, value) in dict {
+                if key == "image", let imageData = value as? Data {
+                    let filename = "\(Int64(Date().timeIntervalSince1970 * 1000)).png"
+                    multipartFormData.append(imageData, withName: key, fileName: filename, mimeType: "image/png")
+                } else if let stringValue = "\(value)".data(using: .utf8) {
+                    multipartFormData.append(stringValue, withName: key)
+                }
+            }
+        }, to: url)
+        .uploadProgress { progress in
+            print("Upload Progress: \(progress.fractionCompleted)")
+        }
+        .responseJSON { response in
+            DispatchQueue.main.async {
+                
+                switch response.result {
+                case .success(let value):
+                    if let JSON = value as? NSDictionary, let status = JSON["status"] as? Bool, status {
+                        print("Response JSON:", JSON)
+                        
+                    }
+                case .failure(let error):
+                    print("Upload Failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
     // MARK: - Logout API
     func LogoutApi() {
         let dict: [String: Any] = [
@@ -103,7 +192,7 @@ struct UserProfileScreenView: View {
             }
         }
     }
-
+    
     // MARK: - Logout Action
     func logout() {
         UserDefaultsManager.setLoggedIn(false)
@@ -116,6 +205,22 @@ struct UserProfileScreenView: View {
                 window.makeKeyAndVisible()
             }
         }
+    }
+}
+
+
+extension UIImage {
+    func resizeToWidth2(_ width: CGFloat) -> UIImage? {
+        let scale = width / self.size.width
+        let newHeight = self.size.height * scale
+        let newSize = CGSize(width: width, height: newHeight)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
+        self.draw(in: CGRect(origin: .zero, size: newSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return resizedImage
     }
 }
 

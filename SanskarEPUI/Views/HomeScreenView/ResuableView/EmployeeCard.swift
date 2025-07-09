@@ -13,6 +13,9 @@ enum EmployeeCardType {
 }
 
 struct EmployeeCard: View {
+    @State private var PImg: String = UserDefaultsManager.getProfileImage()
+    @State private var name: String = UserDefaultsManager.getName()
+    @State private var empCode: String = UserDefaultsManager.getEmpCode()
     var imageName: String = "person.fill"
     var employeeName: String = "AVINASH GUPTA"
     var employeeCode: String = "SANS-00301"
@@ -25,26 +28,48 @@ struct EmployeeCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
-                Image(systemName: imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .padding()
+                if let imageUrl = URL(string: PImg), !PImg.isEmpty {
+                    AsyncImage(url: imageUrl) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .background(Color.blue.opacity(0.1))
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                            .onTapGesture {
+                                isImageFullScreen = true
+                            }
+                    }
+                    .frame(width: 100, height: 100)
                     .background(Color.blue.opacity(0.1))
                     .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Color.green, lineWidth: 2)
-                    )
+                    .overlay(Circle().stroke(Color.green, lineWidth: 2))
                     .onTapGesture {
                         isImageFullScreen = true
                     }
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 100, height: 100)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                        .onTapGesture {
+                            isImageFullScreen = true
+                        }
+                }
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(employeeName)
+                    Text(name)
                         .font(.headline)
                         .foregroundColor(.primary)
                     
-                    Text(employeeCode)
+                    Text(empCode)
                         .font(.subheadline)
                         .foregroundColor(.primary)
                     HStack {
@@ -114,7 +139,7 @@ struct EmployeeCard: View {
             }
         }
         .fullScreenCover(isPresented: $isImageFullScreen) {
-            FullScreenImageView(imageURL: imageName)
+            FullScreenImageView(imageURL: PImg)
         }
     }
 }
