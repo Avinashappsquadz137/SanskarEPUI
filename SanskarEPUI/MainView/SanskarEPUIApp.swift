@@ -32,7 +32,10 @@ struct SanskarEPUIApp: App {
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+        UserDefaultsManager.setSavedDeviceModel(deviceModel)
+          
+            print("📱 Device model saved: \(UserDefaultsManager.getSavedDeviceModel())")
+
         UNUserNotificationCenter.current().delegate = self
         
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -115,14 +118,17 @@ struct SplashView: View {
             }
         } else {
             ZStack {
-                Color.white.ignoresSafeArea()
-                Image("inventory-management")
+                Image("signBackground")
+                       .resizable()
+                       .scaledToFill()
+                       .ignoresSafeArea()
+                Image("splash_logo")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 200, height: 200)
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now()) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     withAnimation {
                         isActive = true
                     }

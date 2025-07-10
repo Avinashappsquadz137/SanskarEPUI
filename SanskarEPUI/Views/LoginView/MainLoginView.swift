@@ -16,8 +16,8 @@ struct MainLoginView: View {
     @State private var digit4: String = ""
     @State private var showingLoginScreen = false
     @State private var showValidationError: Bool = false
-    @State private var showToast = false
-    @State private var toastMessage = ""
+    @State private var navigateToForgetPin = false
+    @State private var showForgetAlert = false
     
     enum PinField {
         case digit1, digit2, digit3, digit4
@@ -77,8 +77,6 @@ struct MainLoginView: View {
                             otpTextField(text: $digit4, next: nil, prev: .digit3, tag: .digit4)
                         }
                         .padding(.horizontal, 24)
- 
-                        
                         CustonButton(title: "Login", backgroundColor: .orange) {
                             hideKeyboard()
                             LoginApi()
@@ -93,13 +91,32 @@ struct MainLoginView: View {
                             EmptyView()
                         }
                     }
-                    NavigationLink(destination: ForgetPassword()) {
+                    Button(action: {
+                        hideKeyboard()
+                        if mobile.count != 10 {
+                            ToastManager.shared.show(message: "Please enter a valid 10-digit mobile number")
+                        } else {
+                            showForgetAlert = true
+                        }
+                    }) {
                         Text("Forget Pin ?")
                             .font(.system(size: 22, weight: .semibold))
                             .padding(.top)
                             .padding(.trailing, 28)
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
+                    .alert("Are you sure you want to reset your password?", isPresented: $showForgetAlert) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("Yes", role: .destructive) {
+                            navigateToForgetPin = true
+                        }
+                    }
+                    NavigationLink(
+                        destination: ForgetPassword(number: mobile),
+                        isActive: $navigateToForgetPin
+                    ) {
+                        EmptyView()
+                    }
                     Spacer()
                 }
                 Image("SanskarLogo")
@@ -142,6 +159,10 @@ struct MainLoginView: View {
     // MARK: - API Call
     func LoginApi() {
         let pin = digit1 + digit2 + digit3 + digit4
+        guard pin.count == 4 else {
+            ToastManager.shared.show(message: "Please enter a valid 4-digit PIN")
+            return
+        }
         let dict: [String: Any] = [
             "CntNo": mobile,
             "pin": pin,
@@ -162,13 +183,10 @@ struct MainLoginView: View {
                 case .success(let model):
                     if model.status == true {
                         if let userData = model.data {
-                         
                             UserDefaultsManager.saveUserData(from: userData)
                             UserDefaultsManager.setLoggedIn(true)
                             UserDefaultsManager.setName(userData.name ?? "")
                             UserDefaultsManager.setEmpCode(userData.empCode ?? "")
-                            print(userData.name ?? "")
-                            print(userData.empCode ?? "")
                             ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                             showingLoginScreen = true
                         }

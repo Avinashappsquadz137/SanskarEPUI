@@ -77,6 +77,8 @@ struct Constant {
     static let selfPunchAPI                = "api_panel/selfPunch"
     static let updateProfile               = "api_panel/update_profile"
     static let getlogout                   = "api_panel/logout"
+    static let verifyOTP                   = "api_panel/email_otp_verification"
+    static let setNewPin                   = "api_panel/set_pin"
     
 }
 

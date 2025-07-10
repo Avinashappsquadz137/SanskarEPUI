@@ -51,11 +51,11 @@ class UserDefaultsManager {
     }
     // MARK: - Getter Methods
     static func getEmpCode() -> String {
-        UserDefaults.standard.string(forKey: Keys.empCode) ?? "SANS-00301" //493
+        UserDefaults.standard.string(forKey: Keys.empCode) ?? "" //493
     }
 
     static func getName() -> String {
-        UserDefaults.standard.string(forKey: Keys.name) ?? "Vaibhav Bhradwaj"
+        UserDefaults.standard.string(forKey: Keys.name) ?? ""
     }
     
     static func getBirthday() -> String {
@@ -272,7 +272,6 @@ class UserDefaultsManager {
         } else {
             setBookingRoleID("")
         }
-        setLoggedIn(true)
     }
 
 

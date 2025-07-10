@@ -96,48 +96,17 @@ struct UserProfileScreenView: View {
         }
         uploadProfileImage(image: selectedImage)
     }
-    
-//    func uploadProfileImage(image: UIImage) {
-//        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
-//        
-//        let url = Constant.BASEURL + Constant.updateProfile
-//        let parameters: [String: String] = [
-//            "EmpCode": empCode
-//        ]
-//        
-//        AF.upload(multipartFormData: { form in
-//            for (key, value) in parameters {
-//                form.append(Data(value.utf8), withName: key)
-//            }
-//            form.append(imageData, withName: "image", fileName: "\(Int64(Date().timeIntervalSince1970 * 1000)).png", mimeType: "image/png")
-//        }, to: url)
-//        .responseJSON { response in
-//            switch response.result {
-//            case .success(let value):
-//                if let json = value as? [String: Any], let status = json["status"] as? Bool, status {
-//                    let msg = json["message"] as? String ?? "📤 Waiting for approval by HOD"
-//                        ToastManager.shared.show(message: msg)
-//                    if let imgURL = json["imgUrl"] as? String {
-//                        UserDefaultsManager.setProfileImage(imgURL)
-//                        PImg = imgURL
-//                    }
-//                }
-//            case .failure(let error):
-//                print("Upload failed: \(error.localizedDescription)")
-//            }
-//        }
-//    }
-    
     func uploadProfileImage(image: UIImage) {
         var dict = [String: Any]()
         dict["EmpCode"] = empCode
-        if let resizedImage = image.resizeToWidth2(250),
+        if let resizedImage = image.resizeToWidth(250),
            let imageData = resizedImage.pngData() {
             dict["image"] = imageData
         }
 
         let url = Constant.BASEURL + Constant.updateProfile
-print(url)
+        print(url)
+        print(dict)
         AF.upload(multipartFormData: { multipartFormData in
             for (key, value) in dict {
                 if key == "image", let imageData = value as? Data {
@@ -207,21 +176,4 @@ print(url)
         }
     }
 }
-
-
-extension UIImage {
-    func resizeToWidth2(_ width: CGFloat) -> UIImage? {
-        let scale = width / self.size.width
-        let newHeight = self.size.height * scale
-        let newSize = CGSize(width: width, height: newHeight)
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0)
-        self.draw(in: CGRect(origin: .zero, size: newSize))
-        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return resizedImage
-    }
-}
-
 
