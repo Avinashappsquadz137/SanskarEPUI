@@ -216,7 +216,11 @@ struct GuestRecordHistory: View {
                 }
             }
         }
-        
+        .onChange(of: addNewGuestSheet) { newValue in
+            if !newValue {
+                GuestHistoryApi()
+            }
+        }
     }
     
     func GuestHistoryApi() {
