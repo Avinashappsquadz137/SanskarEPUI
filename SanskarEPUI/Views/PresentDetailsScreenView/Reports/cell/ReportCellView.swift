@@ -54,6 +54,7 @@ struct ReportCellView: View {
 
                 Button(action: onCancelLeave) {
                     Text("Cancel Leave")
+                        .font(.caption)
                         .frame(maxWidth: .infinity)
                         .padding(5)
                         .foregroundColor(.white)

@@ -24,31 +24,35 @@ struct RequestViewScreen: View {
     
     var body: some View {
         VStack {
-            TextField("Search by Name...", text: $searchText)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(10)
-            
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(filteredBookings, id: \.katha_booking_id) { newBookings in
-                        NewBookingCellView(
-                            config: NewBookingCellConfig(
-                                showAmount: false,
-                                showGST: false
-                            ), onTap: {
-                                selectedBooking = newBookings
-                                navigate = true
-                            }, name: newBookings.name, amount: newBookings.amount, gST: newBookings.gST, channelName: newBookings.channelName, venue: newBookings.venue, katha_date: newBookings.katha_date, katha_from_Date: newBookings.katha_from_Date, kathaTiming: newBookings.kathaTiming, slotTiming: newBookings.slotTiming, status: newBookings.status
-                        )
+            if filteredBookings.isEmpty {
+                EmptyStateView(imageName: "EmptyList", message: "No List found")
+            } else {
+                TextField("Search by Name...", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(10)
+                
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(filteredBookings, id: \.katha_booking_id) { newBookings in
+                            NewBookingCellView(
+                                config: NewBookingCellConfig(
+                                    showAmount: false,
+                                    showGST: false
+                                ), onTap: {
+                                    selectedBooking = newBookings
+                                    navigate = true
+                                }, name: newBookings.name, amount: newBookings.amount, gST: newBookings.gST, channelName: newBookings.channelName, venue: newBookings.venue, katha_date: newBookings.katha_date, katha_from_Date: newBookings.katha_from_Date, kathaTiming: newBookings.kathaTiming, slotTiming: newBookings.slotTiming, status: newBookings.status
+                            )
+                        }
+                        NavigationLink(
+                            destination: selectedBooking.map { AssignForPromationView(newBookings: $0) },
+                            isActive: $navigate
+                        ) {
+                            EmptyView()
+                        }.hidden()
                     }
-                    NavigationLink(
-                        destination: selectedBooking.map { AssignForPromationView(newBookings: $0) },
-                        isActive: $navigate
-                    ) {
-                        EmptyView()
-                    }.hidden()
+                    .padding()
                 }
-                .padding()
             }
         }
         .onAppear {

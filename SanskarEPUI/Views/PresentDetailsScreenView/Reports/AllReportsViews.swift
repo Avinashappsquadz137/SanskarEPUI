@@ -17,25 +17,31 @@ struct MyReportsViews: View {
     @State private var showReasonSheet = false
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(reports, id: \.sno) { report in
-                    ReportCellView(
-                        reqNo: report.sno ?? 0,
-                        duration: getDuration(from: report.date1, to: report.date2),
-                        dateRange: "\(report.date1 ?? "") to \(report.date2 ?? "")",
-                        leaveStatus: report.status ?? "",
-                        leaveType: report.leave_type ?? "",
-                        onCancelLeave: {
-                            selectedReqNo = report.sno
-                            selectedLeaveType = report.leave_type ?? ""
-                            showReasonSheet = true
-                        }
-
-                    )}
-                Spacer()
+        VStack {
+            if reports.isEmpty {
+                EmptyStateView(imageName: "EmptyList", message: "No reports found")
+            }else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForEach(reports, id: \.sno) { report in
+                            ReportCellView(
+                                reqNo: report.sno ?? 0,
+                                duration: getDuration(from: report.date1, to: report.date2),
+                                dateRange: "\(report.date1 ?? "") to \(report.date2 ?? "")",
+                                leaveStatus: report.status ?? "",
+                                leaveType: report.leave_type ?? "",
+                                onCancelLeave: {
+                                    selectedReqNo = report.sno
+                                    selectedLeaveType = report.leave_type ?? ""
+                                    showReasonSheet = true
+                                }
+                                
+                            )}
+                        Spacer()
+                    }
+                    .padding()
+                }
             }
-            .padding()
         }
         .onAppear {
             getMyReportsList()

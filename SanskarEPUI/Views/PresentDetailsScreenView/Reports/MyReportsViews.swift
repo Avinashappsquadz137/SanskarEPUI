@@ -25,48 +25,52 @@ struct AllReportsViews: View {
     }
     var body: some View {
         VStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-
-                TextField("Search by Name or ID", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .overlay(
-                        HStack {
-                            Spacer()
-                            if !searchText.isEmpty {
-                                Button(action: {
-                                    searchText = ""
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray)
+            if filteredEmployees.isEmpty {
+                EmptyStateView(imageName: "EmptyList", message: "No Reports found")
+            } else {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    
+                    TextField("Search by Name or ID", text: $searchText)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .overlay(
+                            HStack {
+                                Spacer()
+                                if !searchText.isEmpty {
+                                    Button(action: {
+                                        searchText = ""
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.trailing, 8)
                                 }
-                                .padding(.trailing, 8)
                             }
-                        }
-                    )
-            }
-            .padding(10)
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
-            .padding(.horizontal)
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(filteredEmployees.indices, id: \.self) { index in
-                        let employee = employees[index]
-                        EmployeeCellView(
-                            name: employee.name ?? "N/A",
-                            empCode: employee.empCode ?? "N/A",
-                            department: employee.dept ?? "N/A",
-                            imageUrl: employee.empImage ?? ""
                         )
-                    }
                 }
-                .padding()
+                .padding(10)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(filteredEmployees.indices, id: \.self) { index in
+                            let employee = employees[index]
+                            EmployeeCellView(
+                                name: employee.name ?? "N/A",
+                                empCode: employee.empCode ?? "N/A",
+                                department: employee.dept ?? "N/A",
+                                imageUrl: employee.empImage ?? ""
+                            )
+                        }
+                    }
+                    .padding()
+                }
             }
-            .onAppear {
-                employeeLeaveApi()
-            }
+        }
+        .onAppear {
+            employeeLeaveApi()
         }
     }
     //AttendanceGridView(detail: detail)

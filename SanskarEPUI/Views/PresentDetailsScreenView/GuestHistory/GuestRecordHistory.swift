@@ -47,9 +47,7 @@ struct GuestRecordHistory: View {
                 )
                 Spacer()
                 if guestHistory.isEmpty {
-                    Text("No guest history available.")
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
                 } else {
                     List(filteredGuestHistory, id: \.id) { guest in
                         HStack(alignment: .center, spacing: 12) {

@@ -34,21 +34,25 @@ struct BookingViewScreen: View {
                      ) {
                          EmptyView()
                      }.hidden()
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(filteredBookings, id: \.katha_booking_id) { booking in
-                        NewBookingCellView(
-                            config: NewBookingCellConfig(
-                                showAmount: true,
-                                showGST: true
-                            ), onTap: {
-                                selectedBooking = booking 
-                                navigate = true
-                            }, name: booking.name, amount: booking.amount, gST: booking.gST, channelName: booking.channelName, venue: booking.venue, katha_date: booking.katha_date, katha_from_Date: booking.katha_from_Date, kathaTiming: booking.kathaTiming, slotTiming: booking.slotTiming, status: booking.status
-                        )
+            if filteredBookings.isEmpty {
+                EmptyStateView(imageName: "EmptyList", message: "No Booking List found")
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(filteredBookings, id: \.katha_booking_id) { booking in
+                            NewBookingCellView(
+                                config: NewBookingCellConfig(
+                                    showAmount: true,
+                                    showGST: true
+                                ), onTap: {
+                                    selectedBooking = booking
+                                    navigate = true
+                                }, name: booking.name, amount: booking.amount, gST: booking.gST, channelName: booking.channelName, venue: booking.venue, katha_date: booking.katha_date, katha_from_Date: booking.katha_from_Date, kathaTiming: booking.kathaTiming, slotTiming: booking.slotTiming, status: booking.status
+                            )
+                        }
                     }
+                    .padding()
                 }
-                .padding()
             }
         }
         .onAppear {

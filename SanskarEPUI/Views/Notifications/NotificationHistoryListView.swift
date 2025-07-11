@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NotificationHistoryListView: View {
+    @EnvironmentObject var notificationHandler: NotificationHandler
     @State private var notifications: [PushHistory] = []
     @State private var searchText = ""
     @State private var selectedItem: PushHistory?
@@ -27,7 +28,9 @@ struct NotificationHistoryListView: View {
         ZStack {
             VStack {
                 SearchBars(text: $searchText)
-                
+                if filteredNotifications.isEmpty {
+                    EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
+                } else {
                 List(filteredNotifications, id: \.id) { item in
                     NotificationRowView(item: item)
                         .onTapGesture {
@@ -56,6 +59,7 @@ struct NotificationHistoryListView: View {
                 }
                 .listStyle(.plain)
             }
+        }
             
             // Guest Popup Overlay
             if showGuestPopup, let item = selectedItem {
@@ -73,6 +77,26 @@ struct NotificationHistoryListView: View {
                     },
                     onClose: {
                         showGuestPopup = false
+                    },
+                    reqID: item.req_id ?? 0
+                )
+                .padding()
+                .zIndex(1)
+                .transition(.scale)
+            }
+            
+            if notificationHandler.showGuestPopup, let item = notificationHandler.selectedPushData {
+                GuestArrivalAlert(
+                    img : item.notification_thumbnail ?? "",
+                    guestName: item.notification_content ?? "Guest",
+                    onAccept: { location in
+                        notificationHandler.showGuestPopup = false
+                    },
+                    onReject: {_ in
+                        notificationHandler.showGuestPopup = false
+                    },
+                    onClose: {
+                        notificationHandler.showGuestPopup = false
                     },
                     reqID: item.req_id ?? 0
                 )

@@ -11,7 +11,7 @@ import SwiftUI
 struct AdminInfoView: View {
     @Binding var selectedDates: String
     @State private var eventDetails: [Events] = []
-    
+    @State var navigateToWishView = false
     var body: some View {
         VStack(spacing: 10) {
             ForEach(eventDetails, id: \.emp_Code) { detail in
@@ -66,9 +66,8 @@ struct AdminInfoView: View {
         }
     }
     func birthdayCell(detail: Events) -> some View {
-        VStack {
+        return VStack {
             HStack {
-                NavigationLink(destination: BirthdayWishView(detail: detail)) {
                     HStack {
                         if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
                             AsyncImage(url: url) { image in
@@ -83,25 +82,34 @@ struct AdminInfoView: View {
                                 .resizable()
                                 .frame(width: 50, height: 50)
                                 .clipShape(Circle())
-                        }                        
+                        }
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(detail.name ?? "Unknown").font(.subheadline).bold().foregroundColor(.black)
+                            Text(detail.name ?? "Unknown")
+                                .font(.subheadline)
+                                .bold()
+                                .foregroundColor(.black)
                             Text(detail.bDay ?? "")
                                 .font(.footnote)
                                 .foregroundColor(.gray)
                         }
                         Spacer()
                     }
-                }
                 Button(action: {
-                    print("Message tapped for \(detail.name ?? "Unknown")")
+                    navigateToWishView = true
                 }) {
                     Text("Message")
                         .padding(.horizontal)
                         .padding(.vertical, 6)
-                        .background(Color.green)
+                        .background(detail.actionStatus == "1" ? Color.gray : Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(8)
+                }
+                .disabled(detail.actionStatus == "1")
+                NavigationLink(
+                    destination: BirthdayWishView(detail: detail),
+                    isActive: $navigateToWishView
+                ) {
+                    EmptyView()
                 }
             }
             .padding(10)

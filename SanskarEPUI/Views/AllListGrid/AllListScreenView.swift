@@ -104,9 +104,10 @@ struct AllListView: View {
                 .navigationTitle("Health Policy Card")
         } else if id == 3 {
             BookingViewScreen()
-                .navigationTitle(" Booking View")
+                .navigationTitle("Booking View")
         }else if id == 5 {
             RequestViewScreen()
+                .navigationTitle("Request View")
         }else if id == 6 {
             MainTourView()
                 .navigationTitle("TOUR")

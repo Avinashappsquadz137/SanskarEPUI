@@ -36,23 +36,30 @@ struct ToastView: View {
     var body: some View {
         ZStack {
             if toastManager.showToast {
-                Text(toastManager.toastMessage)
-                    .font(.headline)
-                    .padding()
-                    .background(Color.black.opacity(0.8))
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding()
-                    .transition(.opacity)
-                    .offset(y: offset)
-                    .onAppear {
-                        withAnimation(.easeIn(duration: 0.5)) {
-                            self.offset = 30
-                        }
+                HStack(spacing: 5) {
+                    Image("SanskarLogo")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                        .clipShape(Circle())
+
+                    Text(toastManager.toastMessage)
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                }
+                .padding()
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(12)
+                .padding(.horizontal)
+                .transition(.opacity)
+                .offset(y: offset)
+                .onAppear {
+                    withAnimation(.easeIn(duration: 0.5)) {
+                        self.offset = 30
                     }
-                    .onDisappear {
-                        self.offset = -100
-                    }
+                }
+                .onDisappear {
+                    self.offset = -100
+                }
             }
         }
         .animation(.easeInOut, value: toastManager.showToast)

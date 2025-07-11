@@ -29,19 +29,19 @@ struct NotificationPushHistory : Codable {
     }
 
 }
-struct PushHistory : Codable {
-    let id : String?
-    let notification_title : String?
-    let notification_content : String?
-    let device_type : String?
-    let notification_type : String?
-    let notification_thumbnail : String?
-    let from_EmpCode : String?
-    let empCode : String?
-    let req_id : Int?
-    let note_type : String?
-    let creation_date : String?
-    let inOrOut : String?
+struct PushHistory : Codable , Identifiable {
+    var id : String?
+    var notification_title : String?
+    var notification_content : String?
+    var device_type : String?
+    var notification_type : String?
+    var notification_thumbnail : String?
+    var from_EmpCode : String?
+    var empCode : String?
+    var req_id : Int?
+    var note_type : String?
+    var creation_date : String?
+    var inOrOut : String?
     var status : Bool?
 
     enum CodingKeys: String, CodingKey {
@@ -77,7 +77,35 @@ struct PushHistory : Codable {
         inOrOut = try values.decodeIfPresent(String.self, forKey: .inOrOut)
         status = try values.decodeIfPresent(Bool.self, forKey: .status)
     }
-
+    init(
+            id: String? = nil,
+            notification_title: String? = nil,
+            notification_content: String? = nil,
+            device_type: String? = nil,
+            notification_type: String? = nil,
+            notification_thumbnail: String? = nil,
+            from_EmpCode: String? = nil,
+            empCode: String? = nil,
+            req_id: Int? = nil,
+            note_type: String? = nil,
+            creation_date: String? = nil,
+            inOrOut: String? = nil,
+            status: Bool? = nil
+        ) {
+            self.id = id
+            self.notification_title = notification_title
+            self.notification_content = notification_content
+            self.device_type = device_type
+            self.notification_type = notification_type
+            self.notification_thumbnail = notification_thumbnail
+            self.from_EmpCode = from_EmpCode
+            self.empCode = empCode
+            self.req_id = req_id
+            self.note_type = note_type
+            self.creation_date = creation_date
+            self.inOrOut = inOrOut
+            self.status = status
+        }
 }
 
 // MARK: - GetFloorList

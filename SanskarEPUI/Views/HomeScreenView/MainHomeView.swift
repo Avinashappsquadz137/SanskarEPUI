@@ -45,7 +45,8 @@ struct MainHomeView: View {
                 AllListView()
                 Spacer()
                 NavigationLink(
-                    destination: NotificationHistoryListView(),
+                    destination: NotificationHistoryListView()
+                        .environmentObject(NotificationHandler.shared),
                     isActive: $navigateNotification
                 ) {
                     EmptyView()
