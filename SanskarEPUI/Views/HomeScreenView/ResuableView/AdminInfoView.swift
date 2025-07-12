@@ -11,7 +11,8 @@ import SwiftUI
 struct AdminInfoView: View {
     @Binding var selectedDates: String
     @State private var eventDetails: [Events] = []
-    @State var navigateToWishView = false
+    @State private var selectedBirthdayGuest: Events? = nil
+
     var body: some View {
         VStack(spacing: 10) {
             ForEach(eventDetails, id: \.emp_Code) { detail in
@@ -31,6 +32,15 @@ struct AdminInfoView: View {
         .onChange(of: selectedDates) { _ in
             eventOnSelectedDate()
         }
+        .navigationDestination(isPresented: Binding<Bool>(
+            get: { selectedBirthdayGuest != nil },
+            set: { if !$0 { selectedBirthdayGuest = nil } }
+        )) {
+            if let guest = selectedBirthdayGuest {
+                BirthdayWishView(detail: guest)
+            }
+        }
+
     }
     
     
@@ -66,36 +76,38 @@ struct AdminInfoView: View {
         }
     }
     func birthdayCell(detail: Events) -> some View {
-        return VStack {
+        VStack {
             HStack {
-                    HStack {
-                        if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
-                            AsyncImage(url: url) { image in
-                                image.resizable()
-                            } placeholder: {
-                                ProgressView()
-                            }
+                HStack {
+                    if let imageUrl = detail.pImg, let url = URL(string: imageUrl) {
+                        AsyncImage(url: url) { image in
+                            image.resizable()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
                             .frame(width: 50, height: 50)
                             .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                        }
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(detail.name ?? "Unknown")
-                                .font(.subheadline)
-                                .bold()
-                                .foregroundColor(.black)
-                            Text(detail.bDay ?? "")
-                                .font(.footnote)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
                     }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(detail.name ?? "Unknown")
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundColor(.black)
+                        Text(detail.bDay ?? "")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    }
+                    Spacer()
+                }
+                
                 Button(action: {
-                    navigateToWishView = true
+                    selectedBirthdayGuest = detail
                 }) {
                     Text("Message")
                         .padding(.horizontal)
@@ -105,12 +117,6 @@ struct AdminInfoView: View {
                         .cornerRadius(8)
                 }
                 .disabled(detail.actionStatus == "1")
-                NavigationLink(
-                    destination: BirthdayWishView(detail: detail),
-                    isActive: $navigateToWishView
-                ) {
-                    EmptyView()
-                }
             }
             .padding(10)
             .background(Color.white)
@@ -118,6 +124,7 @@ struct AdminInfoView: View {
             .shadow(radius: 2)
         }
     }
+
     
     func leaveCell(detail: Events) -> some View {
         NavigationLink(destination: LeaveDetailView(detail: detail)) {

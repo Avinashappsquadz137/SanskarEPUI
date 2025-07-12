@@ -42,7 +42,7 @@ struct Constant {
     static let detailOfEmp                 = "api_panel/detailofemp"
     static let hodLeaveUpdate              = "api_panel/hod_leave_update"
     static let birthdayWishApi             = "api-panel/wish-birthday"
-    static let birthdayWishreply           = "api-panel/birthday-reply"
+    static let birthdayWishreply           = "api-panel/wish-birthday"
     static let wfhomeRequest               = "api_panel/work_from_home"
     static let dayOffRequest               = "api_panel/off_day"
     static let leaveRequest                = "api_panel/employee_leave"
@@ -79,7 +79,8 @@ struct Constant {
     static let getlogout                   = "api_panel/logout"
     static let verifyOTP                   = "api_panel/email_otp_verification"
     static let setNewPin                   = "api_panel/set_pin"
-    
+    static let kathaGetDataByDate          = "api_panel/get_data_by_date"
+    static let getDateKeyAPI               = "api_panel/get_date_key"
 }
 
 

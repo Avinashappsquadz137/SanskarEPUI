@@ -113,8 +113,8 @@ struct BirthdayWishView: View {
     func birthdayWishreply() {
         var dict = [String: Any]()
         dict["EmpCode"] = detail.emp_Code
-        dict["Msg"] = messageText
-        dict["FromEmpCode"] =  "\(UserDefaultsManager.getEmpCode())"
+        dict["Message"] = messageText
+        dict["Sent_by"] =  "\(UserDefaultsManager.getEmpCode())"
         
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.birthdayWishreply,
@@ -125,15 +125,14 @@ struct BirthdayWishView: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
-                    if let data = model.data {
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+                    if model.status == true {
+                        ToastManager.shared.show(message: model.message ?? "Wished successfully")
                         messageText = ""
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             dismiss()
                         }
-                        print("Fetched items: \(data)")
                     } else {
-                        print("No data received")
+                        ToastManager.shared.show(message: model.message ?? "Something went wrong")
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
