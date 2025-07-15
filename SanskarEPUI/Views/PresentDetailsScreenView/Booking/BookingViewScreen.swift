@@ -17,57 +17,42 @@
 import SwiftUI
 
 struct BookingViewScreen: View {
-    @State private var bookings: [NewBooking] = []
+    @StateObject private var viewModel = BookingViewModel()
+    
     @State private var navigateToAddKatha = false
-    @State private var searchText = ""
-    @State private var showOnlyApproved = false
     @State private var navigateApprove = false
     @State private var navigateClientDetails = false
     @State private var selectedBooking: NewBooking?
-    
-    @State private var keyId: String? = nil
-    @State private var dateRange: String = "all"
-    @State private var selectDateStart: Date = Date()
-    @State private var selectDateEnd: Date = Date()
-    
-    @State private var showDropdown = false
-    @State private var dateKeyOptions: [GetDateKey] = []
-    @State private var showCustomDatePicker = false
-    
-    var filteredBookings: [NewBooking] {
-        if searchText.isEmpty {
-            return bookings
-        } else {
-            return bookings.filter { $0.name?.localizedCaseInsensitiveContains(searchText) ?? false }
-        }
-    }
+    @State private var showAssignSheet = false
+
     var body: some View {
         ZStack {
             VStack {
                 CustomNavigationBar(
                     onFilter: {
-                        if dateKeyOptions.isEmpty {
-                            getDateKeyModel()
+                        if viewModel.dateKeyOptions.isEmpty {
+                            viewModel.getDateKeyModel()
                         }
-                        showDropdown.toggle()
+                        viewModel.showDropdown.toggle()
                     },
-                    onSearch: { query in self.searchText = query },
-                    onAddListToggle: {  navigateToAddKatha = true },
+                    onSearch: { query in viewModel.searchText = query },
+                    onAddListToggle: { navigateToAddKatha = true },
                     isListMode: false,
-                    showFilter: !showOnlyApproved
+                    showFilter: !viewModel.showOnlyApproved
                 )
-                if showCustomDatePicker {
+                
+                if viewModel.showCustomDatePicker {
                     VStack(spacing: 16) {
-                        DatePicker("Select Start Date", selection: $selectDateStart, displayedComponents: [.date])
+                        DatePicker("Start Date", selection: $viewModel.selectDateStart, displayedComponents: [.date])
                             .datePickerStyle(.compact)
-                        DatePicker("Select End Date", selection: $selectDateEnd, displayedComponents: [.date])
+                        DatePicker("End Date", selection: $viewModel.selectDateEnd, displayedComponents: [.date])
                             .datePickerStyle(.compact)
                         
                         Button("Apply") {
-                            self.kathaGetDataByDateAPI()
+                            viewModel.kathaGetDataByDateAPI()
                             withAnimation {
-                                showDropdown = false
-                                showCustomDatePicker = false
+                                viewModel.showDropdown = false
+                                viewModel.showCustomDatePicker = false
                             }
                         }
                         .padding()
@@ -82,67 +67,42 @@ struct BookingViewScreen: View {
                     .shadow(radius: 4)
                     .padding(.horizontal)
                 }
-                NavigationLink(
-                    destination: BookKathaView(isSelected: false),
-                    isActive: $navigateToAddKatha
-                ) {
-                    EmptyView()
-                }
-                .hidden()
-                NavigationLink(
-                    destination: selectedBooking.map { BookingApproveSchedule(booking: $0) },
-                    isActive: $navigateApprove
-                ) {
-                    EmptyView()
-                }.hidden()
-                NavigationLink(
-                    destination: selectedBooking.map { ClientDetailFormView(booking: $0) },
-                    isActive: $navigateClientDetails
-                ) {
-                    EmptyView()
-                }.hidden()
-                if filteredBookings.isEmpty {
+                
+                NavigationLink(destination: BookKathaView(isSelected: false), isActive: $navigateToAddKatha) { EmptyView() }.hidden()
+                NavigationLink(destination: selectedBooking.map { BookingApproveSchedule(booking: $0) }, isActive: $navigateApprove) { EmptyView() }.hidden()
+                NavigationLink(destination: selectedBooking.map { ClientDetailFormView(booking: $0) }, isActive: $navigateClientDetails) { EmptyView() }.hidden()
+                
+                if viewModel.filteredBookings.isEmpty {
                     EmptyStateView(imageName: "EmptyList", message: "No Booking List found")
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            ForEach(filteredBookings, id: \.katha_booking_id) { booking in
-                                NewBookingCellView(
-                                    config: NewBookingCellConfig(
-                                        showAmount: true,
-                                        showGST: true
-                                    ), onTap: {
-                                        selectedBooking = booking
-                                        if  showOnlyApproved == false {
-                                            navigateApprove = true
-                                        } else {
-                                            navigateClientDetails = true //clientDetail's Form
-                                        }
-                                        
-                                    }, name: booking.name, amount: booking.amount, gST: booking.gST, channelName: booking.channelName, venue: booking.venue, katha_date: booking.katha_date, katha_from_Date: booking.katha_from_Date, kathaTiming: booking.kathaTiming, slotTiming: booking.slotTiming, status: booking.status
-                                )
+                            ForEach(viewModel.filteredBookings, id: \.katha_booking_id) { booking in
+                                cellView(for: booking)
                             }
+
                         }
                         .padding()
                     }
                 }
             }
-            if showDropdown && !dateKeyOptions.isEmpty {
+            
+            if viewModel.showDropdown && !viewModel.dateKeyOptions.isEmpty {
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(dateKeyOptions, id: \.key) { option in
+                    ForEach(viewModel.dateKeyOptions, id: \.key) { option in
                         Button(action: {
-                            self.keyId = String(option.key ?? -3)
-                            self.dateRange = option.date_range ?? "all"
-                            if self.dateRange == "custom" {
+                            viewModel.keyId = String(option.key ?? -3)
+                            viewModel.dateRange = option.date_range ?? "all"
+                            if viewModel.dateRange == "custom" {
                                 withAnimation {
-                                    self.showDropdown = false
-                                    self.showCustomDatePicker = true
+                                    viewModel.showDropdown = false
+                                    viewModel.showCustomDatePicker = true
                                 }
                             } else {
-                                self.kathaGetDataByDateAPI()
+                                viewModel.kathaGetDataByDateAPI()
                                 withAnimation {
-                                    self.showDropdown = false
-                                    self.showCustomDatePicker = false
+                                    viewModel.showDropdown = false
+                                    viewModel.showCustomDatePicker = false
                                 }
                             }
                         }) {
@@ -152,12 +112,7 @@ struct BookingViewScreen: View {
                                 .background(Color.white)
                                 .foregroundColor(.black)
                         }
-                        .overlay(
-                            Rectangle()
-                                .frame(height: 0.5)
-                                .foregroundColor(Color.gray.opacity(0.3)),
-                            alignment: .bottom
-                        )
+                        .overlay(Rectangle().frame(height: 0.5).foregroundColor(Color.gray.opacity(0.3)), alignment: .bottom)
                     }
                 }
                 .background(Color.white)
@@ -165,88 +120,51 @@ struct BookingViewScreen: View {
                 .shadow(radius: 4)
                 .padding(.horizontal)
             }
-            
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Toggle("", isOn: $showOnlyApproved)
+                Toggle("", isOn: $viewModel.showOnlyApproved)
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
                     .labelsHidden()
             }
         }
-        .onChange(of: showOnlyApproved) { value in
-            resetDateFilter()
-            if value {
-                dateRange = ""
-                kathaGetDataByDateAPI()
-                getDateKeyModel()
-            } else {
-             
-                getApproveKathalist()
-            }
+        .onChange(of: viewModel.showOnlyApproved) { newValue in
+            viewModel.onToggleChanged(newValue)
         }
         .onAppear {
-            resetDateFilter()
-            getApproveKathalist()
-        }
-        .onDisappear() {
-            showOnlyApproved = false
+            viewModel.onAppear()
         }
         .background(
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if showDropdown {
-                        showDropdown = false
-                    }
-                }
-        )
-        
-    }
-    
-    //assignBookingDetail
-    
-    func resetDateFilter() {
-        dateRange = "all"
-        keyId = nil
-        showCustomDatePicker = false
-        showDropdown = false
-        selectDateStart = Date()
-        selectDateEnd = Date()
-    }
-
-    func getApproveKathalist() {
-        let params: [String: Any] = [
-            "EmpCode": UserDefaultsManager.getEmpCode(),
-            "category_id": "2"
-        ]
-        
-        ApiClient.shared.callmethodMultipart(
-            apiendpoint: Constant.getApproveKathalist,
-            method: .post,
-            param: params,
-            model: NewBookingModel.self
-        ) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let model):
-                    self.bookings = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                case .failure(let error):
-                    ToastManager.shared.show(message: "Enter Correct ID")
-                    print("API Error: \(error)")
+            Color.clear.contentShape(Rectangle()).onTapGesture {
+                if viewModel.showDropdown {
+                    viewModel.showDropdown = false
                 }
             }
+        )
+        .sheet(isPresented: $showAssignSheet) {
+            AssignEmployeeSheet(assignList: viewModel.assignDetails) { selectedEmpCode in
+                if let kathaId = selectedBooking?.katha_booking_id {
+                    selectKathaAssignAPI(kathaId: kathaId, assignTo: selectedEmpCode)
+                }
+                
+            }
         }
+
+
+
+        
+
     }
     
-    func assignBookingDetailAPI() {
+    func selectKathaAssignAPI(kathaId: String, assignTo : String) {
         let params: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode(),
+            "katha_id": "\(kathaId)",
+            "assign_to": assignTo,
         ]
-        
+        print(params)
         ApiClient.shared.callmethodMultipart(
-            apiendpoint: Constant.assignBookingDetail,
+            apiendpoint: Constant.kathaBookingAssign,
             method: .post,
             param: params,
             model: AssignBookingDetailModel.self
@@ -254,7 +172,7 @@ struct BookingViewScreen: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
-                  
+                 showAssignSheet = false
                     ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
@@ -263,74 +181,40 @@ struct BookingViewScreen: View {
             }
         }
     }
-    func kathaGetDataByDateAPI() {
-        var dict: [String: Any] = [
-            "EmpCode": UserDefaultsManager.getEmpCode()
-        ]
-        if keyId != nil
-        {
-            dict["value"]  = keyId
-        }
-        else
-        {
-            dict["value"]   = "-3"
-        }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        if dateRange == "custom" {
-            dict["start_date"] = formatter.string(from: selectDateStart)
-            dict["end_date"] = formatter.string(from: selectDateEnd)
-        } else {
-            dict["start_date"] = ""
-            dict["end_date"] = ""
-        }
-        ApiClient.shared.callmethodMultipart(
-            apiendpoint: Constant.kathaGetDataByDate,
-            method: .post,
-            param: dict,
-            model: NewBookingModel.self
-        ) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let model):
-                    self.bookings = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                    print(model.data)
-                case .failure(let error):
-                    ToastManager.shared.show(message: "Enter Correct ID")
-                    print("API Error: \(error)")
+    private func cellView(for booking: NewBooking) -> some View {
+        NewBookingCellView(
+            config: NewBookingCellConfig(),
+            onTap: {
+                selectedBooking = booking
+                if !viewModel.showOnlyApproved {
+                    viewModel.assignBookingDetailAPI()
+                    navigateApprove = true
+                } else {
+                    navigateClientDetails = true
                 }
-            }
-        }
-    }
-    
-    func getDateKeyModel() {
-        var dict: [String: Any] = [
-            "EmpCode": UserDefaultsManager.getEmpCode()
-        ]
-        
-        ApiClient.shared.callmethodMultipart(
-            apiendpoint: Constant.getDateKeyAPI,
-            method: .post,
-            param: dict,
-            model: GetDateKeyModel.self
-        ) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let model):
-                    self.dateKeyOptions = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                    print(model.data)
-                case .failure(let error):
-                    ToastManager.shared.show(message: "Enter Correct ID")
-                    print("API Error: \(error)")
+            },
+            onAssignTap: {
+                selectedBooking = booking
+                viewModel.assignBookingDetailAPI()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showAssignSheet = true
                 }
-            }
-        }
+            },
+            name: booking.name,
+            amount: booking.amount,
+            gST: booking.gST,
+            channelName: booking.channelName,
+            venue: booking.venue,
+            katha_date: booking.katha_date,
+            katha_from_Date: booking.katha_from_Date,
+            kathaTiming: booking.kathaTiming,
+            slotTiming: booking.slotTiming,
+            status: booking.status,
+            showAssignedList: viewModel.showOnlyApproved
+        )
     }
-    
-    
 }
+
 struct NewBookingCellConfig {
     var showAmount: Bool = true
     var showGST: Bool = true
@@ -341,6 +225,7 @@ struct NewBookingCellView: View {
     
     var config: NewBookingCellConfig = NewBookingCellConfig()
     var onTap: (() -> Void)?
+    var onAssignTap: (() -> Void)?
     
     let name : String?
     let amount : String?
@@ -352,6 +237,8 @@ struct NewBookingCellView: View {
     let kathaTiming : String?
     let slotTiming : String?
     let status : String?
+    
+    var showAssignedList: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -389,10 +276,52 @@ struct NewBookingCellView: View {
             Text("Date: \(katha_date ?? katha_from_Date ?? "N/A")").font(.caption2)
             Text("Time: \(kathaTiming ?? slotTiming ?? "N/A")").font(.caption2)
             Text("Status: \(status ?? "N/A")").font(.caption2)
+            
+            if showAssignedList {
+                Divider()
+                HStack {
+                    Text("Assigned To:")
+                        .font(.caption).bold()
+                    Button(action: {
+                        onAssignTap?()
+                    }) {
+                        Text("Click Here To assign")
+                            .font(.caption2)
+                            .padding(.vertical, 4)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    
+                }
+            }
         }
         .padding()
         .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
         .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+    }
+}
+struct AssignEmployeeSheet: View {
+    let assignList: [AssignBookingDetail]
+    let onAssignSelected: (String) -> Void
+    
+    var body: some View {
+        NavigationView {
+            List(assignList, id: \.empCode) { employee in
+                Button(action: {
+                    if let empCode = employee.empCode {
+                        onAssignSelected(empCode)
+                    }
+                }) {
+                    VStack(alignment: .leading) {
+                        Text(employee.name ?? "No Name")
+                            .font(.headline)
+                        Text("Emp Code: \(employee.empCode ?? "N/A")")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+            .navigationTitle("Select Employee")
+        }
     }
 }

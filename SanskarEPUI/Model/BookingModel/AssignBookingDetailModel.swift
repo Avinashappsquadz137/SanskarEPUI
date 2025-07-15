@@ -29,7 +29,7 @@ struct AssignBookingDetailModel : Codable {
 
 }
 
-struct AssignBookingDetail : Codable {
+struct AssignBookingDetail : Codable , Identifiable {
     var id: String { empCode ?? UUID().uuidString }
     let name : String?
     let empCode : String?

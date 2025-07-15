@@ -83,7 +83,7 @@ struct Constant {
     static let getDateKeyAPI               = "api_panel/get_date_key"
     static let clientdetailApi             = "api_panel/kathabooking_clientdetail"
     static let assignBookingDetail         = "api_panel/assign_booking_detail"
-    
+    static let kathaBookingAssign          = "api_panel/katha_booking_assign"
 }
 
 
