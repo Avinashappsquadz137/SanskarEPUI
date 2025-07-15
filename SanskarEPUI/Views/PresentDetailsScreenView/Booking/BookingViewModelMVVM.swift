@@ -12,7 +12,7 @@ class BookingViewModel: ObservableObject {
     @Published var bookings: [NewBooking] = []
     @Published var dateKeyOptions: [GetDateKey] = []
     @Published var assignDetails: [AssignBookingDetail] = []
-
+    
     @Published var keyId: String? = nil
     @Published var dateRange: String = "all"
     @Published var selectDateStart: Date = Date()
@@ -23,7 +23,7 @@ class BookingViewModel: ObservableObject {
     @Published var showOnlyApproved = false
     @Published var searchText = ""
     @Published var selectedAssign: Bool? = nil
-
+    
     var filteredBookings: [NewBooking] {
         if searchText.isEmpty {
             return bookings
@@ -57,34 +57,33 @@ class BookingViewModel: ObservableObject {
         selectDateEnd = Date()
     }
     func assignBookingDetailAPI() {
-            let params: [String: Any] = [
-                "EmpCode": "SANS-00037"
-            ]
-
-            ApiClient.shared.callmethodMultipart(
-                apiendpoint: Constant.assignBookingDetail,
-                method: .post,
-                param: params,
-                model: AssignBookingDetailModel.self
-            ) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let model):
-                        if model.status == true {
-                            self.assignDetails = model.data ?? []
-                        } else {
-                            self.assignDetails = []
-                            ToastManager.shared.show(message: model.message ?? "Failed to fetch")
-                        }
-                    case .failure(let error):
+        let params: [String: Any] = [
+            "EmpCode": UserDefaultsManager.getEmpCode()
+        ]
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.assignBookingDetail,
+            method: .post,
+            param: params,
+            model: AssignBookingDetailModel.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    if model.status == true {
+                        self.assignDetails = model.data ?? []
+                    } else {
                         self.assignDetails = []
-                        ToastManager.shared.show(message: "API Error")
-                        print("Error: \(error.localizedDescription)")
+                        ToastManager.shared.show(message: model.message ?? "Failed to fetch")
                     }
+                case .failure(let error):
+                    self.assignDetails = []
+                    ToastManager.shared.show(message: "API Error")
+                    print("Error: \(error.localizedDescription)")
                 }
             }
         }
-
+    }
 
     func getApproveKathalist() {
         let params: [String: Any] = [
@@ -108,7 +107,7 @@ class BookingViewModel: ObservableObject {
             }
         }
     }
-
+    
     func getDateKeyModel() {
         let dict: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode()
@@ -130,7 +129,7 @@ class BookingViewModel: ObservableObject {
             }
         }
     }
-
+    
     func kathaGetDataByDateAPI() {
         var dict: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode()
