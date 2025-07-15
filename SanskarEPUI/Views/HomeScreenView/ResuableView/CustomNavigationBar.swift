@@ -13,6 +13,7 @@ struct CustomNavigationBar: View {
     var onSearch: ((String) -> Void)? = nil
     var onAddListToggle: (() -> Void)? = nil
     var isListMode: Bool = true
+    var showFilter: Bool = false
 
     @State private var isSearching = false
     @State private var searchText = ""
@@ -38,10 +39,12 @@ struct CustomNavigationBar: View {
                             .foregroundColor(.gray)
                     }
                 } else {
-                    if let onFilter = onFilter {
-                        Button(action: onFilter) {
-                            Image(systemName: "line.horizontal.3.decrease.circle")
-                                .font(.system(size: 22))
+                    if !showFilter {
+                        if let onFilter = onFilter {
+                            Button(action: onFilter) {
+                                Image(systemName: "line.horizontal.3.decrease.circle")
+                                    .font(.system(size: 22))
+                            }
                         }
                     }
                     if onSearch != nil {

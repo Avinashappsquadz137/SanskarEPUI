@@ -81,6 +81,9 @@ struct Constant {
     static let setNewPin                   = "api_panel/set_pin"
     static let kathaGetDataByDate          = "api_panel/get_data_by_date"
     static let getDateKeyAPI               = "api_panel/get_date_key"
+    static let clientdetailApi             = "api_panel/kathabooking_clientdetail"
+    static let assignBookingDetail         = "api_panel/assign_booking_detail"
+    
 }
 
 

@@ -40,7 +40,7 @@ struct Events : Codable {
     let reason : String?
     let leave_type : String?
     let event_type : String?
-    let actionStatus : String?
+    var actionStatus : String?
     let from_date : String?
     let to_date : String?
     let req_date : String?

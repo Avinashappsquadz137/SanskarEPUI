@@ -37,10 +37,13 @@ struct AdminInfoView: View {
             set: { if !$0 { selectedBirthdayGuest = nil } }
         )) {
             if let guest = selectedBirthdayGuest {
-                BirthdayWishView(detail: guest)
+                BirthdayWishView(detail: guest) {
+                    if let index = eventDetails.firstIndex(where: { $0.emp_Code == guest.emp_Code }) {
+                        eventDetails[index].actionStatus = "1"
+                    }
+                }
             }
         }
-
     }
     
     

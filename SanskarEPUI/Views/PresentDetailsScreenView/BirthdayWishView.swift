@@ -11,6 +11,7 @@ struct BirthdayWishView: View {
     let detail: Events
     @State private var messageText: String = ""
     @Environment(\.dismiss) private var dismiss
+    let onWished: () -> Void
     let defaultMessages = [
         "Wishing you a day filled with love and cheer!",
         "Have a wonderful birthday!",
@@ -128,6 +129,7 @@ struct BirthdayWishView: View {
                     if model.status == true {
                         ToastManager.shared.show(message: model.message ?? "Wished successfully")
                         messageText = ""
+                        onWished()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             dismiss()
                         }

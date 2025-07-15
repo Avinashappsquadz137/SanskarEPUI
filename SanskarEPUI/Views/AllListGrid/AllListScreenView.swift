@@ -56,7 +56,7 @@ struct AllListView: View {
                     if var data = model.data {
                         data = data.filter { $0.id != 4 }
                         self.reqType = data
-                        let manualItem = SideBar(id: 100, name: "User Profile")
+                        let manualItem = SideBar(id: 100, name: "Profile")
                         self.reqType.insert(manualItem, at: 0)
                         let manualItem2 = SideBar(id: 101, name: "Calander")
                         self.reqType.insert(manualItem2, at: 1)
@@ -144,8 +144,9 @@ struct CardView: View {
         }
         .padding()
         .frame(width: UIScreen.main.bounds.width / 2  - 30)
-        .background(Color(.systemGray6))
+        .background(Color(.white))
         .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.5), radius: 4, x: 0, y: 2)
     }
     
     private func imageForID(_ id: Int) -> UIImage {
