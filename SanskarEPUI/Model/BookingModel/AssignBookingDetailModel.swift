@@ -29,7 +29,7 @@ struct AssignBookingDetailModel : Codable {
 
 }
 
-struct AssignBookingDetail : Codable , Identifiable {
+struct AssignBookingDetail : Codable , Identifiable  , Equatable{
     var id: String { empCode ?? UUID().uuidString }
     let name : String?
     let empCode : String?
@@ -45,6 +45,8 @@ struct AssignBookingDetail : Codable , Identifiable {
         name = try values.decodeIfPresent(String.self, forKey: .name)
         empCode = try values.decodeIfPresent(String.self, forKey: .empCode)
     }
-
+    static func == (lhs: AssignBookingDetail, rhs: AssignBookingDetail) -> Bool {
+            return lhs.empCode == rhs.empCode
+        }
 }
 

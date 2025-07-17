@@ -18,10 +18,11 @@ struct GuestRecordHistory: View {
     @State private var startDate: String = ""
     @State private var endDate: String = ""
     @State private var searchText: String = ""
-    
+    @State private var isImageFullScreen = false
     @State private var startDateRaw: Date = Date()
     @State private var endDateRaw: Date = Date()
-    
+    @State private var fullScreenImageURL: String? = nil
+
     var filteredGuestHistory: [GuestHistory] {
         if searchText.isEmpty {
             return guestHistory
@@ -63,6 +64,10 @@ struct GuestRecordHistory: View {
                                 .background(Color.blue.opacity(0.1))
                                 .clipShape(Circle())
                                 .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                                .onTapGesture {
+                                    fullScreenImageURL = guest.image
+                                    isImageFullScreen = true
+                                }
                             } else {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()
@@ -107,6 +112,9 @@ struct GuestRecordHistory: View {
                     
                 }
             }
+        }
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: fullScreenImageURL)
         }
         .navigationTitle("Guest History")
         .onAppear {

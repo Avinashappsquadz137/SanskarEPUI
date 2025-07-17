@@ -18,7 +18,7 @@ struct EditGuestView: View {
     @State private var reason: String = ""
     @State private var selectedDate: Date = Date()
     @State private var selectedImage: UIImage? = nil
-    
+    @State private var isImageFullScreen = false
     var selectedId: String? {
         return guest.id
     }
@@ -38,6 +38,9 @@ struct EditGuestView: View {
                     .frame(width: 120, height: 120)
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                    .onTapGesture {
+                        isImageFullScreen = true
+                    }
                 } else {
                     Image(systemName: "person.crop.circle.fill")
                         .resizable()
@@ -96,6 +99,10 @@ struct EditGuestView: View {
                 }.resume()
             }
         }
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: guest.image)
+        }
+
         .navigationTitle("Edit Guest")
         .navigationBarTitleDisplayMode(.inline)
     }

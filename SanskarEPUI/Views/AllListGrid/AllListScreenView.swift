@@ -103,8 +103,14 @@ struct AllListView: View {
             HealthViewScreen()
                 .navigationTitle("Health Policy Card")
         } else if id == 3 {
-            BookingViewScreen()
-                .navigationTitle("Booking View")
+            Group {
+                if UserDefaultsManager.getBookingRoleID() == "4" {
+                    BookReceptionScreen()
+                } else {
+                    BookingViewScreen()
+                }
+            }
+            .navigationTitle("Booking View")
         }else if id == 5 {
             RequestViewScreen()
                 .navigationTitle("Request View")

@@ -84,6 +84,7 @@ struct Constant {
     static let clientdetailApi             = "api_panel/kathabooking_clientdetail"
     static let assignBookingDetail         = "api_panel/assign_booking_detail"
     static let kathaBookingAssign          = "api_panel/katha_booking_assign"
+    static let bookingLeadAPI              = "api_panel/booking_lead"
 }
 
 
