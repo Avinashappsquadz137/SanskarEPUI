@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainLoginView: View {
     
-    @State private var mobile: String = "8130067305"
+    @State private var mobile: String = ""
     @State private var digit1: String = ""
     @State private var digit2: String = ""
     @State private var digit3: String = ""
