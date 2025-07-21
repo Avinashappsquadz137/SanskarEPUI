@@ -25,6 +25,8 @@ struct BookingViewScreen: View {
     @State private var selectedBooking: NewBooking?
     @State private var showAssignSheet = false
 
+    let allowedRoles: Set<Int> = [1, 2, 3]
+    let roleID = Int(UserDefaultsManager.getBookingRoleID()) ?? 1
     var body: some View {
         ZStack {
             VStack {
@@ -36,7 +38,7 @@ struct BookingViewScreen: View {
                         viewModel.showDropdown.toggle()
                     },
                     onSearch: { query in viewModel.searchText = query },
-                    onAddListToggle: { navigateToAddKatha = true },
+                    onAddListToggle: allowedRoles.contains(roleID) ? { navigateToAddKatha = true } : {},
                     isListMode: false,
                     showFilter: !viewModel.showOnlyApproved
                 )
@@ -123,10 +125,12 @@ struct BookingViewScreen: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Toggle("", isOn: $viewModel.showOnlyApproved)
+                if allowedRoles.contains(roleID) {
+                    Toggle("", isOn: $viewModel.showOnlyApproved)
                     .toggleStyle(SwitchToggleStyle(tint: .blue))
                     .labelsHidden()
             }
+         }
         }
         .onChange(of: viewModel.showOnlyApproved) { newValue in
             viewModel.onToggleChanged(newValue)
@@ -149,11 +153,6 @@ struct BookingViewScreen: View {
                 
             }
         }
-
-
-
-        
-
     }
     
     func selectKathaAssignAPI(kathaId: String, assignTo : String) {

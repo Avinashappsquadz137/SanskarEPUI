@@ -10,7 +10,7 @@ struct BookReceptionScreen: View {
     @State private var bookings: [BookReception] = []
     @State private var searchQuery: String = ""
     @State private var isShowingEnquiryForm = false
-
+    
     var filteredBookings: [BookReception] {
         if searchQuery.isEmpty {
             return bookings
@@ -24,7 +24,7 @@ struct BookReceptionScreen: View {
             }
         }
     }
-
+    
     var body: some View {
         VStack {
             CustomNavigationBar(
@@ -78,7 +78,7 @@ struct BookReceptionScreen: View {
 
 struct BookingCardView: View {
     let booking: BookReception
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -107,5 +107,17 @@ struct BookingCardView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .onTapGesture {
+            makePhoneCall()
+        }
+    }
+    private func makePhoneCall() {
+        guard let phoneNumber = booking.caller_mobile,
+              let url = URL(string: "tel://\(phoneNumber)"),
+              UIApplication.shared.canOpenURL(url) else {
+            print("Invalid phone number or device doesn't support calling.")
+            return
+        }
+        UIApplication.shared.open(url)
     }
 }

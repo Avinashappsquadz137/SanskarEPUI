@@ -106,6 +106,8 @@ struct AllListView: View {
             Group {
                 if UserDefaultsManager.getBookingRoleID() == "4" {
                     BookReceptionScreen()
+                } else if UserDefaultsManager.getBookingRoleID() == "9" {
+                    QCMetaViewScreen()
                 } else {
                     BookingViewScreen()
                 }
