@@ -14,7 +14,7 @@ enum EmployeeCardType {
 
 struct EmployeeCard: View {
     @State private var PImg: String = UserDefaultsManager.getProfileImage()
-    @State private var name: String = UserDefaultsManager.getName()
+    @State private var name: String = UserDefaultsManager.getName().uppercased()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     var imageName: String = "person.fill"
     var employeeName: String = "AVINASH GUPTA"

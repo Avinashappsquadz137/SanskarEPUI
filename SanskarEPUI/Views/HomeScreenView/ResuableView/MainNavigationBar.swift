@@ -40,7 +40,7 @@ struct MainNavigationBar: View {
                     .padding(8)
             }
         }
-        .padding(.top , 0)
+        .padding(.top , -10)
         .background(Color(.systemBackground))
         .overlay(Divider(), alignment: .bottom)
     }
