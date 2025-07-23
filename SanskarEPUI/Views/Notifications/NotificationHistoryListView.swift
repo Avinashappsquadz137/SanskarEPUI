@@ -261,7 +261,7 @@ struct NotificationRowView: View {
                     .padding(.top, 6)
             } else {
                 Circle()
-                    .fill(Color.red)
+                    .fill(Color.white)
                     .frame(width: 12, height: 12)
                     .padding(.top, 6)
             }
