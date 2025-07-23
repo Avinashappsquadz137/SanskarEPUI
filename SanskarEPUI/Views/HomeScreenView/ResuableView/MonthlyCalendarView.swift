@@ -68,7 +68,7 @@ struct MonthlyCalendarView: View {
                         .frame(maxWidth: .infinity, minHeight: 35)
                         .background(
                             index % 7 == 0
-                            ? Color.orange
+                            ? Color.red
                             : isSelected
                             ? Color.blue
                             : isToday
@@ -139,10 +139,10 @@ struct MonthlyCalendarView: View {
     private func circleColor(for status: AttendanceStatus?) -> Color {
         switch status {
         case .present: return .green
-        case .absent: return .red
-        case .weekend: return .orange
+        case .absent: return .orange
+        case .weekend: return .clear
         case .holiday: return .yellow
-        case .unknown, nil: return .clear
+        case .unknown, nil: return .orange
         }
     }
 

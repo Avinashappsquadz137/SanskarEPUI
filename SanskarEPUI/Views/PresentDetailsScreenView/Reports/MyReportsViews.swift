@@ -73,7 +73,7 @@ struct AllReportsViews: View {
             employeeLeaveApi()
         }
     }
-    //AttendanceGridView(detail: detail)
+ 
     private func employeeLeaveApi() {
         let params: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode(),

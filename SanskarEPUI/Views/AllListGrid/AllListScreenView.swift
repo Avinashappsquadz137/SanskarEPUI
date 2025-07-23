@@ -22,17 +22,18 @@ struct AllListView: View {
         VStack {
             SearchBars(text: $searchText)
             ScrollView {
-                LazyVGrid(columns: columns) {
+                LazyVGrid(columns: columns ,spacing: 8) {
                     ForEach(filteredReqType.indices, id: \.self) { index in
                         let item = filteredReqType[index]
                         NavigationLink(
                             destination: destinationView(for: item.id ?? 0)
                         ) {
                             CardView(item: item)
+                                .padding(3)
                         }
                     }
-                    .padding(3)
                 }
+                .padding(.horizontal)
             }
         }
         .onAppear {
