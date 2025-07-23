@@ -254,7 +254,7 @@ struct NotificationRowView: View {
             }
             
             Spacer()
-            if item.status == true {
+            if item.notification_type == "9" {
                 Circle()
                     .fill(Color.green)
                     .frame(width: 12, height: 12)

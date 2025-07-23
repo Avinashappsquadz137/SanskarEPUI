@@ -57,8 +57,8 @@ struct CalendarScreenView: View {
 struct LegendView: View {
     let items = [
         (Color.green, "Present"),
-        (Color.red, "Absent"),
-        (Color.orange, "Weekend"),
+        (Color.orange, "Absent"),
+        (Color.red, "Weekend"),
         (Color.yellow, "Approved Leave")
     ]
     
