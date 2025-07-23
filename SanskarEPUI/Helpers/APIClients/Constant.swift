@@ -32,7 +32,7 @@ class ApiRequest {
 struct Constant {
 
     static let BASEURL                     = ApiRequest.Url.serverURL
-    static let imageURL                    = "https://ep.sanskargroup.in/uploads/"
+    static let imageURL                    = "\(BASEURL)uploads/"
     
     static let getlogin                    = "api_panel/login_app"
     static let employeeMasterDetail        = "api_panel/employee_master_detail"
