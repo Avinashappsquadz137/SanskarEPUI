@@ -82,3 +82,33 @@ struct ContentView: View {
         }
     }
 }
+
+
+struct ToastViewBack: View {
+    var message: String
+    @Binding var isShowing: Bool
+    
+    var body: some View {
+        Group {
+            if isShowing {
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.8))
+                    .cornerRadius(10)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            withAnimation {
+                                isShowing = false
+                            }
+                        }
+                    }
+            }
+        }
+        .animation(.easeInOut, value: isShowing)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, 20)
+    }
+}

@@ -63,7 +63,6 @@ struct SavedTourBillingRequestView: View {
                 switch result {
                 case .success(let model):
                     self.tourRequests = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                 case .failure(let error):
                     ToastManager.shared.show(message: "Failed to fetch tour list.")
                     print("API Error: \(error)")

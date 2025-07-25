@@ -197,8 +197,6 @@ struct ApplyLeaveView: View {
                     if model.status == true {
                         showToast = true
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Leave applied successfully.")
-                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             showToast = false
                             dismiss()
@@ -234,8 +232,6 @@ struct ApplyLeaveView: View {
                     if model.status == true {
                         showToast = true
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Leave applied successfully.")
-                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             showToast = false
                             dismiss()
@@ -274,9 +270,7 @@ struct ApplyLeaveView: View {
                     if model.status == true {
                         showToast = true
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Leave applied successfully.")
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             showToast = false
                             dismiss()
                         }
@@ -315,8 +309,7 @@ struct ApplyLeaveView: View {
                         showToast = true
                         ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                         print("Leave applied successfully.")
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             showToast = false
                             dismiss()
                         }
@@ -334,8 +327,3 @@ struct ApplyLeaveView: View {
     }
 }
 
-struct ApplyLeaveView_Previews: PreviewProvider {
-    static var previews: some View {
-        ApplyLeaveView()
-    }
-}

@@ -15,7 +15,9 @@ struct MyReportsViews: View {
     @State private var selectedLeaveType: String = ""
     @State private var reason: String = ""
     @State private var showReasonSheet = false
-    
+    @State private var toastMessage: String = ""
+    @State private var showToast: Bool = false
+
     var body: some View {
         VStack {
             if reports.isEmpty {
@@ -43,6 +45,9 @@ struct MyReportsViews: View {
                 }
             }
         }
+        .overlay(
+            ToastViewBack(message: toastMessage, isShowing: $showToast)
+        )
         .onAppear {
             getMyReportsList()
         }
@@ -137,7 +142,6 @@ struct MyReportsViews: View {
                 case .success(let model):
                     if model.status == true {
                         self.reports = model.data ?? []
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                     } else {
                         ToastManager.shared.show(message: model.message ?? "Something went wrong.")
                     }
@@ -166,10 +170,12 @@ struct MyReportsViews: View {
                 switch result {
                 case .success(let response):
                     if response.status == true {
-                        ToastManager.shared.show(message: response.message ?? "Leave cancelled")
+                        toastMessage = response.message ?? "Leave cancelled successfully"
+                        showToast = true
                         getMyReportsList()
                     } else {
-                        ToastManager.shared.show(message: response.message ?? "Could not cancel")
+                        toastMessage = response.message ?? "Could not cancel leave"
+                        showToast = true
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Network error")

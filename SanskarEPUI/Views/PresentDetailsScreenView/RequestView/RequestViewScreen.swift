@@ -75,7 +75,6 @@ struct RequestViewScreen: View {
                 switch result {
                 case .success(let model):
                     self.newBookings = model.data ?? []
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")

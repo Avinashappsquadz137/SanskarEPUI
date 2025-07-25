@@ -78,6 +78,7 @@ struct AllListView: View {
             ApplyLeaveView()
         }else if id == 25 {
             PunchHistoryView()
+                .navigationTitle("Punch History")
         }else if id == 101 {
             CalendarScreenView()
         } else if id == 8 {
@@ -98,6 +99,7 @@ struct AllListView: View {
                 .navigationTitle("Booking Approval")
         } else if id == 1 {
             ApprovalView()
+                .navigationTitle("Approval Screen")
         }else if id == 14 {
             WebOpenerView(urlString: "https://app.sanskargroup.in/terms.html")
         }else if id ==  11 {

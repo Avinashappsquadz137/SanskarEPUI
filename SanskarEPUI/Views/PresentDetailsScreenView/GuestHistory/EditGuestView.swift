@@ -102,7 +102,9 @@ struct EditGuestView: View {
         .fullScreenCover(isPresented: $isImageFullScreen) {
             FullScreenImageView(imageURL: guest.image)
         }
-
+        .onTapGesture {
+            hideKeyboard()
+        }
         .navigationTitle("Edit Guest")
         .navigationBarTitleDisplayMode(.inline)
     }
