@@ -15,7 +15,7 @@ struct LeaveApprovalView: View {
 
     
     var filteredLeaves: [LeaveHistory] {
-        let nonNilLeaves = leaveRequests.filter { $0.application_No != nil }
+        let nonNilLeaves = leaveRequests.filter { $0.ids != nil }
 
         if selectedSegment == 0 && !searchText.isEmpty {
             return nonNilLeaves.filter { $0.name?.localizedCaseInsensitiveContains(searchText) ?? false }
@@ -42,7 +42,7 @@ struct LeaveApprovalView: View {
                         if selectedRequests.count == filteredLeaves.count {
                             selectedRequests.removeAll()
                         } else {
-                            selectedRequests = filteredLeaves.compactMap { $0.application_No.map { String($0) } }
+                            selectedRequests = filteredLeaves.compactMap { $0.ids.map { String($0) } }
                         }
                     }
                 }
@@ -50,19 +50,19 @@ struct LeaveApprovalView: View {
             }
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(filteredLeaves, id: \.application_No) { leave in
+                    ForEach(filteredLeaves, id: \.ids) { leave in
                         LeaveCellView(
                             leave: leave,
                             showSelection: selectedSegment == 0,
                             isSelected: Binding(
                                 get: {
-                                    if let id = leave.application_No {
+                                    if let id = leave.ids {
                                         return selectedRequests.contains(String(id))
                                     }
                                     return false
                                 },
                                 set: { newValue in
-                                    guard let id = leave.application_No else { return }
+                                    guard let id = leave.ids else { return }
                                     let strId = String(id)
                                     if newValue {
                                         if !selectedRequests.contains(strId) {
@@ -82,7 +82,7 @@ struct LeaveApprovalView: View {
             if selectedSegment == 0 && !selectedRequests.isEmpty {
                         VStack(spacing: 10) {
                             TextEditor(text: $remarkText)
-                                .frame(height: 100)
+                                .frame(height: 50)
                                 .padding(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
@@ -91,7 +91,11 @@ struct LeaveApprovalView: View {
                             
                             HStack(spacing: 20) {
                                 Button(action: {
-                                    hodLeaveUpdate(reply: "approved")
+                                    if remarkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        ToastManager.shared.show(message: "Please add a reason before approving.")
+                                    } else {
+                                        hodLeaveUpdate(reply: "approved")
+                                    }
                                 }) {
                                     Text("Approve")
                                         .frame(maxWidth: .infinity)
@@ -103,6 +107,11 @@ struct LeaveApprovalView: View {
 
                                 Button(action: {
                                     hodLeaveUpdate(reply: "declined")
+                                    if remarkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        ToastManager.shared.show(message: "Please add a reason before rejecting.")
+                                    } else {
+                                        hodLeaveUpdate(reply: "declined")
+                                    }
                                 }) {
                                     Text("Reject")
                                         .frame(maxWidth: .infinity)
@@ -117,6 +126,10 @@ struct LeaveApprovalView: View {
                     }
             Spacer()
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
+        .overlay(ToastView())
         .onAppear {
             fetchLeaveData()
         }
@@ -158,13 +171,13 @@ struct LeaveApprovalView: View {
                         if let leaves = model.data {
                             self.leaveRequests = leaves
                         }
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+                       // ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
                     } else {
                         self.leaveRequests = []
-                        ToastManager.shared.show(message: model.message ?? "Something went wrong.")
+                       // ToastManager.shared.show(message: model.message ?? "Something went wrong.")
                     }
                 case .failure(let error):
-                    ToastManager.shared.show(message: "Enter Correct ID")
+                    //ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")
                 }
             }
@@ -172,9 +185,8 @@ struct LeaveApprovalView: View {
     }
     
     func hodLeaveUpdate(reply: String) {
-        for id in selectedRequests {
             var dict = [String: Any]()
-            dict["req_id"] = id
+            dict["req_id"] = selectedRequests
             dict["reply"] = reply
             dict["reason"] = remarkText
 
@@ -201,7 +213,7 @@ struct LeaveApprovalView: View {
                     }
                 }
             }
-        }
+        
     }
 
 }

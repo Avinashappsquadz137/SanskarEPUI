@@ -150,7 +150,7 @@ struct MyReportsViews: View {
     }
     private func cancelLeave(reqNo: Int, leaveType: String, reason: String) {
         let params: [String: Any] = [
-            "RequestId": reqNo,
+            "RequestId": String(reqNo),
             "EmpCode": UserDefaultsManager.getEmpCode(),
             "leave_type": leaveType,
             "reason": reason

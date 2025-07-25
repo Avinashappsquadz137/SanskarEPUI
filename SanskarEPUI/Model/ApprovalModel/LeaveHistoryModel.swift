@@ -30,6 +30,7 @@ struct LeaveHistoryModel : Codable {
 
 }
 struct LeaveHistory : Codable {
+    let ids : String?
     let application_No : Int?
     let name : String?
     let leave_From : String?
@@ -53,6 +54,7 @@ struct LeaveHistory : Codable {
         case location = "location"
         case status = "Status"
         case department = "Dept"
+        case ids = "ID"
     }
 
     init(from decoder: Decoder) throws {
@@ -67,6 +69,7 @@ struct LeaveHistory : Codable {
         location = try values.decodeIfPresent(String.self, forKey: .location)
         status = try values.decodeIfPresent(String.self, forKey: .status)
         department = try values.decodeIfPresent(String.self, forKey: .department)
+        ids = try values.decodeIfPresent(String.self, forKey: .ids)
     }
 
 }

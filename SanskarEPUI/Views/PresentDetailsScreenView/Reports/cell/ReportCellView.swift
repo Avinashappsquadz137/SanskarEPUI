@@ -45,7 +45,7 @@ struct ReportCellView: View {
             }
 
             HStack {
-                Text("Leave Type:")
+                Text("Leave:")
                     .font(.footnote)
                 Text(leaveType)
                     .font(.footnote)
