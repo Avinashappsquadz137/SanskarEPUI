@@ -252,8 +252,6 @@ struct GuestRecordHistory: View {
                 case .success(let model):
                     if let data = model.data {
                         self.guestHistory = data
-                        ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                        print("Fetched items: \(data)")
                     } else {
                         print("No data received")
                     }

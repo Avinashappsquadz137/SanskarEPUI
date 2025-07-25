@@ -189,7 +189,6 @@ struct BookingApprovalView: View {
                     case .success(let model):
                         if model.status == true {
                             self.bookingRequests = model.data ?? []
-                            ToastManager.shared.show(message: model.message ?? "Success")
                             selectedRequests.removeAll()
                         } else {
                             ToastManager.shared.show(message: model.message ?? "Something went wrong.")
