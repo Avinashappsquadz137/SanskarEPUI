@@ -148,13 +148,13 @@ struct NewTourFormView: View {
             apiendpoint: Constant.tourFormApi,
             method: .post,
             param: params,
-            model: GetSuccessMessage.self
+            model: GetSuccessMessageform.self
         ) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
                     ToastManager.shared.show(message: model.message ?? "Successfully updated guest")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         dismiss()
                     }
                     print("Fetched items: \(model)")

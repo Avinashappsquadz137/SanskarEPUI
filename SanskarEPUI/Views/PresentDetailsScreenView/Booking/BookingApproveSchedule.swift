@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct BookingApproveSchedule: View {
+    @Environment(\.dismiss) private var dismiss
     let booking: NewBooking
     @State var isSelected: Bool = false
     @State var showSelection: Bool = false
@@ -86,7 +87,7 @@ struct BookingApproveSchedule: View {
                 } else {
                     HStack(spacing: 20) {
                         Button(action: {
-                            approveRejectBooking(status: "2")
+                            approveRejectBooking(status: "1")
                         }) {
                             Text("Approve")
                                 .frame(maxWidth: .infinity)
@@ -97,7 +98,7 @@ struct BookingApproveSchedule: View {
                         }
                         
                         Button(action: {
-                            approveRejectBooking(status: "1")
+                            approveRejectBooking(status: "2")
                         }) {
                             Text("Reject")
                                 .frame(maxWidth: .infinity)
@@ -139,6 +140,7 @@ struct BookingApproveSchedule: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
+                    dismiss()
                     ToastManager.shared.show(message: model.message ?? "Success")
                 case .failure(let error):
                     ToastManager.shared.show(message: "Error: \(error.localizedDescription)")

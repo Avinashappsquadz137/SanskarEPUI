@@ -463,12 +463,11 @@ struct BookKathaView: View {
             }
 
         } else {
-            ApiClient.shared.callHttpMethod(
+            ApiClient.shared.callmethodMultipart(
                 apiendpoint: Constant.kathabookingApi,
                 method: .post,
                 param: dict,
-                model: GetSuccessMessageBook.self,
-                isMultipart: false
+                model: GetSuccessMessageBook.self
             ) { result in
                 DispatchQueue.main.async {
                     switch result {
