@@ -20,13 +20,13 @@ struct SanskarEPUIApp: App {
             }
         }
     }
-
+    
     var body: some Scene {
         WindowGroup {
             SplashView()
                 .navigationViewStyle(StackNavigationViewStyle())
                 .environment(\.colorScheme, .light)
-                .environmentObject(notificationHandler) 
+                .environmentObject(notificationHandler)
         }
     }
 }
@@ -35,9 +35,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UserDefaultsManager.setSavedDeviceModel(deviceModel)
-          
-            print("📱 Device model saved: \(UserDefaultsManager.getSavedDeviceModel())")
-
+        
+        print("📱 Device model saved: \(UserDefaultsManager.getSavedDeviceModel())")
+        
         UNUserNotificationCenter.current().delegate = self
         
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -76,7 +76,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification) async
     -> UNNotificationPresentationOptions {
@@ -90,12 +90,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
         return [.alert, .sound, .badge]
     }
-
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse) async {
         let userInfo = response.notification.request.content.userInfo
         print("📩 User tapped notification: \(userInfo)")
-
+        
         if let userInfoDict = userInfo as? [String: Any],
            let notificationData = userInfoDict["data"] as? [String: Any] {
             DispatchQueue.main.async {
@@ -103,8 +103,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             }
         }
     }
-
-
+    
+    
     func application(_ application: UIApplication,
                      performActionFor shortcutItem: UIApplicationShortcutItem,
                      completionHandler: @escaping (Bool) -> Void) {
@@ -114,10 +114,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print("User tapped Bug Report!")
         }
     }
-
+    
     func playNotificationSound(type: String?) {
         var soundFileName: String
-
+        
         switch type {
         case "8", "9", "14", "11":
             soundFileName = "bell3"
@@ -128,7 +128,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             print("Sound file not found!")
             return
         }
-
+        
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
             audioPlayer?.prepareToPlay()
@@ -138,12 +138,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         }
     }
 }
-                 
+
 
 
 struct SplashView: View {
     @EnvironmentObject var notificationHandler: NotificationHandler
     let isLoggedIn = UserDefaultsManager.isLoggedIn()
+    @StateObject private var versionChecker = VersionChecker()
     @State private var isActive = false
     var body: some View {
         NavigationStack {
@@ -175,13 +176,25 @@ struct SplashView: View {
                             .frame(width: 200, height: 200)
                     }
                     .onAppear {
+                        versionChecker.checkForUpdate()
                         notificationHandler.showGuestPopup = false
                         notificationHandler.selectedPushData = nil
                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            withAnimation {
-                                isActive = true
+                            if !versionChecker.shouldForceUpdate {
+                                withAnimation {
+                                    isActive = true
+                                }
                             }
                         }
+                    }
+                    .alert("Update Required", isPresented: $versionChecker.shouldForceUpdate) {
+                        Button("Update") {
+                            if let url = URL(string: "itms-apps://itunes.apple.com/app/apple-store/id6459921906?mt=8") {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                    } message: {
+                        Text("A new version of the app is available. Please update to continue.")
                     }
                 }
             }

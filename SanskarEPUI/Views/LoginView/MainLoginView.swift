@@ -118,6 +118,12 @@ struct MainLoginView: View {
                         EmptyView()
                     }
                     Spacer()
+                    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+                    if ApiRequest.Url.buildType == .pro {
+                        Text("Version - \(appVersion)")
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(.bottom,20)
+                    }
                 }
                 Image("SanskarLogo")
                     .resizable()
