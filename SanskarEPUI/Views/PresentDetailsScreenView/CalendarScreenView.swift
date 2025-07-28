@@ -69,9 +69,6 @@ struct LegendView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Legend:")
-                .font(.headline)
-            
             LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
                 ForEach(items, id: \.1) { item in
                     LegendBullet(color: item.0, text: item.1)

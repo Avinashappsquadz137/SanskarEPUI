@@ -8,22 +8,30 @@
 import SwiftUI
 
 struct ApprovalView: View {
-    
-    // MARK: - State Properties
+    let availableIDs: [Int] 
     @State private var selectedSegment = 0
-    
     var body: some View {
         VStack {
-            Picker("Select Approval Type", selection: $selectedSegment) {
-                Text("Leave").tag(0)
-                Text("Booking").tag(1)
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(.horizontal)
-            if selectedSegment == 0 {
+            if availableIDs.contains(22) && availableIDs.contains(23) {
+                Picker("Select Approval Type", selection: $selectedSegment) {
+                    Text("Leave").tag(0)
+                    Text("Booking").tag(1)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
+
+                if selectedSegment == 0 {
+                    LeaveApprovalView()
+                } else {
+                    BookingApprovalView()
+                }
+
+            } else if availableIDs.contains(22) {
                 LeaveApprovalView()
-            } else {
+            } else if availableIDs.contains(23) {
                 BookingApprovalView()
+            } else {
+                Text("No approval views available")
             }
         }
     }

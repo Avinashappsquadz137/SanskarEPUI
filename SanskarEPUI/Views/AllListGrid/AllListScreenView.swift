@@ -90,17 +90,20 @@ struct AllListView: View {
             AllReportsViews()
                 .navigationTitle("All Reports")
         } else if id == 7 {
-            ReportsViews()
+            let availableReport = reqType.map { $0.id ?? 0 }
+            ReportsViews(availableReports : availableReport)
+                .navigationTitle("Reports")
         } else if id == 22 {
             LeaveApprovalView()
                 .navigationTitle("Leave Approval")
         }  else if id == 23 {
             BookingApprovalView()
                 .navigationTitle("Booking Approval")
-        } else if id == 1 {
-            ApprovalView()
-                .navigationTitle("Approval Screen")
-        }else if id == 14 {
+        }  else if id == 1{
+            let approvalIDs = reqType.map { $0.id ?? 0 }
+            ApprovalView(availableIDs: approvalIDs)
+                .navigationTitle("Approval")
+        } else if id == 14 {
             WebOpenerView(urlString: "https://app.sanskargroup.in/terms.html")
         }else if id ==  11 {
             HealthViewScreen()

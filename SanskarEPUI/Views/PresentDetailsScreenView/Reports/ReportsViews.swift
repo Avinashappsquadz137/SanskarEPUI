@@ -7,32 +7,33 @@
 
 import SwiftUI
 
-enum ReportType: String, CaseIterable, Identifiable {
-    case myReports = "My Reports"
-    case allReports = "All Reports"
-    
-    var id: String { self.rawValue }
-}
-
 struct ReportsViews: View {
-    @State private var selectedTab: ReportType = .myReports
-    
+    let availableReports: [Int]
+    @State private var selectedSegment = 0
     var body: some View {
         VStack {
-            Picker("Select Report", selection: $selectedTab) {
-                ForEach(ReportType.allCases) { type in
-                    Text(type.rawValue).tag(type)
+            if availableReports.contains(17) && availableReports.contains(18) {
+     
+                Picker("Select Report", selection: $selectedSegment) {
+                    Text("My Reports").tag(0)
+                    Text("All Reports").tag(1)
                 }
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(10)
-            switch selectedTab {
-            case .myReports:
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
+
+                if selectedSegment == 0 {
+                    MyReportsViews()
+                } else {
+                    AllReportsViews()
+                }
+
+            } else if availableReports.contains(17) {
                 MyReportsViews()
-            case .allReports:
+            } else if availableReports.contains(18) {
                 AllReportsViews()
+            } else {
+                Text("No approval views available")
             }
         }
-        .navigationTitle("Reports")
     }
 }

@@ -55,7 +55,6 @@ struct LeaveDetailView: View {
             AttendanceGridView(detail: detail)
             HStack( spacing: 16 ) {
                 if UserDefaultsManager.getCode() == "H" {
-                    if detail.status == "R" {
                         CustonButton(title: "Accept", backgroundColor: .green ,width: 100) {
                             print("Accept button tapped!")
                             if let reqID = detail.iD {
@@ -66,7 +65,6 @@ struct LeaveDetailView: View {
                             print("Reject button tapped!")
                             showRejectRemarkSheet = true
                         }
-                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
