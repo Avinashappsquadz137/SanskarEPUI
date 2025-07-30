@@ -51,7 +51,7 @@ struct MonthlyCalendarView: View {
                     Text(day)
                         .font(.caption)
                         .frame(maxWidth: .infinity)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.black)
                 }
             }
 

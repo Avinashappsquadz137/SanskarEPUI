@@ -24,16 +24,38 @@ struct EmployeeCard: View {
     @State private var isImageFullScreen = false
     @State private var showAllListView = false
     @State private var showSheet = false
+    let onProfileTapped: () -> Void
+    let showEditButton: Bool
+    let onEditTapped: (() -> Void)?
+
+    @State private var isImagePickerPresented = false
+    @State private var selectedImage: UIImage?
+    @State private var selectedSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showImageSourceActionSheet = false
+
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
-                if let imageUrl = URL(string: PImg), !PImg.isEmpty {
-                    AsyncImage(url: imageUrl) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
+                VStack(spacing: 2) {
+                    if let imageUrl = URL(string: PImg), !PImg.isEmpty {
+                        AsyncImage(url: imageUrl) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                        .frame(width: 100, height: 100)
+                        .background(Color.blue.opacity(0.1))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                        .onTapGesture {
+                            onProfileTapped()
+                        }
+                    } else {
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
@@ -42,28 +64,21 @@ struct EmployeeCard: View {
                             .clipShape(Circle())
                             .overlay(Circle().stroke(Color.green, lineWidth: 2))
                             .onTapGesture {
-                                isImageFullScreen = true
+                                onProfileTapped()
                             }
                     }
-                    .frame(width: 100, height: 100)
-                    .background(Color.blue.opacity(0.1))
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                    .onTapGesture {
-                        isImageFullScreen = true
-                    }
-                } else {
-                    Image(systemName: "person.crop.circle.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                        .onTapGesture {
-                            isImageFullScreen = true
+                    if showEditButton {
+                        Button(action: {
+                            //onEditTapped?()
+                            showImageSourceActionSheet = true
+                        }) {
+                            Text("Edit")
+                                .foregroundColor(.blue)
+                                .font(.subheadline)
                         }
+                    }
                 }
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(name)
                         .font(.headline)
@@ -138,8 +153,58 @@ struct EmployeeCard: View {
                 }
             }
         }
+        .confirmationDialog("Choose Image Source", isPresented: $showImageSourceActionSheet, titleVisibility: .visible) {
+            Button("Camera") {
+                selectedSourceType = .camera
+                isImagePickerPresented = true
+            }
+            Button("Gallery") {
+                selectedSourceType = .photoLibrary
+                isImagePickerPresented = true
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+        .sheet(isPresented: $isImagePickerPresented, onDismiss: loadImage) {
+            ImagePicker(sourceType: selectedSourceType, selectedImage: $selectedImage)
+        }
+
         .fullScreenCover(isPresented: $isImageFullScreen) {
             FullScreenImageView(imageURL: PImg)
         }
     }
+
+    func loadImage() {
+           guard let selectedImage = selectedImage else { return }
+           uploadProfileImage(image: selectedImage)
+       }
+
+        func uploadProfileImage(image: UIImage) {
+            var dict = [String: Any]()
+            dict["EmpCode"] = empCode
+            var imagesData: [String: Data] = [:]
+            if let imageData = image.jpegData(compressionQuality: 0.8) {
+                imagesData["image"] = imageData
+            }
+            
+            ApiClient.shared.callHttpMethod(
+                apiendpoint: Constant.updateProfile,
+                method: .post,
+                param: dict,
+                model: UpdateProfileResponse.self,
+                isMultipart: true,
+                images: imagesData
+            ) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let model):
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                            ToastManager.shared.show(message: "📤 Waiting for Approval By HR")
+                        }
+                    case .failure(let error):
+                        ToastManager.shared.show(message: "Error: \(error.localizedDescription)")
+                        print("Error booking katha:", error)
+                    }
+                }
+            }
+        }
 }

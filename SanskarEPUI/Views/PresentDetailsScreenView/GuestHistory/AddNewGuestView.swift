@@ -37,8 +37,7 @@ struct AddNewGuestView: View {
                             .font(.headline)
                         TextField("Enter Reason", text: $reason)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
-                        
-                        DatePicker("Select Date & Time", selection: $selectedDate, displayedComponents: [.date, .hourAndMinute])
+                        DatePicker("Select Date & Time", selection: $selectedDate, in: Date()..., displayedComponents: [.date, .hourAndMinute])
                             .font(.headline)
                     }
                     
@@ -92,17 +91,17 @@ struct AddNewGuestView: View {
         dict["Address"] = guestAddress
         dict["Reason"] = reason
         dict["Date1"] = ISO8601DateFormatter().string(from: selectedDate)
+        var imagesData: [String: Data] = [:]
         
-        if let image = selectedImage?.resizeToWidth(250),
-           let imageData = image.pngData() {
-            
+        if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
+             imagesData["image"] = imageData
             ApiClient.shared.callHttpMethod(
                 apiendpoint: Constant.applyNewGuest,
                 method: .post,
                 param: dict,
                 model: GetSuccessMessage.self,
                 isMultipart: true,
-                images: ["image": imageData]
+                images: imagesData
             ) { result in
                 switch result {
                 case .success(let model):

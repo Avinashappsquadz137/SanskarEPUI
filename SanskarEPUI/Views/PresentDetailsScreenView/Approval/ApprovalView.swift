@@ -31,7 +31,7 @@ struct ApprovalView: View {
             } else if availableIDs.contains(23) {
                 BookingApprovalView()
             } else {
-                Text("No approval views available")
+                Text("No Approval Available")
             }
         }
     }

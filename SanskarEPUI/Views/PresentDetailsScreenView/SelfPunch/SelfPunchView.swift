@@ -235,15 +235,15 @@ struct SelfPunchView: View {
             showRemarkAlert = true
             return
         }
-
-        // Resize + convert image
-        guard let resizedImage = image.resizeToWidth(250),
-              let imageData = resizedImage.pngData() else {
+ 
+        var imagesData: [String: Data] = [:]
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             isUploading = false
             showRemarkAlert = true
             return
         }
-
+        imagesData["image"] = imageData
+        
         let empCode = UserDefaultsManager.getEmpCode()
         let location = locationManager.address
         let time = Int(Date().timeIntervalSince1970)

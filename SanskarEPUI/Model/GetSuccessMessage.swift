@@ -102,3 +102,31 @@ struct GetSuccessMessageform : Codable {
     }
 
 }
+
+struct UpdateProfileResponse: Decodable {
+    let data: String
+    let error: [String]
+    let message: String
+    let status: Bool
+
+    private enum CodingKeys: String, CodingKey {
+        case data, error, message, status
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        data = try container.decode(String.self, forKey: .data)
+        error = try container.decode([String].self, forKey: .error)
+        message = try container.decode(String.self, forKey: .message)
+
+        if let boolStatus = try? container.decode(Bool.self, forKey: .status) {
+            status = boolStatus
+        } else if let intStatus = try? container.decode(Int.self, forKey: .status) {
+            status = intStatus == 1
+        } else {
+            throw DecodingError.typeMismatch(Bool.self,
+                .init(codingPath: [CodingKeys.status], debugDescription: "Expected Bool or Int"))
+        }
+    }
+}

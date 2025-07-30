@@ -14,7 +14,7 @@ struct CalendarScreenView: View {
     @State private var selectedDayOnly: String = ""
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             MonthlyCalendarView(
                 selectedDate: $selectedDate,
                 selectedAttendance: $selectedAttendance,
@@ -62,22 +62,18 @@ struct LegendView: View {
         (Color.yellow, "Approved Leave")
     ]
     
-    let columns = [
-        GridItem(.flexible(minimum: 100), spacing: 16),
-        GridItem(.flexible(minimum: 100), spacing: 16)
-    ]
-    
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
                 ForEach(items, id: \.1) { item in
                     LegendBullet(color: item.0, text: item.1)
                 }
             }
+            .padding()
         }
-        .padding()
     }
 }
+
 struct LegendBullet: View {
     let color: Color
     let text: String

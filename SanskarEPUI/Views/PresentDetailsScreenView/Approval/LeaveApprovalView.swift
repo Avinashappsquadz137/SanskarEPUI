@@ -33,7 +33,7 @@ struct LeaveApprovalView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal)
-            if selectedSegment == 0 {
+            if !filteredLeaves.isEmpty && selectedSegment == 0 {
                 HStack {
                     TextField("Search...", text: $searchText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -47,6 +47,9 @@ struct LeaveApprovalView: View {
                     }
                 }
                 .padding(.horizontal)
+            }
+            if filteredLeaves.isEmpty {
+                EmptyStateView(imageName: "EmptyList", message: "No Leave found")
             }
             ScrollView {
                 LazyVStack(spacing: 12) {

@@ -119,9 +119,10 @@ struct EditGuestView: View {
         dict["Reason"] = reason
         dict["Date1"] = ISO8601DateFormatter().string(from: selectedDate)
         
-        if let image = selectedImage?.resizeToWidth(250),
-           let imageData = image.pngData() {
-            
+        var imagesData: [String: Data] = [:]
+        if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
+            imagesData["image"] = imageData
+
             ApiClient.shared.callHttpMethod(
                 apiendpoint: Constant.applyNewGuest,
                 method: .post,

@@ -57,11 +57,7 @@ struct AllListView: View {
                     if var data = model.data {
                         data = data.filter { $0.id != 4 }
                         self.reqType = data
-                        let manualItem = SideBar(id: 100, name: "Profile")
-                        self.reqType.insert(manualItem, at: 0)
-                        let manualItem2 = SideBar(id: 101, name: "Calander")
-                        self.reqType.insert(manualItem2, at: 1)
-                    } 
+                    }
                 case .failure(let error):
                     print("API Error: \(error)")
                 }
@@ -71,9 +67,8 @@ struct AllListView: View {
     
     @ViewBuilder
     private func destinationView(for id: Int) -> some View {
-        if id == 100 {
+        if id == 27 {
             UserProfileScreenView()
-                .navigationTitle("User Profile")
         } else if id == 2 {
             ApplyLeaveView()
         }else if id == 25 {
@@ -128,7 +123,9 @@ struct AllListView: View {
         }else if id  == 24 {
             SelfPunchView()
                 .navigationTitle("Self Punch")
-        }else {
+        }else if id == 26 {
+            CalendarScreenView()
+        } else {
             Text("Work In Progress")
         }
     }
@@ -181,8 +178,8 @@ struct CardView: View {
         case 25: return UIImage(named: "attendance") ?? defaultImage()
         case 23: return UIImage(named: "booking") ?? defaultImage()
         case 22: return UIImage(named: "Leave") ?? defaultImage()
-        case 100: return UIImage(named: "Profile") ?? defaultImage()
-        case 101:return UIImage(named: "Leave") ?? defaultImage()
+        case 27: return UIImage(named: "Profile") ?? defaultImage()
+        case 26:return UIImage(named: "Leave") ?? defaultImage()
         default: return defaultImage()
         }
     }

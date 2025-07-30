@@ -19,6 +19,8 @@ struct MainHomeView: View {
     @StateObject private var calendarViewModel = MonthlyCalendarViewModel()
     @StateObject private var homeMasterDetailVM = HomeMasterDetailViewModel()
     @State private var navigateNotification = false
+    @State private var navigateToProfile = false
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -39,7 +41,11 @@ struct MainHomeView: View {
                         employeeName: name.uppercased(),
                         employeeCode: empCode,
                         employeeAttendance: "\(selectedAttendance?.inTime ?? "") - \(selectedAttendance?.outTime ?? "")",
-                        type: .none
+                        type: .none,
+                        onProfileTapped: {
+                            navigateToProfile = true
+                        }, showEditButton: false,
+                        onEditTapped: nil
                     )
                 }
                 .padding(10)
@@ -53,6 +59,11 @@ struct MainHomeView: View {
                     EmptyView()
                 }
                 .hidden()
+                NavigationLink(destination: UserProfileScreenView(), isActive: $navigateToProfile) {
+                    EmptyView()
+                }
+                .hidden()
+
             }
         }
         .onAppear {

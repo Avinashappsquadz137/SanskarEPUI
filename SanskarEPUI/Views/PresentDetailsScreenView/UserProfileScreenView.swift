@@ -13,10 +13,8 @@ struct UserProfileScreenView: View {
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     @State private var PImg: String = UserDefaultsManager.getProfileImage()
-    @State private var selectedImage: UIImage?
-    @State private var isImagePickerPresented = false
     @State private var fieldValues: [String: String] = [:]
-    
+    @State private var isImageFullScreen = false
     
     let data: [String: String] = [
         "Available PL"         : UserDefaultsManager.getPlBalance(),
@@ -37,7 +35,12 @@ struct UserProfileScreenView: View {
                 employeeName: name.uppercased(),
                 employeeCode: empCode,
                 employeeAttendance: "",
-                type: .none
+                type: .none,
+                onProfileTapped: {
+                    isImageFullScreen = true
+                },
+                showEditButton: true,
+                onEditTapped: nil
             )
             .padding(.horizontal, 10)
             ScrollView {
@@ -66,17 +69,10 @@ struct UserProfileScreenView: View {
             }
             .padding(.horizontal, 10)
         }
-        .overlay(ToastView())
-        .navigationBarItems(trailing:
-                                Button(action: {
-            isImagePickerPresented = true
-        }) {
-            Image(systemName: "camera.fill")
-                .foregroundColor(.blue)
-        })
-        .sheet(isPresented: $isImagePickerPresented, onDismiss: loadImage) {
-            ImagePicker(selectedImage: $selectedImage)
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: PImg)
         }
+        .overlay(ToastView())
         .alert(isPresented: $showLogoutAlert) {
             Alert(
                 title: Text("Are you sure?"),
@@ -87,53 +83,7 @@ struct UserProfileScreenView: View {
                 secondaryButton: .cancel()
             )
         }
-    }
-    
-    func loadImage() {
-        guard let selectedImage = selectedImage else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            ToastManager.shared.show(message: "📤 Waiting for approval by HOD")
-        }
-        uploadProfileImage(image: selectedImage)
-    }
-    func uploadProfileImage(image: UIImage) {
-        var dict = [String: Any]()
-        dict["EmpCode"] = empCode
-        if let resizedImage = image.resizeToWidth(250),
-           let imageData = resizedImage.pngData() {
-            dict["image"] = imageData
-        }
-
-        let url = Constant.BASEURL + Constant.updateProfile
-        print(url)
-        print(dict)
-        AF.upload(multipartFormData: { multipartFormData in
-            for (key, value) in dict {
-                if key == "image", let imageData = value as? Data {
-                    let filename = "\(Int64(Date().timeIntervalSince1970 * 1000)).png"
-                    multipartFormData.append(imageData, withName: key, fileName: filename, mimeType: "image/png")
-                } else if let stringValue = "\(value)".data(using: .utf8) {
-                    multipartFormData.append(stringValue, withName: key)
-                }
-            }
-        }, to: url)
-        .uploadProgress { progress in
-            print("Upload Progress: \(progress.fractionCompleted)")
-        }
-        .responseJSON { response in
-            DispatchQueue.main.async {
-                
-                switch response.result {
-                case .success(let value):
-                    if let JSON = value as? NSDictionary, let status = JSON["status"] as? Bool, status {
-                        print("Response JSON:", JSON)
-                        
-                    }
-                case .failure(let error):
-                    print("Upload Failed: \(error.localizedDescription)")
-                }
-            }
-        }
+        .navigationTitle("User Profile")
     }
     // MARK: - Logout API
     func LogoutApi() {

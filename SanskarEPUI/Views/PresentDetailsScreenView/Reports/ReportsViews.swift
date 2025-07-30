@@ -32,7 +32,7 @@ struct ReportsViews: View {
             } else if availableReports.contains(18) {
                 AllReportsViews()
             } else {
-                Text("No approval views available")
+                Text("No Reports Available")
             }
         }
     }
