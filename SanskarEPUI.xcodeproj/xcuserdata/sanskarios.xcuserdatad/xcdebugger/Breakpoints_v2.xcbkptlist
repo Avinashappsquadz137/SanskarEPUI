@@ -36,5 +36,51 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EB3C6096-EE6C-411C-8FFD-CC0E9B9AEE95"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SanskarEPUI/Views/HomeScreenView/ResuableView/MainNavigationBar.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "11"
+            endingLineNumber = "11"
+            landmarkName = "MainNavigationBar"
+            landmarkType = "14">
+            <Locations>
+               <Location
+                  uuid = "EB3C6096-EE6C-411C-8FFD-CC0E9B9AEE95 - 4352fa570ef76ec3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SanskarEPUI.MainNavigationBar.init() -&gt; SanskarEPUI.MainNavigationBar"
+                  moduleName = "SanskarEPUI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sanskarios/Documents/Appsquadz/SanskarEPUI/SanskarEPUI/Views/HomeScreenView/ResuableView/MainNavigationBar.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "11"
+                  endingLineNumber = "11">
+               </Location>
+               <Location
+                  uuid = "EB3C6096-EE6C-411C-8FFD-CC0E9B9AEE95 - 975e1d9229a70cba"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "default argument 0 of SanskarEPUI.MainNavigationBar.init(logoName: Swift.String, projectName: Swift.String, onSearchTapped: () -&gt; (), onNotificationTapped: () -&gt; (), notificationCount: Swift.Int) -&gt; SanskarEPUI.MainNavigationBar"
+                  moduleName = "SanskarEPUI.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sanskarios/Documents/Appsquadz/SanskarEPUI/SanskarEPUI/Views/HomeScreenView/ResuableView/MainNavigationBar.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

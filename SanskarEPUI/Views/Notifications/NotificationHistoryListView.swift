@@ -105,6 +105,7 @@ struct NotificationHistoryListView: View {
                 .transition(.scale)
             }
         }
+        .overlay(ToastView())
         .animation(.easeInOut, value: showGuestPopup)
         .navigationTitle("Notification History")
         .onAppear {
@@ -137,6 +138,8 @@ struct NotificationHistoryListView: View {
         notifications.removeAll { $0.id == item.id }
         if selectedItem?.notification_type == "9" {
             empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)",status: "2",reason: "Not Available")
+        }else {
+            ToastManager.shared.show(message: "You Can Not Reject Notifications.")
         }
     }
     
@@ -146,6 +149,8 @@ struct NotificationHistoryListView: View {
         }
         if selectedItem?.notification_type == "9" {
             empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)" ,status: "1",selectid: "1")
+        }else {
+            ToastManager.shared.show(message: "You Can Not Approve Notifications.")
         }
     }
     

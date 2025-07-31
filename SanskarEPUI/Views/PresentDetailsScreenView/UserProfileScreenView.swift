@@ -34,7 +34,7 @@ struct UserProfileScreenView: View {
                 imageName: "\(PImg)",
                 employeeName: name.uppercased(),
                 employeeCode: empCode,
-                employeeAttendance: "",
+                employeeAttendance: Text(""),
                 type: .none,
                 onProfileTapped: {
                     isImageFullScreen = true

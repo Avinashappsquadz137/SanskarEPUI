@@ -19,7 +19,9 @@ struct EmployeeCard: View {
     var imageName: String = "person.fill"
     var employeeName: String = "AVINASH GUPTA"
     var employeeCode: String = "SANS-00301"
-    var employeeAttendance: String = "10:00 AM"
+   // var employeeAttendance: String = ""
+    var employeeAttendance: Text
+
     let type: EmployeeCardType
     @State private var isImageFullScreen = false
     @State private var showAllListView = false
@@ -87,13 +89,13 @@ struct EmployeeCard: View {
                     Text(empCode)
                         .font(.subheadline)
                         .foregroundColor(.primary)
+                    employeeAttendance
+                        .font(.footnote)
+                        .foregroundColor(.primary)
                     HStack {
                         switch type {
                         case .ellipsisShow:
                             HStack {
-                                Text(employeeAttendance)
-                                    .font(.subheadline)
-                                    .foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "ellipsis.circle")
                                     .font(.title)

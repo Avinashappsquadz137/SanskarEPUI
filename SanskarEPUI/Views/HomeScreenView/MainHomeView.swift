@@ -20,6 +20,7 @@ struct MainHomeView: View {
     @StateObject private var homeMasterDetailVM = HomeMasterDetailViewModel()
     @State private var navigateNotification = false
     @State private var navigateToProfile = false
+    @State private var notificationCount: Int = 0
 
     var body: some View {
         NavigationView {
@@ -33,14 +34,28 @@ struct MainHomeView: View {
                     onNotificationTapped: {
                         navigateNotification = true
                         print("Notification tapped")
-                    }
+                    },
+                    notificationCount: notificationCount
                 )
                 VStack(spacing: 16) {
                     EmployeeCard(
                         imageName: "\(PImg)",
                         employeeName: name.uppercased(),
                         employeeCode: empCode,
-                        employeeAttendance: "\(selectedAttendance?.inTime ?? "") - \(selectedAttendance?.outTime ?? "")",
+                        employeeAttendance: {
+                            let inTime = homeMasterDetailVM.masterDetail?.InTime ?? ""
+                            let outTime = homeMasterDetailVM.masterDetail?.OutTime ?? ""
+
+                            if inTime.isEmpty {
+                                return Text("Absent")
+                                    .foregroundColor(.red)
+                                    .font(.caption2)
+                            } else {
+                                return Text("In - \(inTime)" + (outTime.isEmpty ? "" : "  Out - \(outTime)"))
+                                    .foregroundColor(.primary)
+                                    .font(.caption2)
+                            }
+                        }(),
                         type: .none,
                         onProfileTapped: {
                             navigateToProfile = true
@@ -63,11 +78,14 @@ struct MainHomeView: View {
                     EmptyView()
                 }
                 .hidden()
-
+                
             }
         }
         .onAppear {
             homeMasterDetailVM.getMasterDetail()
+        }
+        .onChange(of: homeMasterDetailVM.masterDetail) { newDetail in
+            notificationCount = newDetail?.notification_count ?? 0
         }
         .navigationBarBackButtonHidden(true)
     }
