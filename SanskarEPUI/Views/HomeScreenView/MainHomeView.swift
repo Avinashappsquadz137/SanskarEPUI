@@ -49,11 +49,11 @@ struct MainHomeView: View {
                             if inTime.isEmpty {
                                 return Text("Absent")
                                     .foregroundColor(.red)
-                                    .font(.caption2)
+                                    .font(.callout)
                             } else {
                                 return Text("In - \(inTime)" + (outTime.isEmpty ? "" : "  Out - \(outTime)"))
                                     .foregroundColor(.primary)
-                                    .font(.caption2)
+                                    .font(.callout)
                             }
                         }(),
                         type: .none,

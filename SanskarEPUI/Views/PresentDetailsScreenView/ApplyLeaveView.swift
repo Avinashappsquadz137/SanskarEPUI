@@ -10,104 +10,96 @@ import SwiftUI
 struct ApplyLeaveView: View {
     
     // MARK: - State Properties
-    @State private var selectedLeaveType = "Full Day"
+    @State private var selectedLeaveType = "Full"
     @State private var fromDate = Date()
     @State private var toDate = Date()
-    @State private var fromDayType = "Full Day"
-    @State private var toDayType = "Full Day"
+    @State private var fromDayType = "Full"
+    @State private var toDayType = "Full"
     @State private var remarks = ""
     @State private var name: String = UserDefaultsManager.getName()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
     @State private var showToast = false
-    @State private var leaveTypes = ["Full Day", "First Half Day", "Second Half Day", "Comp off", "WFH"]
+    @State private var leaveTypes = ["Full", "Half","Comp off", "WFH"]
+    @State private var halfTypes = ["First Half", "Second Half"]
     
     var body: some View {
         
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-//                Group {
-//                    Text("Employee")
-//                        .font(.subheadline)
-//                        .foregroundColor(.gray)
-//                    Text("\(empCode) - \(name.uppercased())")
-//                        .font(.body)
-//                    
-//                    Text("Applied Date")
-//                        .font(.subheadline)
-//                        .foregroundColor(.gray)
-//                    Text(formattedDate(Date()))
-//                        .font(.body)
-//                }
-//                Group {
-//                    Text("Select Leave Type")
-//                        .font(.caption)
-//                        .foregroundColor(.gray)
-//                    Picker("Select Leave Type", selection: $selectedLeaveType) {
-//                        Text("Select Leave Type").tag("")
-//                        ForEach(leaveTypes, id: \.self) {
-//                            Text($0)
-//                        }
-//                    }
-//                    .onChange(of: selectedLeaveType) { newValue in
-//                        switch newValue {
-//                        case "Full Day":
-//                            fromDayType = "Full Day"
-//                            toDayType = "Full Day"
-//                        case "First Half Day":
-//                            fromDayType = "First Half Day"
-//                            toDayType = "First Half Day"
-//                        case "Second Half Day":
-//                            fromDayType = "Second Half Day"
-//                            toDayType = "Second Half Day"
-//                        case "Off":
-//                            fromDayType = "Off"
-//                            toDayType = "Off"
-//                        case "WFH":
-//                            fromDayType = "WFH"
-//                            toDayType = "WFH"
-//                        default:
-//                            break
-//                        }
-//                    }
-//                    .pickerStyle(MenuPickerStyle())
-//                    .frame(maxWidth: .infinity)
-//                    .padding(10)
-//                    .background(Color(.systemGray6))
-//                    .cornerRadius(10)
-//                }
                 Group {
                     Text("Select Leave Type")
                         .font(.caption)
                         .foregroundColor(.gray)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(leaveTypes, id: \.self) { type in
-                            HStack {
-                                Image(systemName: selectedLeaveType == type ? "largecircle.fill.circle" : "circle")
-                                    .foregroundColor(.blue)
-                                Text(type)
-                                    .foregroundColor(.primary)
-                                Spacer()
-                            }
-                            .contentShape(Rectangle()) 
-                            .onTapGesture {
-                                selectedLeaveType = type
-                                switch type {
-                                    case "Full Day": fromDayType = "Full Day"; toDayType = "Full Day"
-                                    case "First Half Day": fromDayType = "First Half Day"; toDayType = "First Half Day"
-                                    case "Second Half Day": fromDayType = "Second Half Day"; toDayType = "Second Half Day"
-                                    case "Comp Off": fromDayType = "Comp Off"; toDayType = "Comp Off"
-                                    case "WFH": fromDayType = "WFH"; toDayType = "WFH"
-                                    default: break
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(leaveTypes, id: \.self) { type in
+                                Button(action: {
+                                    selectedLeaveType = type
+                                    switch type {
+                                    case "Full":
+                                        fromDayType = "Full"
+                                        toDayType = "Full"
+                                    case "Comp off":
+                                        fromDayType = "Comp Off"
+                                        toDayType = "Comp Off"
+                                    case "WFH":
+                                        fromDayType = "WFH"
+                                        toDayType = "WFH"
+                                    case "Half":
+                                        fromDayType = "First Half"
+                                        toDayType = "First Half"
+                                    default:
+                                        break
+                                    }
+                                }) {
+                                    Text(type)
+                                        .font(.subheadline)
+                                        .foregroundColor(selectedLeaveType == type ? .white : .blue)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(selectedLeaveType == type ? Color.blue : Color.clear)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.blue, lineWidth: 1)
+                                        )
+                                        .cornerRadius(20)
                                 }
                             }
                         }
+                        .padding(.vertical, 5)
                     }
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
+                    if selectedLeaveType == "Half" {
+                        Text("Select Half Day Type")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(halfTypes, id: \.self) { half in
+                                    Button(action: {
+                                        fromDayType = half
+                                        toDayType = half
+                                    }) {
+                                        Text(half)
+                                            .font(.subheadline)
+                                            .foregroundColor(fromDayType == half ? .white : .blue)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(fromDayType == half ? Color.blue : Color.clear)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 20)
+                                                    .stroke(Color.blue, lineWidth: 1)
+                                            )
+                                            .cornerRadius(20)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 5)
+                        }
+                    }
                 }
 
                 Group {
@@ -138,7 +130,7 @@ struct ApplyLeaveView: View {
                                 .cornerRadius(10)
                         }
                     }
-                    if !(selectedLeaveType == "First Half Day" || selectedLeaveType == "Second Half Day" || selectedLeaveType  == "Off") {
+                    if !(selectedLeaveType == "Half" || selectedLeaveType == "Half" || selectedLeaveType  == "Comp off") {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text("To Date")
@@ -198,9 +190,9 @@ struct ApplyLeaveView: View {
         } else if fromDayType == "Full Day" && toDayType == "Full Day" {
             fullDayLeaveRequest()
         } else {
-            if fromDayType == "First Half Day" {
+            if fromDayType == "First Half" {
                 selectedLeaveType = "first half"
-            } else if fromDayType == "Second Half Day" {
+            } else if fromDayType == "Second Half" {
                 selectedLeaveType = "second half"
             } else {
                 selectedLeaveType = "half"

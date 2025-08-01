@@ -105,7 +105,7 @@ struct NotificationHistoryListView: View {
                 .transition(.scale)
             }
         }
-        .overlay(ToastView())
+        //.overlay(ToastView())
         .animation(.easeInOut, value: showGuestPopup)
         .navigationTitle("Notification History")
         .onAppear {
