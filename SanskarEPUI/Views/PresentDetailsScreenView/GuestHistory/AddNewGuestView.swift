@@ -16,8 +16,12 @@ struct AddNewGuestView: View {
     @State private var selectedDate = Date()
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: UIImage? = nil
-
-
+    
+    @State private var isImagePickerPresented = false
+    @State private var selectedSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showImageSourceActionSheet = false
+    
+    @State private var isSubmitting = false
     var body: some View {
         NavigationView {
             ScrollView {
@@ -54,29 +58,42 @@ struct AddNewGuestView: View {
                                 .padding(.bottom, 5)
                         }
                         
-                        PhotosPicker(selection: $selectedItem, matching: .images) {
-                            Label("Select Photo", systemImage: "photo")
+                        Button(action: {
+                            showImageSourceActionSheet = true
+                        }) {
+                            Label("Choose Image Source", systemImage: "photo")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(8)
                         }
-                        .onChange(of: selectedItem) { newItem in
-                            Task {
-                                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                                   let uiImage = UIImage(data: data) {
-                                    selectedImage = uiImage
-                                }
+                        .confirmationDialog(
+                            "Choose Image Source",
+                            isPresented: $showImageSourceActionSheet,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Camera") {
+                                selectedSourceType = .camera
+                                isImagePickerPresented = true
                             }
+                            Button("Gallery") {
+                                selectedSourceType = .photoLibrary
+                                isImagePickerPresented = true
+                            }
+                            Button("Cancel", role: .cancel) { }
                         }
+                        .sheet(isPresented: $isImagePickerPresented) {
+                               ImagePicker(sourceType: selectedSourceType, selectedImage: $selectedImage)
+                           }
                     }
                     CustonButton(
                         title: "Submit",
-                        backgroundColor: (guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil) ? .gray : .orange
+                        backgroundColor: (guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil  || isSubmitting ) ? .gray : .orange
                     ) {
+                        isSubmitting = true
                         addNewGuestApi()
                     }
-                    .disabled(guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil)
+                    .disabled(guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil || isSubmitting)
                 }
                 .padding()
             }
@@ -94,7 +111,7 @@ struct AddNewGuestView: View {
         var imagesData: [String: Data] = [:]
         
         if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
-             imagesData["image"] = imageData
+            imagesData["image"] = imageData
             ApiClient.shared.callHttpMethod(
                 apiendpoint: Constant.applyNewGuest,
                 method: .post,
@@ -111,9 +128,11 @@ struct AddNewGuestView: View {
                             dismiss()
                         }
                     } else {
+                        isSubmitting = false
                         print("Request failed: \(model.message ?? "Unknown error")")
                     }
                 case .failure(let error):
+                    isSubmitting = false
                     print("Error updating repair details:", error)
                 }
             }
