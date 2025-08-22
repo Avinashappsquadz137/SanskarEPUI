@@ -19,6 +19,7 @@ struct MainHomeView: View {
     @StateObject private var calendarViewModel = MonthlyCalendarViewModel()
     @StateObject private var homeMasterDetailVM = HomeMasterDetailViewModel()
     @State private var navigateNotification = false
+    @State private var navigateSearchScreen = false
     @State private var navigateToProfile = false
     @State private var notificationCount: Int = 0
 
@@ -29,7 +30,7 @@ struct MainHomeView: View {
                     logoName: "sanskar",
                     projectName: "SEP",
                     onSearchTapped: {
-                        print("Search tapped")
+                        navigateSearchScreen = true
                     },
                     onNotificationTapped: {
                         navigateNotification = true
@@ -70,6 +71,12 @@ struct MainHomeView: View {
                     destination: NotificationHistoryListView()
                         .environmentObject(NotificationHandler.shared),
                     isActive: $navigateNotification
+                ) {
+                    EmptyView()
+                }
+                NavigationLink(
+                    destination: MasterSearchScreenView(),
+                    isActive: $navigateSearchScreen
                 ) {
                     EmptyView()
                 }
