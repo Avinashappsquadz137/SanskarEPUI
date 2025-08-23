@@ -12,6 +12,7 @@ struct GuestRecordHistory: View {
     @State private var guestHistory: [GuestHistory] = []
     @State private var isLoading = false
     @State private var showSheet = false
+    @State private var openQR = false
     @State private var showFilterSheet = false
     @State private var addNewGuestSheet = false
     @State private var selectedGuest: GuestHistory? = nil
@@ -82,10 +83,10 @@ struct GuestRecordHistory: View {
                                     .font(.system(size: 17, weight: .semibold))
                                 Text("Date: \(guest.guest_date ?? "")")
                                     .font(.system(size: 14))
-                                Text("Mobile: \(guest.mobile ?? "")")
-                                    .font(.system(size: 14))
-                                Text("Address: \(guest.address ?? "")")
-                                    .font(.system(size: 14))
+//                                Text("Mobile: \(guest.mobile ?? "")")
+//                                    .font(.system(size: 14))
+//                                Text("Address: \(guest.address ?? "")")
+//                                    .font(.system(size: 14))
                                 Text("Reason: \(guest.reason ?? "")")
                                     .font(.system(size: 14))
                                 Text("In-Time: \(guest.in_time ?? "")")
@@ -94,14 +95,33 @@ struct GuestRecordHistory: View {
                                     .font(.system(size: 14))
                             }
                             Spacer()
-                            
-                            Image(systemName: "pencil")
-                                .font(.title)
-                                .foregroundColor(.black)
-                                .onTapGesture {
+                            VStack {
+                                Image(systemName: "pencil")
+                                    .font(.title)
+                                    .foregroundColor(.black)
+                                    .onTapGesture {
+                                        selectedGuest = guest
+                                        showSheet.toggle()
+                                    }
+                                Spacer()
+                                Button(action: {
                                     selectedGuest = guest
-                                    showSheet.toggle()
+                                    openQR.toggle()
+                                }) {
+                                    HStack(spacing: 5) {
+                                        Image(systemName: "qrcode")
+                                            .font(.title2)
+                                       
+                                    }
+                                    .padding(5)
+                                    .foregroundColor(.white)
+                                    .background(Color.blue)
+                                    .cornerRadius(12)
+                                    .shadow(radius: 4)
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+
                         }
                         .padding()
                         .background(Color.white)
@@ -119,6 +139,40 @@ struct GuestRecordHistory: View {
         .navigationTitle("Guest History")
         .onAppear {
             GuestHistoryApi()
+        }
+        .sheet(isPresented: $openQR) {
+            if let selectedGuest = selectedGuest {
+                NavigationStack {
+                    GeometryReader { geometry in
+                        VStack {
+                            GuestQRcodeView(guest: selectedGuest)
+                                .toolbar {
+                                    ToolbarItem(placement: .navigationBarTrailing) {
+                                        Button(action: {
+                                            openQR.toggle()
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.black)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .navigationBarTitleDisplayMode(.inline)
+                                .presentationDetents([
+                                    .height(UIScreen.main.bounds.height * 0.45),
+                                    .large
+                                ])
+                            
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .background(Color.clear)
+                        .cornerRadius(15)
+                    }
+                }
+            }else {
+                    Text("No guest selected")
+                }
         }
         .sheet(isPresented: $showSheet) {
             if let selectedGuest = selectedGuest {

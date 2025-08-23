@@ -45,7 +45,9 @@ struct GuestHistory : Codable {
     let reqdate : String?
     let to_whome : String?
     let type : Int?
-
+    let qrcode : String?
+    let qrthumbnail : String?
+    
     enum CodingKeys: String, CodingKey {
 
         case id = "id"
@@ -60,6 +62,8 @@ struct GuestHistory : Codable {
         case reqdate = "reqdate"
         case to_whome = "to_whome"
         case type = "type"
+        case qrthumbnail = "qrthumbnail"
+        case qrcode = "qrcode"
     }
 
     init(from decoder: Decoder) throws {
@@ -75,7 +79,9 @@ struct GuestHistory : Codable {
         image = try values.decodeIfPresent(String.self, forKey: .image)
         reqdate = try values.decodeIfPresent(String.self, forKey: .reqdate)
         to_whome = try values.decodeIfPresent(String.self, forKey: .to_whome)
+        qrthumbnail = try values.decodeIfPresent(String.self, forKey: .qrthumbnail)
         type = try values.decodeIfPresent(Int.self, forKey: .type)
+        qrcode = try values.decodeIfPresent(String.self, forKey: .qrcode)
     }
 
 }

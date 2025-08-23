@@ -116,7 +116,7 @@ struct AddNewGuestView: View {
                 apiendpoint: Constant.applyNewGuest,
                 method: .post,
                 param: dict,
-                model: GetSuccessMessage.self,
+                model: GuestRequestQRModel.self,
                 isMultipart: true,
                 images: imagesData
             ) { result in

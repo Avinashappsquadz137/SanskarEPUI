@@ -118,6 +118,7 @@ struct MasterSearchScreenView: View {
 }
 struct EmployeeCardView: View {
     let employee: MasterListSearch
+    @State private var isImageFullScreen = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -133,6 +134,9 @@ struct EmployeeCardView: View {
                 .frame(width: 80, height: 80)
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.blue, lineWidth: 2))
+                .onTapGesture {
+                    isImageFullScreen = true
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     // Navigate on Name
@@ -170,59 +174,56 @@ struct EmployeeCardView: View {
                 HStack {
                     Image(systemName: "phone.fill")
                         .foregroundColor(.green)
-                    Text(employee.mobile ?? "N/A")
+                    Text((employee.mobile?.isEmpty == false) ? employee.mobile! : "********")
                         .font(.subheadline)
                     Spacer()
                     Image(systemName: "teletype")
                         .foregroundColor(.green)
-                    Text(employee.extn ?? "N/A")
+                    Text((employee.extn?.isEmpty == false) ? employee.extn! : "****")
                         .font(.subheadline)
-                    
                 }
+
             }
             
+            if let plBalance = employee.pLBalance, !plBalance.isEmpty{
             Divider()
-            
-            // Leave Info Section
             HStack(spacing: 16) {
-                if let plBalance = employee.pLBalance {
-                    //                    NavigationLink(destination: LeaveDetailView(employee: employee)) {
+                    if let plBalance = employee.pLBalance {
+                        VStack {
+                            Text("PL Balance")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text(plBalance)
+                                .bold()
+                                .foregroundColor(.blue)
+                        }
+                    }
                     VStack {
-                        Text("PL Balance")
+                        Text("Approved")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(plBalance)
+                        Text(employee.approveLeave ?? "0")
                             .bold()
-                            .foregroundColor(.blue)
+                            .foregroundColor(.green)
                     }
-                    //                    }
-                }
-                
-                VStack {
-                    Text("Approved")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(employee.approveLeave ?? "0")
-                        .bold()
-                        .foregroundColor(.green)
-                }
-                
-                VStack {
-                    Text("Pending")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(employee.pendingLeave ?? "0")
-                        .bold()
-                        .foregroundColor(.orange)
-                }
-                
-                VStack {
-                    Text("Rejected")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(employee.rejectLeave ?? "0")
-                        .bold()
-                        .foregroundColor(.red)
+                    
+                    VStack {
+                        Text("Pending")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(employee.pendingLeave ?? "0")
+                            .bold()
+                            .foregroundColor(.orange)
+                    }
+                    
+                    VStack {
+                        Text("Rejected")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(employee.rejectLeave ?? "0")
+                            .bold()
+                            .foregroundColor(.red)
+                    }
                 }
             }
         }
@@ -230,5 +231,8 @@ struct EmployeeCardView: View {
         .background(Color.white)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 3)
+        .fullScreenCover(isPresented: $isImageFullScreen) {
+            FullScreenImageView(imageURL: employee.pImgUrl)
+        }
     }
 }
