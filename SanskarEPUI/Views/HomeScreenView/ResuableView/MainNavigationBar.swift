@@ -28,7 +28,7 @@ struct MainNavigationBar: View {
             Spacer()
 
             Button(action: onSearchTapped) {
-                Image(systemName: "")
+                Image(systemName: "magnifyingglass")
                     .font(.title2)
                     .foregroundColor(.black)
                     .padding(8)
