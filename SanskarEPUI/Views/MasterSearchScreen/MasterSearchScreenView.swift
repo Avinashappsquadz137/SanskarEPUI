@@ -12,7 +12,7 @@ struct MasterSearchScreenView: View {
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
     @State private var employees: [MasterListSearch] = []
     @State private var isLoading = false
-    
+    @State private var debounce_timer: Timer?
     var body: some View {
         VStack {
             // Search Bar
@@ -40,14 +40,18 @@ struct MasterSearchScreenView: View {
                     )
                     .onChange(of: searchText) { newValue in
                         if newValue.count >= 3 {
-                            MasterListSearchAPI()
+                            debounce_timer?.invalidate()
+                            debounce_timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
+                                MasterListSearchAPI()
+                            }
+                           
                         } else {
                             employees = []
                         }
                     }
             }
-            .padding()
-            
+            .padding(10)
+            Spacer()
             if isLoading {
                 ProgressView("Searching...")
                     .padding()
@@ -75,6 +79,7 @@ struct MasterSearchScreenView: View {
                 .padding(.horizontal)
             }
             }
+            Spacer()
         }
         .navigationBarBackButtonHidden(false)
         .navigationTitle("Master Search Screen")
