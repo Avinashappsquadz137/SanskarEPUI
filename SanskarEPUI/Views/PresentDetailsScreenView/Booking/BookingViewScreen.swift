@@ -25,7 +25,7 @@ struct BookingViewScreen: View {
     @State private var selectedBooking: NewBooking?
     @State private var showAssignSheet = false
 
-    let allowedRoles: Set<Int> = [1, 2, 3]
+    let allowedRoles: Set<Int> = [1]
     let roleID = Int(UserDefaultsManager.getBookingRoleID()) ?? 1
     var body: some View {
         ZStack {
@@ -79,7 +79,7 @@ struct BookingViewScreen: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            ForEach(viewModel.filteredBookings, id: \.katha_booking_id) { booking in
+                            ForEach(viewModel.filteredBookings, id: \.katha_id) { booking in
                                 cellView(for: booking)
                             }
 
@@ -147,7 +147,7 @@ struct BookingViewScreen: View {
         )
         .sheet(isPresented: $showAssignSheet) {
             AssignEmployeeSheet(assignList: viewModel.assignDetails) { selectedEmpCode in
-                if let kathaId = selectedBooking?.katha_booking_id {
+                if let kathaId = selectedBooking?.katha_id {
                     selectKathaAssignAPI(kathaId: kathaId, assignTo: selectedEmpCode)
                 }
                 
@@ -155,7 +155,7 @@ struct BookingViewScreen: View {
         }
     }
     
-    func selectKathaAssignAPI(kathaId: String, assignTo : String) {
+    func selectKathaAssignAPI(kathaId: Int, assignTo : String) {
         let params: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode(),
             "katha_id": "\(kathaId)",
@@ -185,7 +185,7 @@ struct BookingViewScreen: View {
             config: NewBookingCellConfig(),
             onTap: {
                 selectedBooking = booking
-                if !viewModel.showOnlyApproved {
+                if !viewModel.showOnlyApproved && roleID == 1 {
                     viewModel.assignBookingDetailAPI()
                     navigateApprove = true
                 } else {
@@ -254,26 +254,17 @@ struct NewBookingCellView: View {
                 }
                 
             }
+            Text(" \(katha_date ?? "" ) - \(katha_from_Date ?? "") \(channelName ?? "N/A") \(kathaTiming ?? slotTiming ?? "N/A")").font(.caption)
             if config.showAmount || config.showGST {
-                HStack {
-                    Text("Amount: \(amount ?? "N/A")")
+                if gST?.lowercased() == "yes" {
+                    Text("Amount: ₹\(amount ?? "N/A") + GST")
                         .font(.caption2)
-                    Spacer()
-                    Text("GST: \(gST ?? "N/A")")
+                } else {
+                    Text("Amount: ₹\(amount ?? "N/A")")
                         .font(.caption2)
                 }
             }
             
-            HStack {
-                Text("Channel: \(channelName ?? "N/A")")
-                    .font(.caption2)
-                Spacer()
-                Text("Venue: \(venue ?? "N/A")")
-                    .font(.caption2)
-            }
-            
-            Text("Date: \(katha_date ?? katha_from_Date ?? "N/A")").font(.caption2)
-            Text("Time: \(kathaTiming ?? slotTiming ?? "N/A")").font(.caption2)
             Text("Status: \(status ?? "N/A")").font(.caption2)
             
             if showAssignedList {

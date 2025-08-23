@@ -42,41 +42,74 @@ struct ClientDetailFormView: View {
                 
                 CustonButton(title: "Submit", backgroundColor: .orange) {
                     if !clientName.isEmpty {
-                        clientdetailAPI()
+                       // clientdetailAPI()
                     }
                 }
                 .padding(.top)
             }
             .padding()
         }
+//        .onAppear() {
+//            clientNameAPI()
+//        }
         .navigationTitle("Client Details Form")
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    func clientdetailAPI() {
+//    func clientdetailAPI() {
+//        var dict: [String: Any] = [
+//            "EmpCode": UserDefaultsManager.getEmpCode(),
+//            "katha_id": booking.katha_id ?? "",
+//            "address": "",
+//            "addharcard": "",
+//            "client_ID": selectedClientId != nil ? "\(selectedClientId!)" : "0",
+//            "name": clientName,
+//            "gst_no": gstNumber,
+//            "pancard": panNumber,
+//        ]
+//        
+//        
+//        ApiClient.shared.callmethodMultipart(
+//            apiendpoint: Constant.clientdetailApi,
+//            method: .post,
+//            param: dict,
+//            model: GetSuccessMessage.self
+//        ) { result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let model):
+//                    print(model.data)
+//                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                        dismiss()
+//                    }
+//                case .failure(let error):
+//                    ToastManager.shared.show(message: "Enter Correct ID")
+//                    print("API Error: \(error)")
+//                }
+//            }
+//        }
+//    }
+    
+    func clientNameAPI() {
         var dict: [String: Any] = [
             "EmpCode": UserDefaultsManager.getEmpCode(),
-            "katha_id": booking.katha_id ?? "",
-            "client_ID": "0",
-            "name": "\(clientName)",
-            "gst_no": "\(gstNumber)",
-            "pancard": "\(panNumber)",
+            "searchTerm":  ""
         ]
-       
+        
         ApiClient.shared.callmethodMultipart(
-            apiendpoint: Constant.clientdetailApi,
+            apiendpoint: Constant.clientNameApi,
             method: .post,
             param: dict,
-            model: GetSuccessMessage.self
+            model: ClientNameModel.self
         ) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let model):
-                    print(model.data)
-                    ToastManager.shared.show(message: model.message ?? "Fetched Successfully")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        dismiss()
-                    }
+                    print("")
+//                    clientList = model.data ?? []
+//                    filteredClientList = clientList
+                    
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")
