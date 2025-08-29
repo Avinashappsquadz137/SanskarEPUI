@@ -20,9 +20,10 @@ struct MainHomeView: View {
     @StateObject private var homeMasterDetailVM = HomeMasterDetailViewModel()
     @State private var navigateNotification = false
     @State private var navigateSearchScreen = false
+    @State private var navigateQRScreen = false
     @State private var navigateToProfile = false
     @State private var notificationCount: Int = 0
-
+    @State private var scannedText = ""
     @State private var showNotice = false
     @State private var remindLaterTime: Date? = nil
     
@@ -39,6 +40,9 @@ struct MainHomeView: View {
                         onNotificationTapped: {
                             navigateNotification = true
                             print("Notification tapped")
+                        },
+                        onQRTapped : {
+                            navigateQRScreen = true
                         },
                         notificationCount: notificationCount
                     )
@@ -112,6 +116,9 @@ struct MainHomeView: View {
                 )
             }
             
+        }
+        .fullScreenCover(isPresented: $navigateQRScreen) {
+            GuestQRView(isShowingScanner: $navigateQRScreen)
         }
         .onAppear {
             homeMasterDetailVM.getMasterDetail()

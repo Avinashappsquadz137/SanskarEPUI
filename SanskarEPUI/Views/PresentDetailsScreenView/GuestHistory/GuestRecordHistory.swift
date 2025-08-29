@@ -171,7 +171,7 @@ struct GuestRecordHistory: View {
                     }
                 }
             }else {
-                    Text("No guest selected")
+                    Text("Open Next Guest")
                 }
         }
         .sheet(isPresented: $showSheet) {

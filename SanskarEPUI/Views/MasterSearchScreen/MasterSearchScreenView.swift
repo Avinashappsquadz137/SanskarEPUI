@@ -13,6 +13,8 @@ struct MasterSearchScreenView: View {
     @State private var employees: [MasterListSearch] = []
     @State private var isLoading = false
     @State private var debounce_timer: Timer?
+    @FocusState private var isSearchFocused: Bool
+    
     var body: some View {
         VStack {
             // Search Bar
@@ -23,6 +25,7 @@ struct MasterSearchScreenView: View {
                     .padding(.trailing, 30)
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
+                    .focused($isSearchFocused)
                     .overlay(
                         HStack {
                             Spacer()
@@ -83,6 +86,12 @@ struct MasterSearchScreenView: View {
         }
         .navigationBarBackButtonHidden(false)
         .navigationTitle("Master Search Screen")
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
+                isSearchFocused = true
+                MasterListSearchAPI()
+            }
+        }
     }
     
     func MasterListSearchAPI() {
