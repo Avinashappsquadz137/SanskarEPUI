@@ -189,12 +189,13 @@ struct EmployeeCard: View {
             }
             
             ApiClient.shared.callHttpMethod(
-                apiendpoint: Constant.updateProfile,
+                apiendpoint: Constant.changeProfile,
                 method: .post,
                 param: dict,
                 model: UpdateProfileResponse.self,
                 isMultipart: true,
-                images: imagesData
+                images: imagesData,
+                baseUrl: Constant.EP_BASEURL
             ) { result in
                 DispatchQueue.main.async {
                     switch result {

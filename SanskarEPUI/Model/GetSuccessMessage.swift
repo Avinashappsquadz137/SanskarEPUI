@@ -104,8 +104,8 @@ struct GetSuccessMessageform : Codable {
 }
 
 struct UpdateProfileResponse: Decodable {
-    let data: String
-    let error: [String]
+    let data: String?
+    let error: [String]?
     let message: String
     let status: Bool
 
@@ -116,9 +116,9 @@ struct UpdateProfileResponse: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        data = try container.decode(String.self, forKey: .data)
-        error = try container.decode([String].self, forKey: .error)
-        message = try container.decode(String.self, forKey: .message)
+        data = try? container.decode(String.self, forKey: .data)
+        error = try? container.decode([String].self, forKey: .error)
+        message = (try? container.decode(String.self, forKey: .message)) ?? ""
 
         if let boolStatus = try? container.decode(Bool.self, forKey: .status) {
             status = boolStatus
