@@ -30,6 +30,7 @@ struct GuestRecordHistory: View {
     @State private var startDateRaw: Date = Date()
     @State private var endDateRaw: Date = Date()
     @State private var fullScreenImageURL: String? = nil
+    @State private var isEditing = false
 
     var filteredGuestHistory: [GuestHistory] {
         if searchText.isEmpty {
@@ -92,6 +93,8 @@ struct GuestRecordHistory: View {
                                     .font(.system(size: 14))
                                 Text("Reason: \(guest.reason ?? "")")
                                     .font(.system(size: 14))
+                                    .lineLimit(1)                
+                                    .truncationMode(.tail)
                                 Text("In-Time: \(guest.in_time ?? "")")
                                     .font(.system(size: 14))
                                 Text("Out-Time: \(guest.out_time ?? "")")
@@ -99,13 +102,15 @@ struct GuestRecordHistory: View {
                             }
                             Spacer()
                             VStack {
-                                Image(systemName: "pencil")
-                                    .font(.title)
-                                    .foregroundColor(.black)
-                                    .onTapGesture {
-                                        store.selectedGuest = guest
-                                        showSheet.toggle()
-                                    }
+                                if isEditing {
+                                    Image(systemName: "pencil")
+                                        .font(.title)
+                                        .foregroundColor(.black)
+                                        .onTapGesture {
+                                            store.selectedGuest = guest
+                                            showSheet.toggle()
+                                        }
+                                }
                                 Spacer()
                                 Button(action: {
                                     store.selectedGuest = guest
@@ -133,6 +138,16 @@ struct GuestRecordHistory: View {
                     }
                     .listStyle(PlainListStyle())
                     
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    Button(isEditing ? "Done" : "Edit") {
+                        isEditing.toggle()
+                    }
+                    .font(.system(size: 16, weight: .semibold))
                 }
             }
         }
@@ -246,26 +261,29 @@ struct GuestRecordHistory: View {
             NavigationStack {
                 GeometryReader { geometry in
                     VStack {
-                        AddNewGuestView()
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarTrailing) {
-                                    Button(action: {
-                                        addNewGuestSheet.toggle()
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.black)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
+                        AddNewGuestView { newGuest in
+                         
+                            self.store.selectedGuest = newGuest
+                            self.openQR = true
+                        }
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button(action: {
+                                    addNewGuestSheet.toggle()
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.black)
                                 }
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .navigationTitle("Add New Guest")
-                            .navigationBarTitleDisplayMode(.inline)
-                            .presentationDetents([
-                                .height(UIScreen.main.bounds.height * 0.65),
-                                .large
-                            ])
-                        
+                        }
+                        .navigationTitle("Add New Guest")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .presentationDetents([
+                            .height(UIScreen.main.bounds.height * 0.65),
+                            .large
+                        ])
                     }
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .background(Color.clear)
@@ -273,6 +291,15 @@ struct GuestRecordHistory: View {
                 }
             }
         }
+        .sheet(isPresented: $addNewGuestSheet) {
+            NavigationStack {
+                AddNewGuestView { newGuest in
+                    self.store.selectedGuest = newGuest
+                    self.openQR = true
+                }
+            }
+        }
+
         .onChange(of: addNewGuestSheet) { newValue in
             if !newValue {
                 GuestHistoryApi()
@@ -310,5 +337,23 @@ struct GuestRecordHistory: View {
                 }
             }
         }
+    }
+}
+extension GuestHistory {
+    init(from requestQR: GuestRequestQR, name: String? = nil, reason: String? = nil, guestDate: String? = nil ,reqdate : String? = nil) {
+        self.id = nil
+        self.name = requestQR.name
+        self.in_time = nil
+        self.out_time = nil
+        self.reason = requestQR.reason
+        self.guest_date = requestQR.reqdate
+        self.address = nil
+        self.mobile = nil
+        self.image = nil
+        self.reqdate = requestQR.reqdate
+        self.to_whome = nil
+        self.type = nil
+        self.qrcode = requestQR.qrcode
+        self.qrthumbnail = requestQR.qrthumbnail
     }
 }

@@ -22,6 +22,9 @@ struct AddNewGuestView: View {
     @State private var showImageSourceActionSheet = false
     
     @State private var isSubmitting = false
+    
+    var onGuestAdded: ((GuestHistory) -> Void)? = nil
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -123,8 +126,14 @@ struct AddNewGuestView: View {
                 switch result {
                 case .success(let model):
                     if model.status == true {
-                        ToastManager.shared.show(message: model.message ?? "Successfully updated repair details")
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        if let guestData = model.data {
+                            print(model.data ?? "No data")
+                            let newGuest = GuestHistory(from: guestData)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                onGuestAdded?(newGuest)  
+                                dismiss()
+                            }
+                        } else {
                             dismiss()
                         }
                     } else {

@@ -32,17 +32,25 @@ struct GuestRequestQRModel : Codable {
 struct GuestRequestQR : Codable {
     let qrcode : String?
     let qrthumbnail : String?
-
+    let name : String?
+    let reason : String?
+    let reqdate : String?
     enum CodingKeys: String, CodingKey {
 
         case qrcode = "qrcode"
         case qrthumbnail = "qrthumbnail"
+        case name = "guestName"
+        case reason = "reason"
+        case reqdate = "reqdate"
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         qrcode = try values.decodeIfPresent(String.self, forKey: .qrcode)
         qrthumbnail = try values.decodeIfPresent(String.self, forKey: .qrthumbnail)
+        name = try values.decodeIfPresent(String.self, forKey: .name)
+        reason = try values.decodeIfPresent(String.self, forKey: .reason)
+        reqdate = try values.decodeIfPresent(String.self, forKey: .reqdate)
     }
 
 }
