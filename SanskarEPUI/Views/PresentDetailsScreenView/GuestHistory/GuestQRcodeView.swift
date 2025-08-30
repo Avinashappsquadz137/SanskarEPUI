@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct GuestQRcodeView: View {
-    var guest: GuestHistory
+    @EnvironmentObject var store: GuestStore
     
     @State private var qrImage: UIImage?
     @State private var showShareSheet = false
     
     var body: some View {
+        if let guest = store.selectedGuest {
         VStack(spacing: 10) {
             if let name = guest.name {
                 Text(name.uppercased())
@@ -21,7 +22,7 @@ struct GuestQRcodeView: View {
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
             }
-
+            
             if let thumb = guest.qrthumbnail, let url = URL(string: thumb) {
                 AsyncImage(url: url) { image in
                     image
@@ -59,26 +60,28 @@ struct GuestQRcodeView: View {
             .padding(.horizontal, 40)
             .sheet(isPresented: $showShareSheet) {
                 if let qrImage = guest.qrthumbnail {
-                        let shareMessage = """
+                    let shareMessage = """
                         Guest Details:
                         Name: \(guest.name ?? "Sanskar TV")
                         Date: \(guest.guest_date ?? "")
                         Reason: \(guest.reason ?? "")
                         """
-                        ShareSheet(activityItems: [qrImage, shareMessage])
-                        
-                    } else if let qrText = guest.qrcode {
-                        let shareMessage = """
+                    ShareSheet(activityItems: [qrImage, shareMessage])
+                    
+                } else if let qrText = guest.qrcode {
+                    let shareMessage = """
                         Guest QR Code:
                         \(qrText)
                         """
-                        ShareSheet(activityItems: [shareMessage])
-                    }
+                    ShareSheet(activityItems: [shareMessage])
+                }
             }
             
             Spacer()
         }
         .padding()
+    }
+        
         
     }
 }

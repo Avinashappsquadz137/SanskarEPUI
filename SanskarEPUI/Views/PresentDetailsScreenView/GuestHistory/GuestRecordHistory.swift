@@ -6,8 +6,16 @@
 //
 import SwiftUI
 
+
+class GuestStore: ObservableObject {
+    @Published var guests: [GuestHistory] = []
+    @Published var selectedGuest: GuestHistory? = nil
+}
+
+
 struct GuestRecordHistory: View {
     
+    @EnvironmentObject var store: GuestStore
     @Environment(\.dismiss) private var dismiss
     @State private var guestHistory: [GuestHistory] = []
     @State private var isLoading = false
@@ -15,7 +23,6 @@ struct GuestRecordHistory: View {
     @State private var openQR = false
     @State private var showFilterSheet = false
     @State private var addNewGuestSheet = false
-    @State private var selectedGuest: GuestHistory? = nil
     @State private var startDate: String = ""
     @State private var endDate: String = ""
     @State private var searchText: String = ""
@@ -83,10 +90,6 @@ struct GuestRecordHistory: View {
                                     .font(.system(size: 17, weight: .semibold))
                                 Text("Date: \(guest.guest_date ?? "")")
                                     .font(.system(size: 14))
-//                                Text("Mobile: \(guest.mobile ?? "")")
-//                                    .font(.system(size: 14))
-//                                Text("Address: \(guest.address ?? "")")
-//                                    .font(.system(size: 14))
                                 Text("Reason: \(guest.reason ?? "")")
                                     .font(.system(size: 14))
                                 Text("In-Time: \(guest.in_time ?? "")")
@@ -100,12 +103,12 @@ struct GuestRecordHistory: View {
                                     .font(.title)
                                     .foregroundColor(.black)
                                     .onTapGesture {
-                                        selectedGuest = guest
+                                        store.selectedGuest = guest
                                         showSheet.toggle()
                                     }
                                 Spacer()
                                 Button(action: {
-                                    selectedGuest = guest
+                                    store.selectedGuest = guest
                                     openQR.toggle()
                                 }) {
                                     HStack(spacing: 5) {
@@ -141,11 +144,10 @@ struct GuestRecordHistory: View {
             GuestHistoryApi()
         }
         .sheet(isPresented: $openQR) {
-            if let selectedGuest = selectedGuest {
                 NavigationStack {
                     GeometryReader { geometry in
                         VStack {
-                            GuestQRcodeView(guest: selectedGuest)
+                            GuestQRcodeView()
                                 .toolbar {
                                     ToolbarItem(placement: .navigationBarTrailing) {
                                         Button(action: {
@@ -170,16 +172,12 @@ struct GuestRecordHistory: View {
                         .cornerRadius(15)
                     }
                 }
-            }else {
-                    Text("Open Next Guest")
-                }
         }
         .sheet(isPresented: $showSheet) {
-            if let selectedGuest = selectedGuest {
                 NavigationStack {
                     GeometryReader { geometry in
                         VStack {
-                            EditGuestView(guest: selectedGuest)
+                            EditGuestView() 
                                 .toolbar {
                                     ToolbarItem(placement: .navigationBarTrailing) {
                                         Button(action: {
@@ -204,9 +202,6 @@ struct GuestRecordHistory: View {
                         .cornerRadius(15)
                     }
                 }
-            } else {
-                Text("No guest selected") 
-            }
         }
         .sheet(isPresented: $showFilterSheet) {
             NavigationStack {

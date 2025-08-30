@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AllListView: View {
     @State private var reqType: [SideBar] = []
+    @StateObject private var store = GuestStore()
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     @State private var searchText = ""
     var filteredReqType: [SideBar] {
@@ -78,6 +79,7 @@ struct AllListView: View {
             CalendarScreenView()
         } else if id == 8 {
             GuestRecordHistory()
+                .environmentObject(store)
         } else if id == 17 {
             MyReportsViews()
                 .navigationTitle("My Reports")
