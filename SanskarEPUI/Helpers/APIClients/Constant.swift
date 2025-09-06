@@ -91,6 +91,7 @@ struct Constant {
     static let masterSearchList            = "api_panel/master_search"
     static let guestInByQrcode             = "api_panel/guest_in_by_qrcode"
     static let salesDetailsList            = "api_panel/katha_booking_sales_list"
+    static let kathaBookingSalesDetails    = "api_panel/katha_booking_sales_details"
 }
 
 

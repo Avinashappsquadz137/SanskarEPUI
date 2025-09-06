@@ -25,7 +25,10 @@ struct SalesDetailsView: View {
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(employees) { employee in
-                                SalesEmployeeRow(employee: employee)
+                                NavigationLink(destination: SalesEmployeeDetailsView(employee: employee)) {
+                                    SalesEmployeeRow(employee: employee)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.vertical)
