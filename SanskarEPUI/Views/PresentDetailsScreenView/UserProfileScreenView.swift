@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Alamofire
 
 struct UserProfileScreenView: View {
     @State private var showLogoutAlert: Bool = false
@@ -29,61 +28,62 @@ struct UserProfileScreenView: View {
     ]
     
     var body: some View {
-        VStack(spacing: 16) {
-            EmployeeCard(
-                imageName: "\(PImg)",
-                employeeName: name.uppercased(),
-                employeeCode: empCode,
-                employeeAttendance: Text(""),
-                type: .none,
-                onProfileTapped: {
-                    isImageFullScreen = true
-                },
-                showEditButton: true,
-                onEditTapped: nil
-            )
-            .padding(.horizontal, 10)
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(key)
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            
-                            TextField("Enter \(key)", text: Binding(
-                                get: { fieldValues[key] ?? value },
-                                set: { fieldValues[key] = $0 }
-                            ))
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+        ZStack {
+            VStack(spacing: 16) {
+                EmployeeCard(
+                    imageName: "\(PImg)",
+                    employeeName: name.uppercased(),
+                    employeeCode: empCode,
+                    employeeAttendance: Text(""),
+                    type: .none,
+                    onProfileTapped: {
+                        isImageFullScreen = true
+                    },
+                    showEditButton: true,
+                    onEditTapped: nil
+                )
+                .padding(.horizontal, 10)
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(data.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(key)
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                
+                                TextField("Enter \(key)", text: Binding(
+                                    get: { fieldValues[key] ?? value },
+                                    set: { fieldValues[key] = $0 }
+                                ))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            }
+                            .padding()
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .cornerRadius(8)
                         }
-                        .padding()
-                        .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(8)
                     }
+                    .padding()
                 }
-                .padding()
+                CustonButton(title: "Logout", backgroundColor: .orange) {
+                    showLogoutAlert = true
+                }
+                .padding(.horizontal, 10)
             }
-            CustonButton(title: "Logout", backgroundColor: .orange) {
-                showLogoutAlert = true
+            .overlay(ToastView())
+            .alert(isPresented: $showLogoutAlert) {
+                Alert(
+                    title: Text("Are you sure?"),
+                    message: Text("Do you really want to log out?"),
+                    primaryButton: .destructive(Text("Log Out")) {
+                        LogoutApi()
+                    },
+                    secondaryButton: .cancel()
+                )
             }
-            .padding(.horizontal, 10)
+            .navigationTitle("User Profile")
+            ImageFullScreenView(imageURL: PImg, isPresented: $isImageFullScreen)
         }
-        .fullScreenCover(isPresented: $isImageFullScreen) {
-            FullScreenImageView(imageURL: PImg)
-        }
-        .overlay(ToastView())
-        .alert(isPresented: $showLogoutAlert) {
-            Alert(
-                title: Text("Are you sure?"),
-                message: Text("Do you really want to log out?"),
-                primaryButton: .destructive(Text("Log Out")) {
-                    LogoutApi()
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .navigationTitle("User Profile")
+       
     }
     // MARK: - Logout API
     func LogoutApi() {

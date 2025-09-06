@@ -126,11 +126,14 @@ struct BookingViewScreen: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 if allowedRoles.contains(roleID) {
-                    Toggle("", isOn: $viewModel.showOnlyApproved)
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                    .labelsHidden()
+                    VStack(spacing: 4) {
+                        Toggle("", isOn: $viewModel.showOnlyApproved)
+                            .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        Text("Approved")
+                            .font(.caption)
+                    }
+                }
             }
-         }
         }
         .onChange(of: viewModel.showOnlyApproved) { newValue in
             viewModel.onToggleChanged(newValue)
