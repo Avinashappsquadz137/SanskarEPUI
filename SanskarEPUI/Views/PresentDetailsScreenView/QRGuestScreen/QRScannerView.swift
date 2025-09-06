@@ -35,7 +35,7 @@ struct QRScannerView: View {
                             addQRItemDetail()
                           
                         }) {
-                            Text("Guest Add")
+                            Text("Verify Guest")
                                 .padding()
                                 .background(Color.blue)
                                 .foregroundColor(.white)
