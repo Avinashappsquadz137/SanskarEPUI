@@ -28,11 +28,13 @@ struct MainNavigationBar: View {
 
             Spacer()
             HStack(spacing: 5){
-                Button(action: onQRTapped) {
-                    Image(systemName: "qrcode.viewfinder")
-                        .font(.title2)
-                        .foregroundColor(.black)
-                        .padding(8)
+                if UserDefaultsManager.getDepartment() == "GUARD" {
+                    Button(action: onQRTapped) {
+                        Image(systemName: "qrcode.viewfinder")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                            .padding(8)
+                    }
                 }
                 Button(action: onSearchTapped) {
                     Image(systemName: "magnifyingglass")

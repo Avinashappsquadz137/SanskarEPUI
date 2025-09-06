@@ -7,8 +7,7 @@
 import SwiftUI
 
 struct SalesEmployeeDetailsView: View {
-    let employee: SalesDetailsList
-    
+    let employeeCode: String
     @State private var isImageFullScreen = false
     @State private var isLoading: Bool = false
     // Pagination & Data
@@ -39,37 +38,32 @@ struct SalesEmployeeDetailsView: View {
                 } else {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 12) {
-                            ForEach(recentKathas, id: \.id) { katha in
+                            ForEach(recentKathas.indices, id: \.self) { index in
+                                let katha = recentKathas[index]
+                                
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(katha.kathaName ?? "Unknown")
                                         .font(.headline)
                                     Text("Date: \(katha.date ?? "")")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
-                                    Text("Amount: ₹\(katha.amount ?? 0)")
+                                    Text("Amount: ₹\(katha.amount ?? 0, specifier: "%.2f")")
                                         .font(.subheadline)
                                 }
-                                .font(.body)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding()
                                 .background(Color(.systemGray6))
                                 .cornerRadius(10)
-                            }
-                            
-                            // Pagination Button
-                            if currentPage < totalPages {
-                                Button(action: {
-                                    currentPage += 1
-                                    salesEMPDetailsAPI()
-                                }) {
-                                    Text("Load More")
-                                        .bold()
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .background(Color.blue)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(10)
+                                .onAppear {
+                                    if index == recentKathas.count - 1 && currentPage < totalPages && !isLoading {
+                                        currentPage += 1
+                                        salesEMPDetailsAPI()
+                                    }
                                 }
+                            }
+                            if isLoading && currentPage > 1 {
+                                ProgressView("Loading more...")
+                                    .padding()
                             }
                         }
                     }
@@ -99,10 +93,10 @@ struct SalesEmployeeDetailsView: View {
         .sheet(isPresented: $showFilterSheet) {
             filterSheet
         }
-        .navigationTitle(employee.name ?? "Details")
+        .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
         .overlay(
-            ImageFullScreenView(imageURL: employee.empImage ?? "", isPresented: $isImageFullScreen)
+            ImageFullScreenView(imageURL: employeeDetails?.profileImage ?? "", isPresented: $isImageFullScreen)
         )
     }
     
@@ -113,7 +107,7 @@ struct SalesEmployeeDetailsView: View {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         let dict: [String: Any] = [
-            "EmpCode": employee.empCode ?? "",
+            "EmpCode": employeeCode,
             "page": String(currentPage),
             "fromDate": dateFormatter.string(from: fromDate),
             "toDate": dateFormatter.string(from: toDate)
@@ -152,14 +146,14 @@ struct SalesEmployeeDetailsView: View {
     // MARK: - Views
     private var profileHeaderView: some View {
         Group {
-            if let url = employee.empImage,
+            if let url = employeeDetails?.profileImage,
                let imageUrl = URL(string: url) {
                 AsyncImage(url: imageUrl) { image in
                     image.resizable()
                         .scaledToFill()
                 } placeholder: {
                     Circle().fill(Color.gray.opacity(0.3))
-                        .overlay(Text(initials(from: employee.name)))
+                        .overlay(Text(initials(from: employeeDetails?.name)))
                 }
                 .frame(width: 100, height: 100)
                 .clipShape(Circle())
@@ -170,7 +164,7 @@ struct SalesEmployeeDetailsView: View {
                 Circle()
                     .fill(Color.gray.opacity(0.3))
                     .overlay(
-                        Text(initials(from: employee.name))
+                        Text(initials(from: employeeDetails?.name))
                             .font(.system(size: 40))
                             .bold()
                             .minimumScaleFactor(0.5)
@@ -181,7 +175,7 @@ struct SalesEmployeeDetailsView: View {
                     .frame(width: 100, height: 100)
             }
             
-            Text(employee.name ?? "Unknown")
+            Text(employeeDetails?.name ?? "Unknown")
                 .font(.title2).bold()
         }
     }
@@ -198,7 +192,7 @@ struct SalesEmployeeDetailsView: View {
                 Text("Katha Pending: \(kathaPending)")
             }
             if let totalAmount = employeeDetails?.totalAmount {
-                Text("Total Amount: \(totalAmount)")
+                Text("Total Amount: ₹\(totalAmount , specifier: "%.2f")")
             }
         }
         .font(.body)

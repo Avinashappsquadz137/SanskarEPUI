@@ -128,7 +128,13 @@ struct AllListView: View {
         }else if id == 26 {
             CalendarScreenView()
         }else if id == 28 {
-            SalesDetailsView()
+            if UserDefaultsManager.getBookingRoleID() == "3" {
+                SalesEmployeeDetailsView(employeeCode: UserDefaultsManager.getEmpCode())
+            }else if UserDefaultsManager.getBookingRoleID() == "1" {
+                SalesDetailsView()
+            }else {
+                Text("Work In Progress")
+            }
         } else {
             Text("Work In Progress")
         }
