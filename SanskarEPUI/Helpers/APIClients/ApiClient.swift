@@ -153,6 +153,7 @@ class ApiClient: NSObject {
         method: ApiMethod,
         param: [String: Any],
         model: T.Type,
+        baseUrl : String = "",
         completion: @escaping (Result<T, Error>) -> Void
     ){
         DispatchQueue.main.async {
@@ -177,7 +178,14 @@ class ApiClient: NSObject {
             urlEncoding = URLEncoding.queryString
         }
         
-        let fullUrl = (Constant.BASEURL + apiendpoint).trimmingCharacters(in: .whitespacesAndNewlines)
+        let fullUrl: String
+        if apiendpoint.lowercased().hasPrefix("http") {
+            fullUrl = apiendpoint
+        } else if !baseUrl.isEmpty {
+            fullUrl = (baseUrl + apiendpoint).trimmingCharacters(in: .whitespacesAndNewlines)
+        } else {
+            fullUrl = (Constant.BASEURL + apiendpoint).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
         print("Api:--", fullUrl)
         print("Param:--", param)
         print("Method:--", apiMethod.rawValue)

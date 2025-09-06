@@ -46,9 +46,18 @@ struct EmployeeCard: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                         } placeholder: {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .overlay(
+                                    Text(initials(from: name))
+                                        .font(.system(size: 40))
+                                        .bold()
+                                        .minimumScaleFactor(0.5)
+                                        .lineLimit(1)
+                                        .foregroundColor(.black)
+                                        .padding(10)
+                                )
+                                .frame(width: 100, height: 100)
                         }
                         .frame(width: 100, height: 100)
                         .background(Color.blue.opacity(0.1))
@@ -58,13 +67,18 @@ struct EmployeeCard: View {
                             onProfileTapped()
                         }
                     } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                Text(initials(from: name))
+                                    .font(.system(size: 40))
+                                    .bold()
+                                    .minimumScaleFactor(0.5)
+                                    .lineLimit(1)           
+                                    .foregroundColor(.black)
+                                    .padding(10)
+                            )
                             .frame(width: 100, height: 100)
-                            .background(Color.blue.opacity(0.1))
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.green, lineWidth: 2))
                             .onTapGesture {
                                 onProfileTapped()
                             }

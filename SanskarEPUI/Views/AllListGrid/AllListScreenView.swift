@@ -127,6 +127,8 @@ struct AllListView: View {
                 .navigationTitle("Self Punch")
         }else if id == 26 {
             CalendarScreenView()
+        }else if id == 28 {
+            SalesDetailsView()
         } else {
             Text("Work In Progress")
         }
@@ -182,6 +184,7 @@ struct CardView: View {
         case 22: return UIImage(named: "Leave") ?? defaultImage()
         case 27: return UIImage(named: "Profile") ?? defaultImage()
         case 26:return UIImage(named: "Leave") ?? defaultImage()
+        case 28:return UIImage(named: "SalesIcon") ?? defaultImage()
         default: return defaultImage()
         }
     }

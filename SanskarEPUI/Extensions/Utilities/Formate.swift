@@ -43,3 +43,10 @@ func hideKeyboard() {
    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
                                    to: nil, from: nil, for: nil)
 }
+func initials(from name: String?) -> String {
+    guard let name = name else { return "" }
+    let parts = name.split(separator: " ")
+    let first = parts.first?.first.map { String($0) } ?? ""
+    let last = parts.dropFirst().first?.first.map { String($0) } ?? ""
+    return (first + last).uppercased()
+}

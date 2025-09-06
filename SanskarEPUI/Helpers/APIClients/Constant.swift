@@ -31,6 +31,7 @@ class ApiRequest {
 
 struct Constant {
     static let EP_BASEURL                  = "https://ep.sanskargroup.in/api/"
+    
     static let BASEURL                     = ApiRequest.Url.serverURL
     static let imageURL                    = "\(BASEURL)uploads/"
     
@@ -89,6 +90,7 @@ struct Constant {
     static let bookingLeadAPI              = "api_panel/booking_lead"
     static let masterSearchList            = "api_panel/master_search"
     static let guestInByQrcode             = "api_panel/guest_in_by_qrcode"
+    static let salesDetailsList            = "api_panel/katha_booking_sales_list"
 }
 
 
