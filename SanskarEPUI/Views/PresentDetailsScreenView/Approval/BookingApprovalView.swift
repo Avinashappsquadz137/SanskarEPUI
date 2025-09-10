@@ -213,8 +213,8 @@ struct BookingCellView: View {
     var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(booking.name?.uppercased() ?? "").font(.caption2)
-                Text(booking.venue ?? "-").font(.caption2)
+                Text(booking.name?.uppercased() ?? "") .fontWeight(.semibold)
+                Text(booking.venue ?? "-").font(.caption)
                 Text("\(booking.katha_from_Date ?? "-")").font(.caption2)
                 Text("\(booking.channelName ?? "-")").font(.caption2)
             }
