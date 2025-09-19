@@ -91,12 +91,12 @@ struct AddNewGuestView: View {
                     }
                     CustonButton(
                         title: "Submit",
-                        backgroundColor: (guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil  || isSubmitting ) ? .gray : .orange
+                        backgroundColor: (guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || isSubmitting ) ? .gray : .orange
                     ) {
                         isSubmitting = true
                         addNewGuestApi()
                     }
-                    .disabled(guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || selectedImage == nil || isSubmitting)
+                    .disabled(guestName.isEmpty || guestAddress.isEmpty || reason.isEmpty || isSubmitting)
                 }
                 .padding()
             }
@@ -111,41 +111,52 @@ struct AddNewGuestView: View {
         dict["Address"] = guestAddress
         dict["Reason"] = reason
         dict["Date1"] = ISO8601DateFormatter().string(from: selectedDate)
+
         var imagesData: [String: Data] = [:]
-        
-        if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
+
+        let finalImage: UIImage
+        if let selected = selectedImage {
+            finalImage = selected
+        } else {
+            finalImage = UIImage(named: "Profile") ?? UIImage()
+        }
+
+        if let imageData = finalImage.jpegData(compressionQuality: 0.8) {
             imagesData["image"] = imageData
-            ApiClient.shared.callHttpMethod(
-                apiendpoint: Constant.applyNewGuest,
-                method: .post,
-                param: dict,
-                model: GuestRequestQRModel.self,
-                isMultipart: true,
-                images: imagesData
-            ) { result in
-                switch result {
-                case .success(let model):
-                    if model.status == true {
-                        if let guestData = model.data {
-                            print(model.data ?? "No data")
-                            let newGuest = GuestHistory(from: guestData)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                onGuestAdded?(newGuest)  
-                                dismiss()
-                            }
-                        } else {
+        }
+
+        ApiClient.shared.callHttpMethod(
+            apiendpoint: Constant.applyNewGuest,
+            method: .post,
+            param: dict,
+            model: GuestRequestQRModel.self,
+            isMultipart: true,
+            images: imagesData
+        ) { result in
+            switch result {
+            case .success(let model):
+                if model.status == true {
+                    if let guestData = model.data {
+                        print(model.data ?? "No data")
+                        let newGuest = GuestHistory(from: guestData)
+                        ToastManager.shared.show(message: "\(model.message ?? "")")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            onGuestAdded?(newGuest)
                             dismiss()
                         }
                     } else {
-                        isSubmitting = false
-                        print("Request failed: \(model.message ?? "Unknown error")")
+                        dismiss()
                     }
-                case .failure(let error):
+                } else {
                     isSubmitting = false
-                    print("Error updating repair details:", error)
+                    print("Request failed: \(model.message ?? "Unknown error")")
                 }
+            case .failure(let error):
+                isSubmitting = false
+                print("Error updating repair details:", error)
             }
         }
     }
+
 }
 
