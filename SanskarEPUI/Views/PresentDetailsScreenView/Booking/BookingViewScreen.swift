@@ -129,8 +129,8 @@ struct BookingViewScreen: View {
                     VStack(spacing: 4) {
                         Toggle("", isOn: $viewModel.showOnlyApproved)
                             .toggleStyle(SwitchToggleStyle(tint: .blue))
-                        Text("Approved")
-                            .font(.caption)
+//                        Text("Approved")
+//                            .font(.caption)
                     }
                 }
             }

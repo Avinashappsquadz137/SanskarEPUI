@@ -4,7 +4,9 @@
 //
 //  Created by Sanskar IOS Dev on 01/07/25.
 //
-
+// "Full Day Leave"  = "14"
+//"BirthDay" = "13"
+//"Visitor" = "20"
 import SwiftUI
 
 struct NotificationHistoryListView: View {
@@ -49,12 +51,19 @@ struct NotificationHistoryListView: View {
                             }
                         }
                         .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                            Button {
-                                approveNotification(item)
-                            } label: {
-                                Label("Approve", systemImage: "checkmark")
+                            if item.notification_type == "14" {
+                                Button {
+                                    approveNotification(item)
+                                } label: {
+                                    Label("Approve", systemImage: "checkmark")
+                                }
+                                .tint(.blue)
+                                Button(role: .destructive) {
+                                    rejectNotification(item)
+                                } label: {
+                                    Label("Reject", systemImage: "xmark")
+                                }
                             }
-                            .tint(.blue)
                         }
                 }
                 .listStyle(.plain)
@@ -126,8 +135,10 @@ struct NotificationHistoryListView: View {
                 title: Text("Delete All Notifications"),
                 message: Text("Are you sure you want to delete all notifications?"),
                 primaryButton: .destructive(Text("Delete")) {
+                    let ids = notifications.compactMap { $0.id }
+                    let idString = ids.joined(separator: ",")
+                    removePushHistoryAPI(NotificationID: idString)
                     notifications.removeAll()
-                    removePushHistoryAPI()
                 },
                 secondaryButton: .cancel()
             )
@@ -136,10 +147,8 @@ struct NotificationHistoryListView: View {
     }
     func deleteNotification(_ item: PushHistory) {
         notifications.removeAll { $0.id == item.id }
-        if selectedItem?.notification_type == "9" {
-            empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)",status: "2",reason: "Not Available")
-        }else {
-            ToastManager.shared.show(message: "You Can Not Reject Notifications.")
+        if let id = item.id {
+            removePushHistoryAPI(NotificationID: id)
         }
     }
     
@@ -147,12 +156,16 @@ struct NotificationHistoryListView: View {
         if let index = notifications.firstIndex(where: { $0.id == item.id }) {
             notifications[index].status = true
         }
-        if selectedItem?.notification_type == "9" {
-            empGuestActionAPI(id: "\(selectedItem?.req_id ?? 0)" ,status: "1",selectid: "1")
-        }else {
-            ToastManager.shared.show(message: "You Can Not Approve Notifications.")
-        }
+        hodLeaveUpdate(reply: "approved" , pushReq_id : "\(item.push_req_id ?? "")")
     }
+    func rejectNotification(_ item: PushHistory) {
+        if let index = notifications.firstIndex(where: { $0.id == item.id }) {
+            notifications[index].status = true
+        }
+        hodLeaveUpdate(reply: "declined", pushReq_id : "\(item.push_req_id ?? "")")
+    }
+    
+
     
     func pushHistoryAPI () {
         var dict = [String: Any]()
@@ -174,9 +187,10 @@ struct NotificationHistoryListView: View {
             }
         }
     }
-    func removePushHistoryAPI() {
+    func removePushHistoryAPI(NotificationID : String) {
         var dict = [String: Any]()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        dict["notification_id"] = NotificationID
         
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.removePushHistory,
@@ -190,6 +204,7 @@ struct NotificationHistoryListView: View {
                     self.notifications = model.data ?? []
                 case .failure(let error):
                     print("API Error: \(error)")
+                    ToastManager.shared.show(message: "You Can Not Reject Notifications.")
                 }
             }
         }
@@ -217,6 +232,35 @@ struct NotificationHistoryListView: View {
                 }
             }
         }
+    }
+    func hodLeaveUpdate(reply: String , pushReq_id : String) {
+            var dict = [String: Any]()
+            dict["req_id"] = [pushReq_id]
+            dict["reply"] = reply
+            dict["reason"] = "Approve"
+
+            ApiClient.shared.callmethodMultipart(
+                apiendpoint: Constant.hodLeaveUpdate,
+                method: .post,
+                param: dict,
+                model: GetSuccessMessage.self
+            ) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let model):
+                        if model.status == true {
+                            ToastManager.shared.show(message: model.message ?? "Success")
+                            pushHistoryAPI()
+                        } else {
+                            ToastManager.shared.show(message: model.message ?? "Something went wrong.")
+                        }
+                    case .failure(let error):
+                        ToastManager.shared.show(message: "Error occurred")
+                        print("API Error: \(error)")
+                    }
+                }
+            }
+        
     }
 }
 

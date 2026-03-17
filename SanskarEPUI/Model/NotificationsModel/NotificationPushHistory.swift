@@ -39,6 +39,7 @@ struct PushHistory : Codable , Identifiable {
     var from_EmpCode : String?
     var empCode : String?
     var req_id : Int?
+    var push_req_id : String?
     var note_type : String?
     var creation_date : String?
     var inOrOut : String?
@@ -55,6 +56,7 @@ struct PushHistory : Codable , Identifiable {
         case from_EmpCode = "from_EmpCode"
         case empCode = "EmpCode"
         case req_id = "req_id"
+        case push_req_id = "push_req_id"
         case note_type = "note_type"
         case creation_date = "creation_date"
         case inOrOut = "inOrOut"
@@ -72,6 +74,7 @@ struct PushHistory : Codable , Identifiable {
         from_EmpCode = try values.decodeIfPresent(String.self, forKey: .from_EmpCode)
         empCode = try values.decodeIfPresent(String.self, forKey: .empCode)
         req_id = try values.decodeIfPresent(Int.self, forKey: .req_id)
+        push_req_id = try values.decodeIfPresent(String.self, forKey: .push_req_id)
         note_type = try values.decodeIfPresent(String.self, forKey: .note_type)
         creation_date = try values.decodeIfPresent(String.self, forKey: .creation_date)
         inOrOut = try values.decodeIfPresent(String.self, forKey: .inOrOut)
@@ -87,6 +90,7 @@ struct PushHistory : Codable , Identifiable {
             from_EmpCode: String? = nil,
             empCode: String? = nil,
             req_id: Int? = nil,
+            push_req_id: String? = nil,
             note_type: String? = nil,
             creation_date: String? = nil,
             inOrOut: String? = nil,
@@ -101,6 +105,7 @@ struct PushHistory : Codable , Identifiable {
             self.from_EmpCode = from_EmpCode
             self.empCode = empCode
             self.req_id = req_id
+            self.push_req_id = push_req_id
             self.note_type = note_type
             self.creation_date = creation_date
             self.inOrOut = inOrOut
