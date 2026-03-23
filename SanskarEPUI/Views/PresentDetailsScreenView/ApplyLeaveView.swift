@@ -130,7 +130,7 @@ struct ApplyLeaveView: View {
                                 .cornerRadius(10)
                         }
                     }
-                    if !(selectedLeaveType == "Half" || selectedLeaveType == "Half" || selectedLeaveType  == "Comp off") {
+                    if selectedLeaveType != "Half" {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text("To Date")
@@ -178,7 +178,7 @@ struct ApplyLeaveView: View {
             .padding()
             
         }
-        .overlay(showToast ? ToastView() : nil)
+        .overlay(ToastView())
         .navigationTitle("LEAVE")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -187,7 +187,7 @@ struct ApplyLeaveView: View {
             offdayRequest()
         } else if fromDayType == "WFH" || toDayType == "WFH" {
             wfHRequest()
-        } else if fromDayType == "Full Day" && toDayType == "Full Day" {
+        } else if fromDayType == "Full" && toDayType == "Full" {
             fullDayLeaveRequest()
         } else {
             if fromDayType == "First Half" {
@@ -205,13 +205,14 @@ struct ApplyLeaveView: View {
         let dict: [String: Any] = [
             "EmpCode": empCode,
             "from_date": formattedDate(fromDate),
+            "to_date": formattedDate(toDate),
             "leave_res": remarks
         ]
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.dayOffRequest,
             method: .post,
             param: dict,
-            model: SideBarApi.self
+            model: GetSuccessMessage.self
         ) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -224,8 +225,12 @@ struct ApplyLeaveView: View {
                             dismiss()
                         }
                     } else {
+                        showToast = true
                         ToastManager.shared.show(message: model.message ?? "Something went wrong.")
-                        print("API responded with failure: \(model)")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showToast = false
+                        }
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
@@ -246,7 +251,7 @@ struct ApplyLeaveView: View {
             apiendpoint: Constant.wfhomeRequest,
             method: .post,
             param: dict,
-            model: SideBarApi.self
+            model: GetSuccessMessage.self
         ) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -259,8 +264,12 @@ struct ApplyLeaveView: View {
                             dismiss()
                         }
                     } else {
+                        showToast = true
                         ToastManager.shared.show(message: model.message ?? "Something went wrong.")
-                        print("API responded with failure: \(model)")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showToast = false
+                        }
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
@@ -297,8 +306,12 @@ struct ApplyLeaveView: View {
                             dismiss()
                         }
                     } else {
+                        showToast = true
                         ToastManager.shared.show(message: model.message ?? "Something went wrong.")
-                        print("API responded with failure: \(model)")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showToast = false
+                        }
                     }
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
@@ -336,8 +349,12 @@ struct ApplyLeaveView: View {
                             dismiss()
                         }
                     } else {
+                        showToast = true
                         ToastManager.shared.show(message: model.message ?? "Something went wrong.")
-                        print("API responded with failure: \(model)")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            showToast = false
+                        }
                     }
                     
                 case .failure(let error):

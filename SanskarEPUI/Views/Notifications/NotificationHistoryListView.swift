@@ -16,7 +16,8 @@ struct NotificationHistoryListView: View {
     @State private var selectedItem: PushHistory?
     @State private var showGuestPopup = false
     @State private var showDeleteAllAlert = false
-
+    @State private var showActionSheet = false
+    
     var filteredNotifications: [PushHistory] {
         searchText.isEmpty
         ? notifications
@@ -33,42 +34,37 @@ struct NotificationHistoryListView: View {
                 if filteredNotifications.isEmpty {
                     EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
                 } else {
-                List(filteredNotifications, id: \.id) { item in
-                    NotificationRowView(item: item)
-                        .onTapGesture {
-                            if item.notification_type == "8" || item.notification_type == "9" {
-                                selectedItem = item
-                                showGuestPopup = true
-                            } else if item.notification_type == "14"{
-                                
+                    List(filteredNotifications, id: \.id) { item in
+                        NotificationRowView(item: item)
+                            .onTapGesture {
+                                handleTap(item)
                             }
-                        }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                            Button(role: .destructive) {
-                                deleteNotification(item)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                            if item.notification_type == "14" {
-                                Button {
-                                    approveNotification(item)
-                                } label: {
-                                    Label("Approve", systemImage: "checkmark")
-                                }
-                                .tint(.blue)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
-                                    rejectNotification(item)
+                                    deleteNotification(item)
                                 } label: {
-                                    Label("Reject", systemImage: "xmark")
+                                    Label("Delete", systemImage: "trash")
                                 }
                             }
-                        }
+                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                if item.notification_type == "14" {
+                                    Button {
+                                        approveNotification(item)
+                                    } label: {
+                                        Label("Approve", systemImage: "checkmark")
+                                    }
+                                    .tint(.blue)
+                                    Button(role: .destructive) {
+                                        rejectNotification(item)
+                                    } label: {
+                                        Label("Reject", systemImage: "xmark")
+                                    }
+                                }
+                            }
+                    }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
             }
-        }
             
             // Guest Popup Overlay
             if showGuestPopup, let item = selectedItem {
@@ -135,20 +131,48 @@ struct NotificationHistoryListView: View {
                 title: Text("Delete All Notifications"),
                 message: Text("Are you sure you want to delete all notifications?"),
                 primaryButton: .destructive(Text("Delete")) {
-                    let ids = notifications.compactMap { $0.id }
-                    let idString = ids.joined(separator: ",")
-                    removePushHistoryAPI(NotificationID: idString)
+                    let ids = notifications.compactMap { Int($0.id ?? "") }
+                    removePushHistoryAPI(notificationIDs: ids)
                     notifications.removeAll()
                 },
                 secondaryButton: .cancel()
             )
         }
-
+        .confirmationDialog("Select Action",
+                            isPresented: $showActionSheet,
+                            titleVisibility: .visible) {
+            
+            if let item = selectedItem {
+                Button("Approve") {
+                    approveNotification(item)
+                }
+                
+                Button("Reject", role: .destructive) {
+                    rejectNotification(item)
+                }
+            }
+        }
+        
+    }
+    func handleTap(_ item: PushHistory) {
+        switch item.notification_type {
+        case "8", "9":
+            selectedItem = item
+            showGuestPopup = true
+            
+        case "14":
+            // Optional: open detail screen instead of approve directly
+            print("Leave notification tapped")
+            selectedItem = item
+            showActionSheet = true
+        default:
+            break
+        }
     }
     func deleteNotification(_ item: PushHistory) {
         notifications.removeAll { $0.id == item.id }
-        if let id = item.id {
-            removePushHistoryAPI(NotificationID: id)
+        if let id = item.id, let intID = Int(id) {
+            removePushHistoryAPI(notificationIDs: [intID])
         }
     }
     
@@ -156,13 +180,13 @@ struct NotificationHistoryListView: View {
         if let index = notifications.firstIndex(where: { $0.id == item.id }) {
             notifications[index].status = true
         }
-        hodLeaveUpdate(reply: "approved" , pushReq_id : "\(item.push_req_id ?? "")")
+        hodLeaveUpdate(reply: "granted" , pushReq_id : "\(item.push_req_id ?? "")" , resons: "Approve")
     }
     func rejectNotification(_ item: PushHistory) {
         if let index = notifications.firstIndex(where: { $0.id == item.id }) {
             notifications[index].status = true
         }
-        hodLeaveUpdate(reply: "declined", pushReq_id : "\(item.push_req_id ?? "")")
+        hodLeaveUpdate(reply: "declined", pushReq_id : "\(item.push_req_id ?? "")", resons: "Reject")
     }
     
 
@@ -187,10 +211,10 @@ struct NotificationHistoryListView: View {
             }
         }
     }
-    func removePushHistoryAPI(NotificationID : String) {
+    func removePushHistoryAPI(notificationIDs: [Int]) {
         var dict = [String: Any]()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
-        dict["notification_id"] = NotificationID
+        dict["notification_id"] = notificationIDs
         
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.removePushHistory,
@@ -215,7 +239,7 @@ struct NotificationHistoryListView: View {
         dict["status"] = status
         dict["floor"] = selectid
         dict["reason"] = reason
-
+        
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.empGuestAction,
             method: .post,
@@ -233,33 +257,33 @@ struct NotificationHistoryListView: View {
             }
         }
     }
-    func hodLeaveUpdate(reply: String , pushReq_id : String) {
-            var dict = [String: Any]()
-            dict["req_id"] = [pushReq_id]
-            dict["reply"] = reply
-            dict["reason"] = "Approve"
-
-            ApiClient.shared.callmethodMultipart(
-                apiendpoint: Constant.hodLeaveUpdate,
-                method: .post,
-                param: dict,
-                model: GetSuccessMessage.self
-            ) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let model):
-                        if model.status == true {
-                            ToastManager.shared.show(message: model.message ?? "Success")
-                            pushHistoryAPI()
-                        } else {
-                            ToastManager.shared.show(message: model.message ?? "Something went wrong.")
-                        }
-                    case .failure(let error):
-                        ToastManager.shared.show(message: "Error occurred")
-                        print("API Error: \(error)")
+    func hodLeaveUpdate(reply: String , pushReq_id : String , resons : String) {
+        var dict = [String: Any]()
+        dict["req_id"] = [pushReq_id]
+        dict["reply"] = reply
+        dict["reason"] = resons
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.hodLeaveUpdate,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    if model.status == true {
+                        ToastManager.shared.show(message: model.message ?? "Success")
+                        pushHistoryAPI()
+                    } else {
+                        ToastManager.shared.show(message: model.message ?? "Something went wrong.")
                     }
+                case .failure(let error):
+                    ToastManager.shared.show(message: "Error occurred")
+                    print("API Error: \(error)")
                 }
             }
+        }
         
     }
 }
@@ -300,6 +324,25 @@ struct NotificationRowView: View {
                 Text(item.notification_content ?? "No Description")
                     .font(.subheadline)
                     .foregroundColor(.gray)
+                if let reason = item.reason, !reason.isEmpty {
+                    Text("Reason: \(reason)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                if let from = item.from_date,
+                   let to = item.to_date,
+                   !from.isEmpty,
+                   !to.isEmpty {
+                    
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Text("\(from) - \(to)")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
             }
             
             Spacer()
@@ -379,7 +422,7 @@ struct GuestArrivalAlert: View {
                             .cornerRadius(8)
                         Button(action: {
                             empGuestActionAPI(id: String(reqID), status: "2", reason: "\(locationText)")
-                           
+                            
                         }) {
                             Image(systemName: "paperplane.circle")
                                 .resizable()
@@ -432,7 +475,7 @@ struct GuestArrivalAlert: View {
             guestFloorAPI()
         }
     }
-
+    
     func guestFloorAPI () {
         var dict = [String: Any]()
         dict["EmpCode"] = UserDefaultsManager.getEmpCode()
@@ -459,7 +502,7 @@ struct GuestArrivalAlert: View {
         dict["status"] = status
         dict["floor"] = selectid
         dict["reason"] = reason
-
+        
         ApiClient.shared.callmethodMultipart(
             apiendpoint: Constant.empGuestAction,
             method: .post,

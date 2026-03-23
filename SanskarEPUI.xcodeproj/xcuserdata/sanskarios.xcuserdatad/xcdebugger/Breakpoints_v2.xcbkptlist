@@ -7,32 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C0B13DF2-88A2-4BFE-A234-90E98F5BC807"
+            uuid = "DD3B0FD1-4E6F-4CCA-A78F-43EB726EC590"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Views/PresentDetailsScreenView/ApplyLeaveView.swift"
+            filePath = "SanskarEPUI/Views/Notifications/NotificationHistoryListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11"
-            endingLineNumber = "11"
-            landmarkName = "ApplyLeaveView"
-            landmarkType = "14">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "84278590-F970-4CCA-83F2-D09AD3C94A28"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SanskarEPUI/Helpers/APIClients/ApiClient.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
-            landmarkName = "callHttpMethod(apiendpoint:method:param:model:isMultipart:images:baseUrl:completion:)"
+            startingLineNumber = "265"
+            endingLineNumber = "265"
+            landmarkName = "hodLeaveUpdate(reply:pushReq_id:resons:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

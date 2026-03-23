@@ -97,7 +97,7 @@ struct LeaveApprovalView: View {
                                     if remarkText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                         ToastManager.shared.show(message: "Please add a reason before approving.")
                                     } else {
-                                        hodLeaveUpdate(reply: "approved")
+                                        hodLeaveUpdate(reply: "granted")
                                     }
                                 }) {
                                     Text("Approve")

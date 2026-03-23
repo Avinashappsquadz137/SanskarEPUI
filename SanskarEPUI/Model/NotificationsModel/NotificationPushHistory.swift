@@ -33,6 +33,9 @@ struct PushHistory : Codable , Identifiable {
     var id : String?
     var notification_title : String?
     var notification_content : String?
+    var from_date : String?
+    var to_date : String?
+    var reason : String?
     var device_type : String?
     var notification_type : String?
     var notification_thumbnail : String?
@@ -50,6 +53,9 @@ struct PushHistory : Codable , Identifiable {
         case id = "id"
         case notification_title = "notification_title"
         case notification_content = "notification_content"
+        case to_date = "to_date"
+        case from_date = "from_date"
+        case reason = "reason"
         case device_type = "device_type"
         case notification_type = "notification_type"
         case notification_thumbnail = "notification_thumbnail"
@@ -68,6 +74,9 @@ struct PushHistory : Codable , Identifiable {
         id = try values.decodeIfPresent(String.self, forKey: .id)
         notification_title = try values.decodeIfPresent(String.self, forKey: .notification_title)
         notification_content = try values.decodeIfPresent(String.self, forKey: .notification_content)
+        from_date = try values.decodeIfPresent(String.self, forKey: .from_date)
+        to_date = try values.decodeIfPresent(String.self, forKey: .to_date)
+        reason = try values.decodeIfPresent(String.self, forKey: .reason)
         device_type = try values.decodeIfPresent(String.self, forKey: .device_type)
         notification_type = try values.decodeIfPresent(String.self, forKey: .notification_type)
         notification_thumbnail = try values.decodeIfPresent(String.self, forKey: .notification_thumbnail)
@@ -84,6 +93,9 @@ struct PushHistory : Codable , Identifiable {
             id: String? = nil,
             notification_title: String? = nil,
             notification_content: String? = nil,
+            to_date: String? = nil,
+            from_date: String? = nil,
+            reason: String? = nil,
             device_type: String? = nil,
             notification_type: String? = nil,
             notification_thumbnail: String? = nil,
@@ -99,6 +111,9 @@ struct PushHistory : Codable , Identifiable {
             self.id = id
             self.notification_title = notification_title
             self.notification_content = notification_content
+            self.from_date = from_date
+            self.to_date = to_date
+            self.reason = reason
             self.device_type = device_type
             self.notification_type = notification_type
             self.notification_thumbnail = notification_thumbnail
