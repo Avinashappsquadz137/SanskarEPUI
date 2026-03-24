@@ -49,6 +49,7 @@ struct MainHomeView: View {
                         onNotificationTapped: {
                             navigateNotification = true
                             print("Notification tapped")
+                            BadgeManager.update(count: 0)
                         },
                         onQRTapped : {
                             navigateQRScreen = true
@@ -148,7 +149,9 @@ struct MainHomeView: View {
             }
         }
         .onChange(of: homeMasterDetailVM.masterDetail) { newDetail in
-            notificationCount = newDetail?.notification_count ?? 0
+            let count = newDetail?.notification_count ?? 0
+            notificationCount = count
+            BadgeManager.update(count: count)
             if let detail = newDetail, detail.notice_active == true {
                 let savedRemindTime = UserDefaults.standard.object(forKey: "remindLaterTimes") as? Date
                 if savedRemindTime == nil || savedRemindTime! <= Date() {
