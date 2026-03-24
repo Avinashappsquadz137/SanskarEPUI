@@ -34,18 +34,50 @@ struct EmployeeCard: View {
     @State private var selectedImage: UIImage?
     @State private var selectedSourceType: UIImagePickerController.SourceType = .photoLibrary
     @State private var showImageSourceActionSheet = false
-
+    var isBirthday: Bool {
+        let bday = UserDefaultsManager.getBirthday()
+        if bday.isEmpty {
+            return false
+        }
+        return isTodayBirthday(bday)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
                 VStack(spacing: 2) {
-                    if let imageUrl = URL(string: PImg), !PImg.isEmpty {
-                        AsyncImage(url: imageUrl) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
+                    ZStack(alignment: .bottomTrailing) {
+                        if let imageUrl = URL(string: PImg), !PImg.isEmpty {
+                            AsyncImage(url: imageUrl) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .overlay(
+                                        Text(initials(from: name))
+                                            .font(.system(size: 40))
+                                            .bold()
+                                            .minimumScaleFactor(0.5)
+                                            .lineLimit(1)
+                                            .foregroundColor(.black)
+                                            .padding(10)
+                                    )
+                                    .frame(width: 100, height: 100)
+                            }
+                            .frame(width: 100, height: 100)
+                            .background(Color.blue.opacity(0.1))
+                            .clipShape(Circle())
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 3)
+                            )
+                            .shadow(color: .black.opacity(0.15), radius: 6, x: 0, y: 3)
+                            .onTapGesture {
+                                onProfileTapped()
+                            }
+                        } else {
                             Circle()
                                 .fill(Color.gray.opacity(0.3))
                                 .overlay(
@@ -58,31 +90,17 @@ struct EmployeeCard: View {
                                         .padding(10)
                                 )
                                 .frame(width: 100, height: 100)
+                                .onTapGesture {
+                                    onProfileTapped()
+                                }
                         }
-                        .frame(width: 100, height: 100)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                        .onTapGesture {
-                            onProfileTapped()
+                        // 🎂 Birthday Badge
+                        if isBirthday {
+                            BirthdayBadgeView()
+                                .offset(x: 30, y: 15)
                         }
-                    } else {
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .overlay(
-                                Text(initials(from: name))
-                                    .font(.system(size: 40))
-                                    .bold()
-                                    .minimumScaleFactor(0.5)
-                                    .lineLimit(1)           
-                                    .foregroundColor(.black)
-                                    .padding(10)
-                            )
-                            .frame(width: 100, height: 100)
-                            .onTapGesture {
-                                onProfileTapped()
-                            }
                     }
+                    .frame(width: 100, height: 100)
                     if showEditButton {
                         Button(action: {
                             //onEditTapped?()
@@ -138,7 +156,8 @@ struct EmployeeCard: View {
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(Color(.systemBackground))
         .cornerRadius(16)
-        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+        .shadow(color: .black.opacity(0.15), radius: 10, x: 0, y: 6)
+        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
         .sheet(isPresented: $showSheet) {
             NavigationStack {
                 GeometryReader { geometry in

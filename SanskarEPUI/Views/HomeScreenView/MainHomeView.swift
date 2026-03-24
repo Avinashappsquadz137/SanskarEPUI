@@ -27,6 +27,15 @@ struct MainHomeView: View {
     @State private var showNotice = false
     @State private var remindLaterTime: Date? = nil
     
+    @State private var showConfetti = false
+    var isBirthday: Bool {
+        let bday = UserDefaultsManager.getBirthday()
+        if bday.isEmpty {
+            return false
+        }
+        return isTodayBirthday(bday)
+    }
+    
     var body: some View {
         ZStack {
             NavigationView {
@@ -47,6 +56,9 @@ struct MainHomeView: View {
                         notificationCount: notificationCount
                     )
                     VStack(spacing: 16) {
+                        if isBirthday {
+                            BirthdayBannerView()
+                        }
                         EmployeeCard(
                             imageName: "\(PImg)",
                             employeeName: name.uppercased(),
@@ -122,6 +134,18 @@ struct MainHomeView: View {
         }
         .onAppear {
             homeMasterDetailVM.getMasterDetail()
+            if isBirthday && shouldShowConfettiToday() {
+                showConfetti = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    showConfetti = false
+                }
+            }
+        }
+        .overlay {
+            if showConfetti {
+                ConfettiView()
+                    .transition(.opacity)
+            }
         }
         .onChange(of: homeMasterDetailVM.masterDetail) { newDetail in
             notificationCount = newDetail?.notification_count ?? 0
