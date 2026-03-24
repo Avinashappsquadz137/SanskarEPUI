@@ -136,7 +136,7 @@ struct ApplyLeaveView: View {
                                 Text("To Date")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
-                                DatePicker("", selection: $toDate, displayedComponents: .date)
+                                DatePicker("", selection: $toDate,in: fromDate..., displayedComponents: .date)
                                     .labelsHidden()
                             }
                             

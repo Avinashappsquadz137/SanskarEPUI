@@ -18,6 +18,13 @@ struct NotificationHistoryListView: View {
     @State private var showDeleteAllAlert = false
     @State private var showActionSheet = false
     
+    @State private var selectedIDs: Set<String> = []
+    @State private var isSelectionMode = false
+    var isAllSelected: Bool {
+        let allIDs = notifications.compactMap { $0.id }
+        return !allIDs.isEmpty && selectedIDs.count == allIDs.count
+    }
+    
     var filteredNotifications: [PushHistory] {
         searchText.isEmpty
         ? notifications
@@ -35,7 +42,27 @@ struct NotificationHistoryListView: View {
                     EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
                 } else {
                     List(filteredNotifications, id: \.id) { item in
-                        NotificationRowView(item: item)
+                        HStack {
+                            NotificationRowView(item: item)
+                              // ✅ Checkbox
+                              if isSelectionMode {
+                                  Image(systemName: selectedIDs.contains(item.id ?? "") ? "checkmark.circle.fill" : "circle")
+                                      .foregroundColor(.blue)
+                                      .onTapGesture {
+                                          toggleSelection(item)
+                                      }
+                              }
+                              
+                              
+                          }
+                        .contentShape(Rectangle()) // full row tappable
+                           .onTapGesture {
+                               if isSelectionMode {
+                                   toggleSelection(item)
+                               } else {
+                                   handleTap(item)
+                               }
+                           }
                             .onTapGesture {
                                 handleTap(item)
                             }
@@ -117,15 +144,35 @@ struct NotificationHistoryListView: View {
             pushHistoryAPI()
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showDeleteAllAlert = true
-                }) {
-                    Image(systemName: "trash.circle")
-                        .font(.title2)
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+   
+                Button(isSelectionMode ? "Cancel" : "Select All") {
+                    isSelectionMode.toggle()
+                    if !isSelectionMode {
+                        selectedIDs.removeAll()
+                    }
+                }
+                
+                if isSelectionMode {
+     
+                    Button(action: {
+                        toggleSelectAll()
+                    }) {
+                        Image(systemName: isAllSelected ? "checkmark.square.fill" : "square")
+                            .font(.title3)
+                    }
+                    
+                    if !selectedIDs.isEmpty {
+                        Button(action: {
+                            showDeleteAllAlert = true
+                        }) {
+                            Image(systemName: "trash")
+                        }
+                    }
                 }
             }
         }
+
         .alert(isPresented: $showDeleteAllAlert) {
             Alert(
                 title: Text("Delete All Notifications"),
@@ -153,6 +200,26 @@ struct NotificationHistoryListView: View {
             }
         }
         
+    }
+    func toggleSelectAll() {
+        let allIDs = notifications.compactMap { $0.id }
+        
+        if isAllSelected {
+            // Unselect all
+            selectedIDs.removeAll()
+        } else {
+            // Select all
+            selectedIDs = Set(allIDs)
+        }
+    }
+    func toggleSelection(_ item: PushHistory) {
+        guard let id = item.id else { return }
+        
+        if selectedIDs.contains(id) {
+            selectedIDs.remove(id)
+        } else {
+            selectedIDs.insert(id)
+        }
     }
     func handleTap(_ item: PushHistory) {
         switch item.notification_type {
