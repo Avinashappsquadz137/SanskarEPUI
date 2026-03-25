@@ -180,9 +180,7 @@ struct NotificationHistoryListView: View {
                 title: Text("Delete All Notifications"),
                 message: Text("Are you sure you want to delete all notifications?"),
                 primaryButton: .destructive(Text("Delete")) {
-                    let ids = notifications.compactMap { Int($0.id ?? "") }
-                    removePushHistoryAPI(notificationIDs: ids)
-                    notifications.removeAll()
+                    deleteSelectedNotifications()
                 },
                 secondaryButton: .cancel()
             )
@@ -202,6 +200,19 @@ struct NotificationHistoryListView: View {
             }
         }
         
+    }
+    func deleteSelectedNotifications() {
+        let ids = selectedIDs.compactMap { Int($0) }
+        print("Deleting IDs:", ids)
+        removePushHistoryAPI(notificationIDs: ids)
+        notifications.removeAll { item in
+            if let id = item.id {
+                return selectedIDs.contains(id)
+            }
+            return false
+        }
+        selectedIDs.removeAll()
+        isSelectionMode = false
     }
     func toggleSelectAll() {
         let allIDs = notifications.compactMap { $0.id }
