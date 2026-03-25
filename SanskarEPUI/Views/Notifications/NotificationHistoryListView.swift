@@ -43,8 +43,12 @@ struct NotificationHistoryListView: View {
                 } else {
                     List(filteredNotifications, id: \.id) { item in
                         HStack {
-                            NotificationRowView(item: item)
-                              // ✅ Checkbox
+                            NotificationRowView(
+                                        item: item,
+                                        onReplySent: {
+                                            pushHistoryAPI()
+                                        }
+                                    )
                               if isSelectionMode {
                                   Image(systemName: selectedIDs.contains(item.id ?? "") ? "checkmark.circle.fill" : "circle")
                                       .foregroundColor(.blue)
@@ -63,9 +67,7 @@ struct NotificationHistoryListView: View {
                                    handleTap(item)
                                }
                            }
-                            .onTapGesture {
-                                handleTap(item)
-                            }
+                            
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button(role: .destructive) {
                                     deleteNotification(item)
@@ -358,7 +360,9 @@ struct NotificationHistoryListView: View {
 
 struct NotificationRowView: View {
     let item: PushHistory
-    
+    @State private var showReplyField = false
+    @State private var replyText = ""
+    var onReplySent: (() -> Void)?
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             if let imageURL = item.notification_thumbnail,
@@ -410,6 +414,30 @@ struct NotificationRowView: View {
                             .foregroundColor(.gray)
                     }
                 }
+                if item.notification_type == "13" {
+                        
+                        if showReplyField {
+                            HStack {
+                                TextField("Write a reply...", text: $replyText)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                
+                                Button("Send") {
+                                    sendReply(text: "\(replyText)", fromEmpCode: item.empCode ?? "")
+                                }
+                                .buttonStyle(.borderless)
+                                .disabled(replyText.isEmpty)
+                            }
+                        } else {
+                            Button("Reply") {
+                                withAnimation {
+                                    showReplyField = true
+                                }
+                            }
+                            .buttonStyle(.borderless)
+                            .font(.subheadline)
+                            .foregroundColor(.blue)
+                        }
+                    }
             }
             
             Spacer()
@@ -428,6 +456,51 @@ struct NotificationRowView: View {
             
         }
         .padding(.vertical, 8)
+    }
+    func sendReply(text : String , fromEmpCode : String) {
+        var dict = [String: Any]()
+        dict["EmpCode"] = fromEmpCode
+        dict["Msg"] = text
+        dict["FromEmpCode"] = UserDefaultsManager.getEmpCode()
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.birthdayWishApi,
+            method: .post,
+            param: dict,
+            model: GetSuccessMessage.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    ToastManager.shared.show(message: model.message ?? "Thank You")
+                    onReplySent?()
+                    replyText = ""
+                    showReplyField = false
+                case .failure(let error):
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    func pushHistoryAPI () {
+        var dict = [String: Any]()
+        dict["EmpCode"] = UserDefaultsManager.getEmpCode()
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.pushHistoryList,
+            method: .post,
+            param: dict,
+            model: NotificationPushHistory.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                   print("")
+                case .failure(let error):
+                    print("API Error: \(error)")
+                }
+            }
+        }
     }
 }
 

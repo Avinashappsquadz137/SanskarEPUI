@@ -44,7 +44,7 @@ struct Constant {
     static let getLogin                    = "api_panel/login_app"
     static let detailOfEmp                 = "api_panel/detailofemp"
     static let hodLeaveUpdate              = "api_panel/hod_leave_update"
-    static let birthdayWishApi             = "api-panel/birthday-wish"
+    static let birthdayWishApi             = "api-panel/birthday-reply"
     static let birthdayWishreply           = "api-panel/wish-birthday"
     static let wfhomeRequest               = "api_panel/work_from_home"
     static let dayOffRequest               = "api_panel/off_day"

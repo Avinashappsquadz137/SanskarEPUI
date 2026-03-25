@@ -49,7 +49,7 @@ struct MainHomeView: View {
                         onNotificationTapped: {
                             navigateNotification = true
                             print("Notification tapped")
-                            BadgeManager.update(count: 0)
+                            BadgeManager.update(count: notificationCount)
                         },
                         onQRTapped : {
                             navigateQRScreen = true
