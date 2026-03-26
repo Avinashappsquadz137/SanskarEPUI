@@ -13,6 +13,7 @@ enum EmployeeCardType {
 }
 
 struct EmployeeCard: View {
+    @StateObject private var homeMasterDetailVM = HomeMasterDetailViewModel()
     @State private var PImg: String = UserDefaultsManager.getProfileImage()
     @State private var name: String = UserDefaultsManager.getName().uppercased()
     @State private var empCode: String = UserDefaultsManager.getEmpCode()
@@ -35,8 +36,8 @@ struct EmployeeCard: View {
     @State private var selectedSourceType: UIImagePickerController.SourceType = .photoLibrary
     @State private var showImageSourceActionSheet = false
     var isBirthday: Bool {
-        let bday = UserDefaultsManager.getBirthday()
-        if bday.isEmpty {
+        guard let bday = homeMasterDetailVM.masterDetail?.BDay,
+              !bday.isEmpty else {
             return false
         }
         return isTodayBirthday(bday)
@@ -205,6 +206,9 @@ struct EmployeeCard: View {
 
         .fullScreenCover(isPresented: $isImageFullScreen) {
             FullScreenImageView(imageURL: PImg)
+        }
+        .onAppear {
+            homeMasterDetailVM.getMasterDetail()
         }
     }
 

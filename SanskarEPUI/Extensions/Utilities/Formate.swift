@@ -52,25 +52,17 @@ func initials(from name: String?) -> String {
 }
 
 func isTodayBirthday(_ dateString: String) -> Bool {
-    
     let formatter = DateFormatter()
-    formatter.dateFormat = "dd-MMM-yyyy"
-    formatter.locale = Locale(identifier: "en_US_POSIX") 
-    
+    formatter.dateFormat = "dd-MM-yyyy"
     guard let birthDate = formatter.date(from: dateString) else {
         return false
     }
-    
     let calendar = Calendar.current
     let today = Date()
-    
-    let birthDay = calendar.component(.day, from: birthDate)
-    let birthMonth = calendar.component(.month, from: birthDate)
-    
-    let todayDay = calendar.component(.day, from: today)
-    let todayMonth = calendar.component(.month, from: today)
-    
-    return (birthDay == todayDay) && (birthMonth == todayMonth)
+    let birthComponents = calendar.dateComponents([.day, .month], from: birthDate)
+    let todayComponents = calendar.dateComponents([.day, .month], from: today)
+    return birthComponents.day == todayComponents.day &&
+           birthComponents.month == todayComponents.month
 }
 func shouldShowConfettiToday() -> Bool {
     let key = "confetti_shown_date"

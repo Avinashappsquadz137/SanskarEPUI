@@ -308,7 +308,7 @@ struct NotificationHistoryListView: View {
                     self.notifications = model.data ?? []
                 case .failure(let error):
                     print("API Error: \(error)")
-                    ToastManager.shared.show(message: "You Can Not Reject Notifications.")
+                    ToastManager.shared.show(message: "\(error)")
                 }
             }
         }

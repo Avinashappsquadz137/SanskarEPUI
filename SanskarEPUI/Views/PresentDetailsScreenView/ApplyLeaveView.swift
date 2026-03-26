@@ -11,8 +11,8 @@ struct ApplyLeaveView: View {
     
     // MARK: - State Properties
     @State private var selectedLeaveType = "Full"
-    @State private var fromDate = Date()
-    @State private var toDate = Date()
+    @State private var fromDate = Calendar.current.startOfDay(for: Date())
+    @State private var toDate = Calendar.current.startOfDay(for: Date())
     @State private var fromDayType = "Full"
     @State private var toDayType = "Full"
     @State private var remarks = ""
@@ -114,8 +114,19 @@ struct ApplyLeaveView: View {
                             Text("From Date")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            DatePicker("", selection: $fromDate, displayedComponents: .date)
-                                .labelsHidden()
+                            DatePicker(
+                                "",
+                                selection: $fromDate,
+                                displayedComponents: .date
+                            )
+                            .labelsHidden()
+                            .onChange(of: fromDate) { newValue in
+                                fromDate = Calendar.current.startOfDay(for: newValue)
+                                
+                                if toDate < fromDate {
+                                    toDate = fromDate
+                                }
+                            }
                         }
                         
                         VStack(alignment: .leading) {
@@ -136,8 +147,16 @@ struct ApplyLeaveView: View {
                                 Text("To Date")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
-                                DatePicker("", selection: $toDate,in: fromDate..., displayedComponents: .date)
-                                    .labelsHidden()
+                                DatePicker(
+                                    "",
+                                    selection: $toDate,
+                                    in: fromDate...,
+                                    displayedComponents: .date
+                                )
+                                .labelsHidden()
+                                .onChange(of: toDate) { newValue in
+                                    toDate = Calendar.current.startOfDay(for: newValue)
+                                }
                             }
                             
                             VStack(alignment: .leading) {

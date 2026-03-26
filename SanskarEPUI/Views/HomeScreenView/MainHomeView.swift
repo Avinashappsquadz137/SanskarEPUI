@@ -29,8 +29,8 @@ struct MainHomeView: View {
     
     @State private var showConfetti = false
     var isBirthday: Bool {
-        let bday = UserDefaultsManager.getBirthday()
-        if bday.isEmpty {
+        guard let bday = homeMasterDetailVM.masterDetail?.BDay,
+              !bday.isEmpty else {
             return false
         }
         return isTodayBirthday(bday)
