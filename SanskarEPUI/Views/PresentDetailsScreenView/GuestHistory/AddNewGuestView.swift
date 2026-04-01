@@ -114,17 +114,11 @@ struct AddNewGuestView: View {
 
         var imagesData: [String: Data] = [:]
 
-        let finalImage: UIImage
-        if let selected = selectedImage {
-            finalImage = selected
-        } else {
-            finalImage = UIImage(named: "Profile") ?? UIImage()
-        }
-
-        if let imageData = finalImage.jpegData(compressionQuality: 0.8) {
+        if let selected = selectedImage,
+           let imageData = selected.jpegData(compressionQuality: 0.8) {
             imagesData["image"] = imageData
         }
-
+        
         ApiClient.shared.callHttpMethod(
             apiendpoint: Constant.applyNewGuest,
             method: .post,
