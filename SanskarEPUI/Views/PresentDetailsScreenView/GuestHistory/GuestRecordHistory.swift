@@ -31,7 +31,10 @@ struct GuestRecordHistory: View {
     @State private var endDateRaw: Date = Date()
     @State private var fullScreenImageURL: String? = nil
     @State private var isEditing = false
-
+    @State private var triggerSubmit = false
+    @State private var showCancelAlert = false
+    @State private var selectedGuestIdForCancel: String = ""
+    
     var filteredGuestHistory: [GuestHistory] {
         if searchText.isEmpty {
             return guestHistory
@@ -47,7 +50,7 @@ struct GuestRecordHistory: View {
             if isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else {                          
+            } else {
                 CustomNavigationBar(
                     onFilter: { showFilterSheet.toggle()  },
                     onSearch: {  query in
@@ -93,7 +96,7 @@ struct GuestRecordHistory: View {
                                     .font(.system(size: 14))
                                 Text("Reason: \(guest.reason ?? "")")
                                     .font(.system(size: 14))
-                                    .lineLimit(1)                
+                                    .lineLimit(1)
                                     .truncationMode(.tail)
                                 Text("In-Time: \(guest.in_time ?? "")")
                                     .font(.system(size: 14))
@@ -110,6 +113,19 @@ struct GuestRecordHistory: View {
                                             store.selectedGuest = guest
                                             showSheet.toggle()
                                         }
+                                }else {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.red)
+                                        .onTapGesture {
+                                            //cancelGuestRequestApi(ReqId: "\(guest.id ?? "")")
+                                            if let id = guest.id {
+                                                selectedGuestIdForCancel = String(id)
+                                                showCancelAlert = true
+                                            } else {
+                                                ToastManager.shared.show(message: "Invalid ID")
+                                            }
+                                        }
                                 }
                                 Spacer()
                                 Button(action: {
@@ -119,7 +135,7 @@ struct GuestRecordHistory: View {
                                     HStack(spacing: 5) {
                                         Image(systemName: "qrcode")
                                             .font(.title2)
-                                       
+                                        
                                     }
                                     .padding(5)
                                     .foregroundColor(.white)
@@ -129,7 +145,7 @@ struct GuestRecordHistory: View {
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
-
+                            
                         }
                         .padding()
                         .background(Color.white)
@@ -159,64 +175,74 @@ struct GuestRecordHistory: View {
             GuestHistoryApi()
         }
         .sheet(isPresented: $openQR) {
-                NavigationStack {
-                    GeometryReader { geometry in
-                        VStack {
-                            GuestQRcodeView()
-                                .toolbar {
-                                    ToolbarItem(placement: .navigationBarTrailing) {
-                                        Button(action: {
-                                            openQR.toggle()
-                                        }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .font(.title2)
-                                                .foregroundColor(.black)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
+            NavigationStack {
+                GeometryReader { geometry in
+                    VStack {
+                        GuestQRcodeView()
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button(action: {
+                                        openQR.toggle()
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.black)
                                     }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
-                                .navigationBarTitleDisplayMode(.inline)
-                                .presentationDetents([
-                                    .height(UIScreen.main.bounds.height * 0.45),
-                                    .large
-                                ])
-                            
-                        }
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .background(Color.clear)
-                        .cornerRadius(15)
+                            }
+                            .navigationBarTitleDisplayMode(.inline)
+                            .presentationDetents([
+                                .height(UIScreen.main.bounds.height * 0.45),
+                                .large
+                            ])
+                        
                     }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .background(Color.clear)
+                    .cornerRadius(15)
                 }
+            }
         }
         .sheet(isPresented: $showSheet) {
-                NavigationStack {
-                    GeometryReader { geometry in
-                        VStack {
-                            EditGuestView() 
-                                .toolbar {
-                                    ToolbarItem(placement: .navigationBarTrailing) {
-                                        Button(action: {
-                                            showSheet.toggle()
-                                        }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .font(.title2)
-                                                .foregroundColor(.black)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
+            NavigationStack {
+                GeometryReader { geometry in
+                    VStack {
+                        EditGuestView(triggerSubmit: $triggerSubmit)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        triggerSubmit = true
+                                    }) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.green)
                                     }
+                                    .buttonStyle(.plain)
                                 }
-                                .navigationBarTitleDisplayMode(.inline)
-                                .presentationDetents([
-                                    .height(UIScreen.main.bounds.height * 0.65),
-                                    .large
-                                ])
-                            
-                        }
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .background(Color.clear)
-                        .cornerRadius(15)
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button(action: {
+                                        showSheet.toggle()
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.black)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .navigationBarTitleDisplayMode(.inline)
+                            .presentationDetents([
+                                .height(UIScreen.main.bounds.height * 0.65),
+                                .large
+                            ])
+                        
                     }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .background(Color.clear)
+                    .cornerRadius(15)
                 }
+            }
         }
         .sheet(isPresented: $showFilterSheet) {
             NavigationStack {
@@ -262,7 +288,7 @@ struct GuestRecordHistory: View {
                 GeometryReader { geometry in
                     VStack {
                         AddNewGuestView { newGuest in
-                         
+                            
                             self.store.selectedGuest = newGuest
                             self.openQR = true
                         }
@@ -299,11 +325,20 @@ struct GuestRecordHistory: View {
                 }
             }
         }
-
+        
         .onChange(of: addNewGuestSheet) { newValue in
             if !newValue {
                 GuestHistoryApi()
             }
+        }
+        .alert("Cancel Request", isPresented: $showCancelAlert) {
+            Button("No", role: .cancel) {}
+            
+            Button("Yes", role: .destructive) {
+                cancelGuestRequestApi(ReqId: selectedGuestIdForCancel)
+            }
+        } message: {
+            Text("Are you sure you want to cancel this guest request?")
         }
     }
     
@@ -331,6 +366,31 @@ struct GuestRecordHistory: View {
                     } else {
                         print("No data received")
                     }
+                case .failure(let error):
+                    ToastManager.shared.show(message: "Enter Correct ID")
+                    print("API Error: \(error)")
+                }
+            }
+        }
+    }
+    
+    func cancelGuestRequestApi(ReqId : String) {
+        var dict = [String: Any]()
+        dict["EmpCode"] = "\(UserDefaultsManager.getEmpCode())"
+        dict["ReqId"] = ReqId
+        
+        ApiClient.shared.callmethodMultipart(
+            apiendpoint: Constant.cancelGuestRequestAPI,
+            method: .post,
+            param: dict,
+            model: GuestHistoryModel.self
+        ) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let model):
+                    GuestHistoryApi()
+                    print("No data received")
+                    ToastManager.shared.show(message: model.message ?? "Guest request has been cancelled successfully.")
                 case .failure(let error):
                     ToastManager.shared.show(message: "Enter Correct ID")
                     print("API Error: \(error)")

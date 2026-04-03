@@ -10,7 +10,7 @@ import SwiftUI
 struct EditGuestView: View {
     @EnvironmentObject var store: GuestStore
     @Environment(\.dismiss) private var dismiss
-
+    @Binding var triggerSubmit: Bool
     // Editable fields
     @State private var name: String = ""
     @State private var mobile: String = ""
@@ -83,6 +83,7 @@ struct EditGuestView: View {
                     // MARK: Submit Button
                     CustonButton(title: "Submit", backgroundColor: .orange) {
                         editGuestRequest()
+                       
                     }
                 }
                 .padding()
@@ -101,6 +102,12 @@ struct EditGuestView: View {
                                 }
                             }
                         }.resume()
+                    }
+                }
+                .onChange(of: triggerSubmit) { newValue in
+                    if newValue {
+                        editGuestRequest()
+                        triggerSubmit = false
                     }
                 }
                 .fullScreenCover(isPresented: $isImageFullScreen) {
@@ -140,7 +147,7 @@ struct EditGuestView: View {
             apiendpoint: Constant.applyNewGuest,
             method: .post,
             param: dict,
-            model: GetSuccessMessage.self,
+            model: GuestRequestQRModel.self,
             isMultipart: !imagesData.isEmpty,
             images: imagesData
         ) { result in
