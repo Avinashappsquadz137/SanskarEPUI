@@ -6,12 +6,10 @@
 //
 import SwiftUI
 
-
 class GuestStore: ObservableObject {
     @Published var guests: [GuestHistory] = []
     @Published var selectedGuest: GuestHistory? = nil
 }
-
 
 struct GuestRecordHistory: View {
     
@@ -30,7 +28,6 @@ struct GuestRecordHistory: View {
     @State private var startDateRaw: Date = Date()
     @State private var endDateRaw: Date = Date()
     @State private var fullScreenImageURL: String? = nil
-    @State private var isEditing = false
     @State private var triggerSubmit = false
     @State private var showCancelAlert = false
     @State private var selectedGuestIdForCancel: String = ""
@@ -105,7 +102,7 @@ struct GuestRecordHistory: View {
                             }
                             Spacer()
                             VStack {
-                                if isEditing {
+                                if guest.isEdit {
                                     Image(systemName: "pencil")
                                         .font(.title)
                                         .foregroundColor(.black)
@@ -113,17 +110,15 @@ struct GuestRecordHistory: View {
                                             store.selectedGuest = guest
                                             showSheet.toggle()
                                         }
-                                }else {
-                                    Image(systemName: "xmark.circle.fill")
+                                }
+                                if guest.isCancel {
+                                    Image(systemName: "trash")
                                         .font(.title2)
-                                        .foregroundColor(.red)
+                                        .foregroundColor(.black)
                                         .onTapGesture {
-                                            //cancelGuestRequestApi(ReqId: "\(guest.id ?? "")")
                                             if let id = guest.id {
                                                 selectedGuestIdForCancel = String(id)
                                                 showCancelAlert = true
-                                            } else {
-                                                ToastManager.shared.show(message: "Invalid ID")
                                             }
                                         }
                                 }
@@ -154,16 +149,6 @@ struct GuestRecordHistory: View {
                     }
                     .listStyle(PlainListStyle())
                     
-                }
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
-                    Button(isEditing ? "Done" : "Edit") {
-                        isEditing.toggle()
-                    }
-                    .font(.system(size: 16, weight: .semibold))
                 }
             }
         }
@@ -415,5 +400,8 @@ extension GuestHistory {
         self.type = nil
         self.qrcode = requestQR.qrcode
         self.qrthumbnail = requestQR.qrthumbnail
+        self.isEdit = false
+        self.isCancel = false
+        self.arrival_time = nil
     }
 }

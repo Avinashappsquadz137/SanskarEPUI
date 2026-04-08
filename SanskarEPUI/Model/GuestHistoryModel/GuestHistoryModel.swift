@@ -47,10 +47,16 @@ struct GuestHistory : Codable {
     let type : Int?
     let qrcode : String?
     let qrthumbnail : String?
+    let isEdit: Bool
+    let isCancel: Bool
+    let arrival_time : String?
     
     enum CodingKeys: String, CodingKey {
 
         case id = "id"
+        case isEdit = "isEdit"
+        case isCancel = "isCancel"
+        case arrival_time = "arrival_time"
         case name = "name"
         case in_time = "in_time"
         case out_time = "out_time"
@@ -69,7 +75,10 @@ struct GuestHistory : Codable {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         id = try values.decodeIfPresent(String.self, forKey: .id)
+        isEdit = try values.decodeIfPresent(Bool.self, forKey: .isEdit) ?? false
+        isCancel = try values.decodeIfPresent(Bool.self, forKey: .isCancel) ?? false
         name = try values.decodeIfPresent(String.self, forKey: .name)
+        arrival_time = try values.decodeIfPresent(String.self, forKey: .arrival_time)
         in_time = try values.decodeIfPresent(String.self, forKey: .in_time)
         out_time = try values.decodeIfPresent(String.self, forKey: .out_time)
         reason = try values.decodeIfPresent(String.self, forKey: .reason)

@@ -13,12 +13,16 @@ struct EditGuestView: View {
     @Binding var triggerSubmit: Bool
     // Editable fields
     @State private var name: String = ""
-    @State private var mobile: String = ""
     @State private var reason: String = ""
     @State private var selectedDate: Date = Date()
-    @State private var selectedImage: UIImage? = nil
     @State private var isImageFullScreen = false
     
+    //MARK: - Edit Photo
+    @State private var isImagePickerPresented = false
+    @State private var selectedImage: UIImage?
+    @State private var selectedSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showImageSourceActionSheet = false
+    @State private var showEditButton: Bool = true
     // Computed guest ID safely from store
     var selectedId: String? {
         return store.selectedGuest?.id
@@ -29,25 +33,40 @@ struct EditGuestView: View {
             if let guest = store.selectedGuest {
                 VStack(spacing: 10) {
                     // MARK: Guest Image
-                    if let imageUrl = guest.image, let url = URL(string: imageUrl) {
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            ProgressView()
+                    VStack {
+                        ZStack(alignment: .bottomTrailing) {
+                            
+                            if let selectedImage = selectedImage {
+                                Image(uiImage: selectedImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            } else if let imageUrl = guest.image,
+                                      let url = URL(string: imageUrl) {
+                                AsyncImage(url: url) { image in
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    ProgressView()
+                                }
+                            } else {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.gray)
+                            }
+
                         }
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
                         .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                        .onTapGesture {
-                            isImageFullScreen = true
+                        Button(action: {
+                            showImageSourceActionSheet = true
+                        }) {
+                            Image(systemName: "pencil.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.blue)
+                                .background(Color.white.clipShape(Circle()))
                         }
-                    } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 120, height: 120)
-                            .foregroundColor(.gray)
+                        .offset(x: -15, y: -15)
+                        
                     }
                     
                     // MARK: Editable Name Field
@@ -63,19 +82,12 @@ struct EditGuestView: View {
                         .background(Color(.systemGray6))
                         .cornerRadius(10)
                     
-                    // MARK: Mobile TextField
-                    TextField("Mobile Number", text: $mobile)
-                        .keyboardType(.phonePad)
-                        .padding(10)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    
                     // MARK: Reason TextEditor
                     VStack(alignment: .leading) {
                         Text("Reason")
                             .font(.headline)
                         TextEditor(text: $reason)
-                            .frame(height: 100)
+                            .frame(height: 80)
                             .padding(4)
                             .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray.opacity(0.4)))
                     }
@@ -90,7 +102,6 @@ struct EditGuestView: View {
                 .onAppear {
                     // populate fields from selected guest
                     name = guest.name ?? ""
-                    mobile = guest.mobile ?? ""
                     reason = guest.reason ?? ""
                     
                     if let imageUrlString = guest.image,
@@ -118,6 +129,23 @@ struct EditGuestView: View {
                     .foregroundColor(.gray)
                     .padding()
             }
+        }
+        .confirmationDialog("Choose Image Source", isPresented: $showImageSourceActionSheet, titleVisibility: .visible) {
+            Button("Camera") {
+                selectedSourceType = .camera
+                isImagePickerPresented = true
+            }
+            Button("Gallery") {
+                selectedSourceType = .photoLibrary
+                isImagePickerPresented = true
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+        .sheet(isPresented: $isImagePickerPresented) {
+            ImagePicker(
+                sourceType: selectedSourceType,
+                selectedImage: $selectedImage
+            )
         }
         .onTapGesture {
             hideKeyboard()
