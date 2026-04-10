@@ -97,6 +97,4 @@ struct ImageFullScreenView: View {
         }
     }
 }
-extension ImageFullScreenView {
-    
-}
+

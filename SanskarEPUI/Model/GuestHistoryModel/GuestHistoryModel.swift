@@ -47,6 +47,7 @@ struct GuestHistory : Codable {
     let type : Int?
     let qrcode : String?
     let qrthumbnail : String?
+    let guestURL : String?
     let isEdit: Bool
     let isCancel: Bool
     let arrival_time : String?
@@ -70,6 +71,7 @@ struct GuestHistory : Codable {
         case type = "type"
         case qrthumbnail = "qrthumbnail"
         case qrcode = "qrcode"
+        case guestURL = "guestURL"
     }
 
     init(from decoder: Decoder) throws {
@@ -91,6 +93,7 @@ struct GuestHistory : Codable {
         qrthumbnail = try values.decodeIfPresent(String.self, forKey: .qrthumbnail)
         type = try values.decodeIfPresent(Int.self, forKey: .type)
         qrcode = try values.decodeIfPresent(String.self, forKey: .qrcode)
+        guestURL = try values.decodeIfPresent(String.self, forKey: .guestURL)
     }
 
 }

@@ -43,171 +43,253 @@ struct GuestRecordHistory: View {
     }
     
     var body: some View {
-        VStack {
-            if isLoading {
-                ProgressView("Loading...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else {
-                CustomNavigationBar(
-                    onFilter: { showFilterSheet.toggle()  },
-                    onSearch: {  query in
-                        self.searchText = query },
-                    onAddListToggle: { addNewGuestSheet.toggle() },
-                    isListMode: true
+        ZStack {
+            if isImageFullScreen, let url = fullScreenImageURL {
+                ImageFullScreenView(
+                    imageURL: url,
+                    isPresented: $isImageFullScreen
                 )
-                Spacer()
-                if guestHistory.isEmpty {
-                    EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
+                .zIndex(1)
+            }
+            VStack {
+                if isLoading {
+                    ProgressView("Loading...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else {
-                    List(filteredGuestHistory, id: \.id) { guest in
-                        HStack(alignment: .center, spacing: 12) {
-                            if let imageUrl = guest.image, let url = URL(string: imageUrl) {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                                .frame(width: 100, height: 100)
-                                .background(Color.blue.opacity(0.1))
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                                .onTapGesture {
-                                    fullScreenImageURL = guest.image
-                                    isImageFullScreen = true
-                                }
-                            } else {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 60, height: 60)
+                    CustomNavigationBar(
+                        onFilter: { showFilterSheet.toggle()  },
+                        onSearch: {  query in
+                            self.searchText = query },
+                        onAddListToggle: { addNewGuestSheet.toggle() },
+                        isListMode: true
+                    )
+                    Spacer()
+                    if guestHistory.isEmpty {
+                        EmptyStateView(imageName: "EmptyList", message: "No Notifications found")
+                    } else {
+                        List(filteredGuestHistory, id: \.id) { guest in
+                            HStack(alignment: .center, spacing: 12) {
+                                if let imageUrl = guest.image, let url = URL(string: imageUrl) {
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                    } placeholder: {
+                                        ProgressView()
+                                    }
+                                    .frame(width: 100, height: 100)
                                     .background(Color.blue.opacity(0.1))
                                     .clipShape(Circle())
                                     .overlay(Circle().stroke(Color.green, lineWidth: 2))
-                            }
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text("Name: \(guest.name ?? "")")
-                                    .font(.system(size: 17, weight: .semibold))
-                                Text("Date: \(guest.guest_date ?? "")")
-                                    .font(.system(size: 14))
-                                Text("Reason: \(guest.reason ?? "")")
-                                    .font(.system(size: 14))
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                Text("In-Time: \(guest.in_time ?? "")")
-                                    .font(.system(size: 14))
-                                Text("Out-Time: \(guest.out_time ?? "")")
-                                    .font(.system(size: 14))
-                            }
-                            Spacer()
-                            VStack {
-                                if guest.isEdit {
-                                    Image(systemName: "pencil")
-                                        .font(.title)
-                                        .foregroundColor(.black)
-                                        .onTapGesture {
-                                            store.selectedGuest = guest
-                                            showSheet.toggle()
-                                        }
-                                }
-                                if guest.isCancel {
-                                    Image(systemName: "trash")
-                                        .font(.title2)
-                                        .foregroundColor(.black)
-                                        .onTapGesture {
-                                            if let id = guest.id {
-                                                selectedGuestIdForCancel = String(id)
-                                                showCancelAlert = true
+                                    .onTapGesture {
+                                        fullScreenImageURL = imageUrl
+                                        DispatchQueue.main.async {
+                                            withAnimation(.easeInOut) {
+                                                isImageFullScreen = true
                                             }
                                         }
+                                    }
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 60, height: 60)
+                                        .background(Color.blue.opacity(0.1))
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(Color.green, lineWidth: 2))
+                                }
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text("Name: \(guest.name ?? "")")
+                                        .font(.system(size: 17, weight: .semibold))
+                                    Text("Date: \(guest.guest_date ?? "")")
+                                        .font(.system(size: 14))
+                                    Text("Reason: \(guest.reason ?? "")")
+                                        .font(.system(size: 14))
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                    Text("In-Time: \(guest.in_time ?? "")")
+                                        .font(.system(size: 14))
+                                    Text("Out-Time: \(guest.out_time ?? "")")
+                                        .font(.system(size: 14))
                                 }
                                 Spacer()
-                                Button(action: {
-                                    store.selectedGuest = guest
-                                    openQR.toggle()
-                                }) {
-                                    HStack(spacing: 5) {
-                                        Image(systemName: "qrcode")
-                                            .font(.title2)
-                                        
+                                VStack {
+                                    if guest.isEdit {
+                                        Image(systemName: "pencil")
+                                            .font(.title)
+                                            .foregroundColor(.black)
+                                            .onTapGesture {
+                                                store.selectedGuest = guest
+                                                showSheet.toggle()
+                                            }
                                     }
-                                    .padding(5)
-                                    .foregroundColor(.white)
-                                    .background(Color.blue)
-                                    .cornerRadius(12)
-                                    .shadow(radius: 4)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    }
-                    .listStyle(PlainListStyle())
-                    
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $isImageFullScreen) {
-            FullScreenImageView(imageURL: fullScreenImageURL)
-        }
-        .navigationTitle("Guest History")
-        .onAppear {
-            GuestHistoryApi()
-        }
-        .sheet(isPresented: $openQR) {
-            NavigationStack {
-                GeometryReader { geometry in
-                    VStack {
-                        GuestQRcodeView()
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    if guest.isCancel {
+                                        Image(systemName: "trash")
+                                            .font(.title2)
+                                            .foregroundColor(.black)
+                                            .onTapGesture {
+                                                if let id = guest.id {
+                                                    selectedGuestIdForCancel = String(id)
+                                                    showCancelAlert = true
+                                                }
+                                            }
+                                    }
+                                    Spacer()
                                     Button(action: {
+                                        store.selectedGuest = guest
                                         openQR.toggle()
                                     }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.black)
+                                        HStack(spacing: 5) {
+                                            Image(systemName: "qrcode")
+                                                .font(.title2)
+                                            
+                                        }
+                                        .padding(5)
+                                        .foregroundColor(.white)
+                                        .background(Color.blue)
+                                        .cornerRadius(12)
+                                        .shadow(radius: 4)
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                 }
+                                
                             }
-                            .navigationBarTitleDisplayMode(.inline)
-                            .presentationDetents([
-                                .height(UIScreen.main.bounds.height * 0.45),
-                                .large
-                            ])
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        }
+                        .listStyle(PlainListStyle())
                         
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .background(Color.clear)
-                    .cornerRadius(15)
                 }
             }
-        }
-        .sheet(isPresented: $showSheet) {
-            NavigationStack {
-                GeometryReader { geometry in
-                    VStack {
-                        EditGuestView(triggerSubmit: $triggerSubmit)
-                            .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
-                                    Button(action: {
-                                        triggerSubmit = true
-                                    }) {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.green)
+            .navigationTitle("Guest History")
+            .onAppear {
+                GuestHistoryApi()
+            }
+            .sheet(isPresented: $openQR) {
+                NavigationStack {
+                    GeometryReader { geometry in
+                        VStack {
+                            GuestQRcodeView()
+                                .toolbar {
+                                    ToolbarItem(placement: .navigationBarTrailing) {
+                                        Button(action: {
+                                            openQR.toggle()
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.black)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    .buttonStyle(.plain)
                                 }
+                                .navigationBarTitleDisplayMode(.inline)
+                                .presentationDetents([
+                                    .height(UIScreen.main.bounds.height * 0.45),
+                                    .large
+                                ])
+                            
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .background(Color.clear)
+                        .cornerRadius(15)
+                    }
+                }
+            }
+            .sheet(isPresented: $showSheet) {
+                NavigationStack {
+                    GeometryReader { geometry in
+                        VStack {
+                            EditGuestView(triggerSubmit: $triggerSubmit)
+                                .toolbar {
+                                    ToolbarItem(placement: .navigationBarLeading) {
+                                        Button(action: {
+                                            triggerSubmit = true
+                                        }) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.green)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                    ToolbarItem(placement: .navigationBarTrailing) {
+                                        Button(action: {
+                                            showSheet.toggle()
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.black)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                }
+                                .navigationBarTitleDisplayMode(.inline)
+                                .presentationDetents([
+                                    .height(UIScreen.main.bounds.height * 0.65),
+                                    .large
+                                ])
+                            
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .background(Color.clear)
+                        .cornerRadius(15)
+                    }
+                }
+            }
+            .sheet(isPresented: $showFilterSheet) {
+                NavigationStack {
+                    VStack(spacing: 20) {
+                        Text("Filter by Date")
+                            .font(.headline)
+                        
+                        DatePicker("Start Date", selection: $startDateRaw, displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .padding(.horizontal)
+                        
+                        DatePicker("End Date", selection: $endDateRaw, displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .padding(.horizontal)
+                        
+                        CustonButton(
+                            title: "Submit",
+                            backgroundColor: .orange
+                        ) {
+                            startDate = dateFormatter.string(from: startDateRaw)
+                            endDate = dateFormatter.string(from: endDateRaw)
+                            showFilterSheet = false
+                            GuestHistoryApi()
+                        }
+                    }
+                    .padding()
+                    .presentationDetents([.height(300)])
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                showFilterSheet = false
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.black)
+                            }
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $addNewGuestSheet) {
+                NavigationStack {
+                    GeometryReader { geometry in
+                        VStack {
+                            AddNewGuestView { newGuest in
+                                
+                                self.store.selectedGuest = newGuest
+                                self.openQR = true
+                            }
+                            .toolbar {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     Button(action: {
-                                        showSheet.toggle()
+                                        addNewGuestSheet.toggle()
                                     }) {
                                         Image(systemName: "xmark.circle.fill")
                                             .font(.title2)
@@ -216,114 +298,42 @@ struct GuestRecordHistory: View {
                                     .buttonStyle(PlainButtonStyle())
                                 }
                             }
+                            .navigationTitle("Add New Guest")
                             .navigationBarTitleDisplayMode(.inline)
                             .presentationDetents([
                                 .height(UIScreen.main.bounds.height * 0.65),
                                 .large
                             ])
-                        
-                    }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .background(Color.clear)
-                    .cornerRadius(15)
-                }
-            }
-        }
-        .sheet(isPresented: $showFilterSheet) {
-            NavigationStack {
-                VStack(spacing: 20) {
-                    Text("Filter by Date")
-                        .font(.headline)
-                    
-                    DatePicker("Start Date", selection: $startDateRaw, displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding(.horizontal)
-                    
-                    DatePicker("End Date", selection: $endDateRaw, displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                        .padding(.horizontal)
-                    
-                    CustonButton(
-                        title: "Submit",
-                        backgroundColor: .orange
-                    ) {
-                        startDate = dateFormatter.string(from: startDateRaw)
-                        endDate = dateFormatter.string(from: endDateRaw)
-                        showFilterSheet = false
-                        GuestHistoryApi()
-                    }
-                }
-                .padding()
-                .presentationDetents([.height(300)])
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            showFilterSheet = false
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.black)
                         }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .background(Color.clear)
+                        .cornerRadius(15)
                     }
                 }
             }
-        }
-        .sheet(isPresented: $addNewGuestSheet) {
-            NavigationStack {
-                GeometryReader { geometry in
-                    VStack {
-                        AddNewGuestView { newGuest in
-                            
-                            self.store.selectedGuest = newGuest
-                            self.openQR = true
-                        }
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button(action: {
-                                    addNewGuestSheet.toggle()
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.black)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .navigationTitle("Add New Guest")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .presentationDetents([
-                            .height(UIScreen.main.bounds.height * 0.65),
-                            .large
-                        ])
+            .sheet(isPresented: $addNewGuestSheet) {
+                NavigationStack {
+                    AddNewGuestView { newGuest in
+                        self.store.selectedGuest = newGuest
+                        self.openQR = true
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .background(Color.clear)
-                    .cornerRadius(15)
                 }
             }
-        }
-        .sheet(isPresented: $addNewGuestSheet) {
-            NavigationStack {
-                AddNewGuestView { newGuest in
-                    self.store.selectedGuest = newGuest
-                    self.openQR = true
-                }
-            }
-        }
-        
-        .onChange(of: addNewGuestSheet) { newValue in
-            if !newValue {
-                GuestHistoryApi()
-            }
-        }
-        .alert("Cancel Request", isPresented: $showCancelAlert) {
-            Button("No", role: .cancel) {}
             
-            Button("Yes", role: .destructive) {
-                cancelGuestRequestApi(ReqId: selectedGuestIdForCancel)
+            .onChange(of: addNewGuestSheet) { newValue in
+                if !newValue {
+                    GuestHistoryApi()
+                }
             }
-        } message: {
-            Text("Are you sure you want to cancel this guest request?")
+            .alert("Cancel Request", isPresented: $showCancelAlert) {
+                Button("No", role: .cancel) {}
+                
+                Button("Yes", role: .destructive) {
+                    cancelGuestRequestApi(ReqId: selectedGuestIdForCancel)
+                }
+            } message: {
+                Text("Are you sure you want to cancel this guest request?")
+            }
         }
     }
     
@@ -403,5 +413,6 @@ extension GuestHistory {
         self.isEdit = false
         self.isCancel = false
         self.arrival_time = nil
+        self.guestURL = nil
     }
 }
