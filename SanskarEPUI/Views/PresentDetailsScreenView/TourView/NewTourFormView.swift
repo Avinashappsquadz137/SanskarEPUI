@@ -91,6 +91,7 @@ struct NewTourFormView: View {
             }
         }
         .navigationTitle("Tour Form")
+        .preferredColorScheme(.light)
     }
 
     // MARK: - Custom TextField

@@ -55,6 +55,7 @@ struct Login : Codable {
     let policyNumber : String?
     let policyValidity : String?
     let policyAmount : String?
+    let insurancePdf : String?
     let imageApproved : String?
     let pImg1 : String?
     let booking_role_id : Int?
@@ -90,6 +91,7 @@ struct Login : Codable {
         case booking_role_id = "booking_role_id"
         case pl_balance = "pl_balance"
         case today_intime = "today_intime"
+        case insurancePdf = "insurancePdf"
     }
 
     init(from decoder: Decoder) throws {
@@ -121,6 +123,7 @@ struct Login : Codable {
         booking_role_id = try values.decodeIfPresent(Int.self, forKey: .booking_role_id)
         pl_balance = try values.decodeIfPresent(String.self, forKey: .pl_balance)
         today_intime = try values.decodeIfPresent(String.self, forKey: .today_intime)
+        insurancePdf = try values.decodeIfPresent(String.self, forKey: .insurancePdf)
     }
 
 }

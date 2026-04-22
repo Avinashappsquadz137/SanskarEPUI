@@ -33,6 +33,7 @@ class UserDefaultsManager {
         static let policyAmount = "PolicyAmount"
         static let plBalance = "pl_balance"
         static let policyNumber = "PolicyNumber"
+        static let insurancePdf = "insurancePdf"
         static let policyValidity = "PolicyValidity"
         static let bookingRoleID = "booking_role_id"
         static let isLoggedInKey = "isLoggedIn"
@@ -128,6 +129,9 @@ class UserDefaultsManager {
     
     static func getPolicyNumber() -> String {
         UserDefaults.standard.string(forKey: Keys.policyNumber) ?? "789456"
+    }
+    static func getinsurancePDF() -> String {
+        UserDefaults.standard.string(forKey: Keys.insurancePdf) ?? ""
     }
     
     static func getPolicyValidity() -> String {
@@ -225,6 +229,9 @@ class UserDefaultsManager {
     static func setPolicyNumber(_ value: String) {
         UserDefaults.standard.set(value, forKey: Keys.policyNumber)
     }
+    static func setInsurancePdf(_ value: String) {
+        UserDefaults.standard.set(value, forKey: Keys.insurancePdf)
+    }
     
     static func setPolicyValidity(_ value: String) {
         UserDefaults.standard.set(value, forKey: Keys.policyValidity)
@@ -261,6 +268,7 @@ class UserDefaultsManager {
         setProfileImage(user.pImg ?? "")
         setAadharNo(user.aadharNo ?? "")
         setPanNo(user.panNo ?? "")
+        setInsurancePdf(user.insurancePdf ?? "")
         setBloodGroup(user.bloodGroup ?? "")
         setPolicyNumber(user.policyNumber ?? "")
         setPolicyValidity(user.policyValidity ?? "")
@@ -296,6 +304,7 @@ class UserDefaultsManager {
         UserDefaults.standard.removeObject(forKey: Keys.policyAmount)
         UserDefaults.standard.removeObject(forKey: Keys.plBalance)
         UserDefaults.standard.removeObject(forKey: Keys.policyNumber)
+        UserDefaults.standard.removeObject(forKey: Keys.insurancePdf)
         UserDefaults.standard.removeObject(forKey: Keys.policyValidity)
         UserDefaults.standard.removeObject(forKey: Keys.bookingRoleID)
     }

@@ -40,6 +40,11 @@
 		<string>remote-notification</string>
 		<string>processing</string>
 		<string>fetch</string>
-	</array>
+    </array>
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
 </dict>
 </plist>
