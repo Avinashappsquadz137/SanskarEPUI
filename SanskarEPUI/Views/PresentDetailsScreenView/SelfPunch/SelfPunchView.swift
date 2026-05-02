@@ -275,8 +275,8 @@ struct SelfPunchView: View {
         if timer != nil || showRemarkAlert { return }
         progress = 0.0
 
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { t in
-            progress = min(progress + 0.02, 1.0)
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { t in
+            progress = min(progress + 0.05, 1.0)
 
             if progress >= 1.0 {
                 t.invalidate()

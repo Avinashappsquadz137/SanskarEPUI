@@ -40,6 +40,10 @@ struct AllListView: View {
         .onAppear {
             fetchSidebarAPI()
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
+        
     }
     
     func fetchSidebarAPI() {
