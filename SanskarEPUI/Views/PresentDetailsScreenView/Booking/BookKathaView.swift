@@ -105,6 +105,29 @@ struct BookKathaView: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding(.horizontal)
                 }
+                .actionSheet(item: $activeSheet) { sheet in
+                    switch sheet {
+                    case .category:
+                        return ActionSheet(
+                            title: Text("Select Katha Category"),
+                            buttons: categoryList.map { category in
+                                .default(Text(category.kathaName ?? "Unknown")) {
+                                    selectedCategory = category
+                                    getKathaTimingCategoryAPI(kathaIds: String(category.iD ?? 0))
+                                }
+                            } + [.cancel()]
+                        )
+                    case .time:
+                        return ActionSheet(
+                            title: Text("Select Katha Time"),
+                            buttons: kathaTime.map { slot in
+                                    .default(Text("\(slot.slotTiming ?? "") - \(slot.slotName ?? "") ")) {
+                                    selectedSlot = slot
+                                }
+                            } + [.cancel()]
+                        )
+                    }
+                }
                 FilePickerAdsView(
                     selectedCategory: $selectedCategory,
                     selectedUIImage: $selectedUIImage,
@@ -123,29 +146,6 @@ struct BookKathaView: View {
             Spacer()
         }
         .navigationTitle("Book Katha")
-        .actionSheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .category:
-                return ActionSheet(
-                    title: Text("Select Katha Category"),
-                    buttons: categoryList.map { category in
-                        .default(Text(category.kathaName ?? "Unknown")) {
-                            selectedCategory = category
-                            getKathaTimingCategoryAPI(kathaIds: String(category.iD ?? 0))
-                        }
-                    } + [.cancel()]
-                )
-            case .time:
-                return ActionSheet(
-                    title: Text("Select Katha Time"),
-                    buttons: kathaTime.map { slot in
-                            .default(Text("\(slot.slotTiming ?? "") - \(slot.slotName ?? "") ")) {
-                            selectedSlot = slot
-                        }
-                    } + [.cancel()]
-                )
-            }
-        }
         .overlay(ToastView())
         .onAppear {
             channelListApi()

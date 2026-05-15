@@ -25,6 +25,7 @@ struct BookingViewScreen: View {
     @State private var selectedBooking: NewBooking?
     @State private var showAssignSheet = false
 
+    let bookingRoles: Set<Int> = [1 , 3]
     let allowedRoles: Set<Int> = [1]
     let roleID = Int(UserDefaultsManager.getBookingRoleID()) ?? 1
     var body: some View {
@@ -38,7 +39,7 @@ struct BookingViewScreen: View {
                         viewModel.showDropdown.toggle()
                     },
                     onSearch: { query in viewModel.searchText = query },
-                    onAddListToggle: allowedRoles.contains(roleID) ? { navigateToAddKatha = true } : {},
+                    onAddListToggle: bookingRoles.contains(roleID) ? { navigateToAddKatha = true } : {},
                     isListMode: false,
                     showFilter: !viewModel.showOnlyApproved
                 )
