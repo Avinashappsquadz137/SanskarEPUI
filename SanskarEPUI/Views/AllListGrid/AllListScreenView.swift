@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FoundationModels
 
 struct AllListView: View {
     @State private var reqType: [SideBar] = []
@@ -61,6 +62,7 @@ struct AllListView: View {
                 case .success(let model):
                     if var data = model.data {
                         data = data.filter { $0.id != 4 }
+                        data.append(SideBar(id: 31,name: "AI Assistant"))
                         self.reqType = data
                     }
                 case .failure(let error):
@@ -139,6 +141,28 @@ struct AllListView: View {
             }else {
                 Text("Work In Progress")
             }
+        } else if id == 31 {
+            if #available(iOS 26.0, *) {
+                if case .available = SystemLanguageModel.default.availability {
+                    ChatBotAI()
+                } else {
+                    ContentUnavailableView(
+                        "AI Not Supported",
+                        systemImage: "brain",
+                        description: Text(
+                            "Apple Intelligence is not available on this device."
+                        )
+                    )
+                }
+            } else {
+                ContentUnavailableView(
+                    "Unsupported iOS Version",
+                    systemImage: "iphone.slash",
+                    description: Text(
+                        "iOS 26 or later is required."
+                    )
+                )
+            }
         } else {
             Text("Work In Progress")
         }
@@ -195,6 +219,7 @@ struct CardView: View {
         case 27: return UIImage(named: "Profile") ?? defaultImage()
         case 26:return UIImage(named: "Leave") ?? defaultImage()
         case 28:return UIImage(named: "SalesIcon") ?? defaultImage()
+        case 31:return UIImage(named: "AIbot") ?? defaultImage()
         default: return defaultImage()
         }
     }
